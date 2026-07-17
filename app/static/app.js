@@ -4,13 +4,25 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const modelData = $('#model-data');
 const models = modelData ? JSON.parse(modelData.textContent) : [];
 
+const colorScheme = window.matchMedia('(prefers-color-scheme: light)');
 const savedTheme = localStorage.getItem('theme');
-if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+const applyTheme = (theme) => {
+  document.documentElement.dataset.theme = theme;
+  const button = $('#theme-toggle');
+  if (button) {
+    button.setAttribute('aria-label', theme === 'light' ? '切换到深色主题' : '切换到浅色主题');
+    button.title = theme === 'light' ? '当前：浅色' : '当前：深色';
+  }
+};
+applyTheme(savedTheme || (colorScheme.matches ? 'light' : 'dark'));
 const themeToggle = $('#theme-toggle');
 themeToggle?.addEventListener('click', () => {
   const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-  document.documentElement.dataset.theme = next;
+  applyTheme(next);
   localStorage.setItem('theme', next);
+});
+colorScheme.addEventListener('change', (event) => {
+  if (!localStorage.getItem('theme')) applyTheme(event.matches ? 'light' : 'dark');
 });
 
 const revealObserver = new IntersectionObserver((entries) => entries.forEach((entry) => {

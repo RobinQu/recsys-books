@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from urllib.parse import urlencode
-from urllib.request import urlopen
 
 import nbformat
 from nbconvert import HTMLExporter
@@ -15,7 +13,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
 from app.content import CHAPTERS, DATASETS, EVOLUTION, FRAMEWORKS, MODELS, NOTEBOOKS, PRACTICES, SOURCES
-from app.source_browser import ide_source_target, source_sections
+from app.source_browser import source_files
 
 ROOT = Path(__file__).resolve().parents[1]
 LEGACY_NOTEBOOKS = {
@@ -123,7 +121,7 @@ def notebook_preview(request: Request, slug: str):
         "chapter_sequence": chapter_sequence,
         "previous_notebook": NOTEBOOKS[notebook_index - 1] if notebook_index > 0 else None,
         "next_notebook": NOTEBOOKS[notebook_index + 1] if notebook_index + 1 < len(NOTEBOOKS) else None,
-        "source_sections": source_sections(slug),
+        "source_groups": source_files(slug),
     })
     return templates.TemplateResponse(request, "notebook_shell.html", context)
 
@@ -150,37 +148,16 @@ def notebook_preview_content(slug: str):
     return FileResponse(path, media_type="text/html")
 
 
-def request_ide_open(target: str) -> None:
-    """Ask the private sidecar to activate a whitelisted source file."""
-    base = os.getenv("IDE_OPENER_INTERNAL_URL", "http://ide:8081").rstrip("/")
-    with urlopen(f"{base}/open?{urlencode({'target': target})}", timeout=10) as response:
-        if response.status != 200:
-            raise RuntimeError(f"IDE opener returned HTTP {response.status}")
-
-
-@app.get("/ide/{slug}", response_class=HTMLResponse)
-def open_source_in_ide(request: Request, slug: str):
+@app.get("/ide/{slug}")
+def open_source_in_ide(slug: str):
     if slug in LEGACY_NOTEBOOKS:
         slug = LEGACY_NOTEBOOKS[slug]
     if slug not in {item["slug"] for item in NOTEBOOKS}:
         raise HTTPException(404, "Unknown notebook")
-    notebook = next(item for item in NOTEBOOKS if item["slug"] == slug)
-    context = page_context(request, "labs")
-    context.update({"notebook": notebook})
-    return templates.TemplateResponse(request, "ide_bridge.html", context)
-
-
-@app.post("/api/ide/{slug}/open")
-def activate_source_in_ide(slug: str):
-    if slug in LEGACY_NOTEBOOKS:
-        slug = LEGACY_NOTEBOOKS[slug]
-    if slug not in {item["slug"] for item in NOTEBOOKS}:
-        raise HTTPException(404, "Unknown notebook")
-    try:
-        request_ide_open(ide_source_target(slug))
-    except Exception as exc:
-        raise HTTPException(503, "浏览器 IDE 尚未就绪，请确认 docker compose 的 ide 服务已启动。") from exc
-    return {"status": "opened", "target": ide_source_target(slug)}
+    ide_url = os.getenv("IDE_PUBLIC_URL", "http://localhost:8090").rstrip("/")
+    folder = f"/home/coder/project/chapter_code/{slug}"
+    entry = f"{folder}/train.py:1:1"
+    return RedirectResponse(f"{ide_url}/?folder={folder}&goto={entry}", status_code=303)
 
 
 @app.get("/source/{slug}", response_class=HTMLResponse)

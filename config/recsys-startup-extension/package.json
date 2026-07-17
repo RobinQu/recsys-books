@@ -1,0 +1,10 @@
+{
+  "name": "recsys-startup",
+  "displayName": "RecSys Chapter Startup",
+  "version": "1.0.0",
+  "publisher": "recsys-atlas",
+  "engines": {"vscode": "^1.85.0"},
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "extensionKind": ["workspace"]
+}

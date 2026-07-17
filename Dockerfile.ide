@@ -1,0 +1,31 @@
+FROM python:3.11-slim AS python-runtime
+
+ENV PIP_NO_CACHE_DIR=1
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0 && \
+    grep -v '^torch==' /tmp/requirements.txt > /tmp/requirements-no-torch.txt && \
+    pip install -r /tmp/requirements-no-torch.txt
+RUN pip install ruff==0.11.13
+
+FROM codercom/code-server:latest
+
+USER root
+# The IDE receives the exact Python runtime used by Web/Jupyter, so imports,
+# execution and language-server navigation all describe the same environment.
+COPY --from=python-runtime /usr/local /usr/local
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /opt/disabled-vscode-extensions && \
+    mv /usr/lib/code-server/lib/vscode/extensions/copilot /opt/disabled-vscode-extensions/copilot && \
+    mkdir -p /home/coder/.local/share/code-server/User && \
+    chown -R coder:coder /home/coder/.local
+
+USER coder
+RUN code-server --install-extension ms-python.python && \
+    code-server --install-extension detachhead.basedpyright@1.39.9 && \
+    code-server --install-extension charliermarsh.ruff
+USER root
+COPY config/recsys-startup-extension /usr/lib/code-server/lib/vscode/extensions/recsys-startup
+USER coder
+COPY --chown=coder:coder config/code-server-settings.json /home/coder/.local/share/code-server/User/settings.json
+ENV PYTHONPATH=/home/coder/project

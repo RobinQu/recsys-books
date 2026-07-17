@@ -1,0 +1,17 @@
+{
+  "python.defaultInterpreterPath": "/usr/local/bin/python",
+  "python.analysis.extraPaths": [
+    "/home/coder/project",
+    "/usr/local/lib/python3.11/site-packages"
+  ],
+  "basedpyright.analysis.typeCheckingMode": "off",
+  "ruff.configuration": "/home/coder/project/pyproject.toml",
+  "ruff.lint.enable": true,
+  "ruff.nativeServer": "on",
+  "python.terminal.activateEnvironment": false,
+  "workbench.startupEditor": "none",
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "window.autoDetectColorScheme": true,
+  "workbench.preferredDarkColorTheme": "Default Dark Modern",
+  "workbench.preferredLightColorTheme": "Default Light Modern"
+}

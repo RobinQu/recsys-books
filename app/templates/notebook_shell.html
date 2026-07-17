@@ -22,7 +22,7 @@
     <nav class="mode-tabs" role="tablist" aria-label="章节查看模式">
       <button class="active" role="tab" aria-selected="true" data-mode="preview">阅读预览</button>
       <button role="tab" aria-selected="false" data-mode="execute">可交互执行</button>
-      <button id="source" role="tab" aria-selected="false" data-mode="source">实现源码</button>
+      <button id="source" role="tab" aria-selected="false" data-mode="source">代码实现</button>
     </nav>
 
     <section class="mode-panel active" data-panel="preview" role="tabpanel">
@@ -33,8 +33,13 @@
       <div class="notebook-frame-wrap interactive-frame"><iframe title="{{ notebook.title }} 可交互模式" data-src="{{ jupyter_url }}/lab/tree/notebooks/{{ notebook.slug }}.ipynb?token=recsys" loading="lazy"></iframe></div>
     </section>
     <section class="mode-panel" data-panel="source" role="tabpanel" hidden>
-      <div class="mode-help"><b>公式—代码映射</b><span>按数据、张量、forward、loss、推理和 metric 追踪完整函数。</span><a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">在独立 IDE 中编辑 ↗</a></div>
-      <div class="embedded-source">{% for section in source_sections %}<section class="source-section"><div><span>{{ section.path }}</span><h2>{{ section.title }}</h2><p>{{ section.explanation }}</p></div><pre><code>{{ section.code }}</code></pre></section>{% endfor %}</div>
+      <div class="mode-help"><b>本章节代码浏览器</b><span>公共数据代码、章节内模型/训练/推理/测试，以及所用框架源码均可直接切换查看。</span><a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">在 IDE 中打开章节目录 ↗</a></div>
+      <div class="source-browser">
+        <aside class="source-file-tree" aria-label="本章节源码文件">
+          {% for group in source_groups %}<section><h3>{{ group.name }}</h3>{% for file in group.files %}<button data-source-target="{{ file.id }}"><span>PY</span><b>{{ file.label }}</b><small>{{ file.origin }}</small></button>{% endfor %}</section>{% endfor %}
+        </aside>
+        <div class="source-editors">{% set state = namespace(first=true) %}{% for group in source_groups %}{% for file in group.files %}<section id="{{ file.id }}" class="source-code-panel {{ 'active' if state.first else '' }}" {{ 'hidden' if not state.first else '' }}><header><div><b>{{ file.label }}</b><span>{{ file.path }}</span></div><em>{{ file.origin }}</em></header><div class="source-code">{{ file.highlighted | safe }}</div></section>{% set state.first = false %}{% endfor %}{% endfor %}</div>
+      </div>
     </section>
 
     <nav class="notebook-pager" aria-label="上一篇和下一篇">
@@ -52,6 +57,13 @@
       if (iframe && !iframe.getAttribute('src')) iframe.src = iframe.dataset.src;
     }));
     if (location.hash === '#source') document.querySelector('[data-mode="source"]').click();
+    document.querySelectorAll('[data-source-target]').forEach((button, index) => {
+      if (index === 0) button.classList.add('active');
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-source-target]').forEach((item) => item.classList.toggle('active', item === button));
+        document.querySelectorAll('.source-code-panel').forEach((panel) => { const active = panel.id === button.dataset.sourceTarget; panel.hidden = !active; panel.classList.toggle('active', active); });
+      });
+    });
   </script>
 </body>
 </html>

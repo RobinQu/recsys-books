@@ -1,68 +1,78 @@
-"""Read-only source index for the tutorial code walkthrough."""
+"""Selected-file source browser for every tutorial chapter."""
 from __future__ import annotations
 
-import ast
+import importlib.util
 from pathlib import Path
 
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import PythonLexer, TextLexer
+
 ROOT = Path(__file__).resolve().parents[1]
-DATA_FILE = ROOT / "recsys_lab" / "data.py"
-EXPERIMENT_FILE = ROOT / "recsys_lab" / "industrial_experiments.py"
-CLASSIC_FILE = ROOT / "recsys_lab" / "experiments.py"
-RUN_FUNCTIONS = {
-    "3_2_1_dssm": "run_dssm", "3_2_2_mind": "run_mind",
-    "3_3_1_deepfm": "run_deepfm", "3_3_2_din": "run_din", "3_3_3_dien": "run_dien",
-    "3_4_1_mmoe": "run_mmoe", "3_4_2_ple": "run_ple", "3_2_3_sasrec": "run_sasrec",
-    "4_2_openonerec_practice": "run_openonerec", "4_3_dlrm_hstu_practice": "run_hstu",
-}
-EXPERIMENT_HELPERS = {
-    "3_2_1_dssm": ["_real_amazon"],
-    "3_2_2_mind": ["_real_amazon", "_mind_rows"],
-    "3_3_1_deepfm": ["_real_kuairand", "_ranking_fields"],
-    "3_3_2_din": ["_real_kuairand", "_run_sequence_ranker"],
-    "3_3_3_dien": ["_real_kuairand", "_run_sequence_ranker"],
-    "3_4_1_mmoe": ["_real_kuairand", "_multitask_view", "_run_multitask"],
-    "3_4_2_ple": ["_real_kuairand", "_multitask_view", "_run_multitask"],
-    "3_2_3_sasrec": ["_real_amazon", "_sequence_windows_from_sequences"],
-    "4_2_openonerec_practice": ["_real_kuairand", "_semantic_catalog"],
-    "4_3_dlrm_hstu_practice": ["_real_kuairand", "_sequence_windows_from_sequences"],
+CHAPTER_ROOT = ROOT / "chapter_code"
+
+FRAMEWORK_MODULES = {
+    "3_2_1_dssm": ["torch_rechub.models.matching.dssm", "torch_rechub.trainers.match_trainer"],
+    "3_2_2_mind": ["torch_rechub.models.matching.mind", "torch_rechub.trainers.match_trainer"],
+    "3_2_3_sasrec": ["torch_rechub.models.matching.sasrec", "torch_rechub.trainers.seq_trainer"],
+    "3_3_1_deepfm": ["torch_rechub.models.ranking.deepfm", "torch_rechub.trainers.ctr_trainer"],
+    "3_3_2_din": ["torch_rechub.models.ranking.din", "torch_rechub.trainers.ctr_trainer"],
+    "3_3_3_dien": ["torch_rechub.models.ranking.dien", "torch_rechub.trainers.ctr_trainer"],
+    "3_4_1_mmoe": ["torch_rechub.models.multi_task.mmoe", "torch_rechub.trainers.mtl_trainer"],
+    "3_4_2_ple": ["torch_rechub.models.multi_task.ple", "torch_rechub.trainers.mtl_trainer"],
+    "4_3_dlrm_hstu_practice": ["torch_rechub.models.generative.hstu", "torch_rechub.trainers.seq_trainer"],
 }
 
 
-def ide_source_target(slug: str) -> str:
-    """Map a tutorial page to one of the IDE opener's whitelisted files."""
-    if slug == "3_0_data_pipeline":
-        return "data"
+def _framework_path(module: str) -> Path | None:
+    spec = importlib.util.find_spec(module)
+    return Path(spec.origin) if spec and spec.origin else None
+
+
+def _file(path: Path, label: str, origin: str) -> dict[str, str]:
+    code = path.read_text(encoding="utf-8")
+    lexer = PythonLexer() if path.suffix == ".py" else TextLexer()
+    key_markers = (
+        "class ", "def forward", "def run_", "def train_", "model =", "optimizer =",
+        "loss =", "losses =", "loss.backward", "with torch.no_grad", "scores =",
+        "probability =", "topk", "return {",
+    )
+    important_lines = [
+        number for number, line in enumerate(code.splitlines(), start=1)
+        if any(marker in line for marker in key_markers)
+    ]
+    return {
+        "id": f"source-{abs(hash(str(path)))}",
+        "label": label,
+        "path": str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path),
+        "origin": origin,
+        "code": code,
+        "highlighted": highlight(
+            code,
+            lexer,
+            HtmlFormatter(linenos="inline", hl_lines=important_lines, cssclass="source-highlight"),
+        ),
+    }
+
+
+def source_files(slug: str) -> list[dict]:
+    groups: list[dict] = []
+    shared_paths = [ROOT / "recsys_lab" / "data.py", ROOT / "recsys_lab" / "runtime.py"]
     if slug.startswith("3_1_"):
-        return "classic"
-    if slug in RUN_FUNCTIONS:
-        return "industrial"
-    return "notebook_generator"
+        shared_paths.append(ROOT / "recsys_lab" / "experiments.py")
+    shared_paths.append(ROOT / "tests" / "test_experiments.py")
+    groups.append({"name": "Notebook 公用代码", "files": [_file(path, path.name, "shared") for path in shared_paths]})
 
+    chapter_dir = CHAPTER_ROOT / slug
+    order = ["model.py", "train.py", "inference.py", "test_model.py", "__init__.py"]
+    chapter_files = [_file(chapter_dir / name, name, "chapter") for name in order if (chapter_dir / name).exists()]
+    groups.append({"name": "本章节独立目录", "files": chapter_files})
 
-def _extract(path: Path, names: list[str]) -> str:
-    source = path.read_text(encoding="utf-8")
-    lines = source.splitlines()
-    blocks = []
-    for node in ast.parse(source).body:
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in names:
-            start, end = node.lineno, node.end_lineno or node.lineno
-            numbered = "\n".join(f"{number:4d}  {lines[number - 1]}" for number in range(start, end + 1))
-            blocks.append(f"# {path.relative_to(ROOT)}:{start} · {node.name}\n{numbered}")
-    return "\n\n".join(blocks)
-
-
-def source_sections(slug: str) -> list[dict[str, str]]:
-    sections = [{
-        "title": "数据加载、来源记录与时间切分", "path": "recsys_lab/data.py",
-        "explanation": "检查数据来自哪个固定文件、怎样选取确定性切片、ID 如何映射，以及测试事件为何只来自时间末端。",
-        "code": _extract(DATA_FILE, ["_load_cached", "load_movielens", "movielens_provenance", "_load_amazon_cached", "load_amazon_2023", "amazon_provenance", "_load_kuairand_cached", "load_kuairand", "kuairand_provenance", "leave_last_out"]),
-    }]
-    run_name = RUN_FUNCTIONS.get(slug)
-    names = ["seed_everything", "_safe_auc", "_train_binary", "_recall_single_target", *EXPERIMENT_HELPERS.get(slug, [])] + ([run_name] if run_name else [])
-    sections.append({
-        "title": f"完整实验入口：{run_name}" if run_name else "实验框架公共骨架",
-        "path": "recsys_lab/industrial_experiments.py",
-        "explanation": "按模型实例化、张量构造、loss、optimizer、推理模式和指标的顺序阅读。辅助函数与入口函数均完整显示。",
-        "code": _extract(EXPERIMENT_FILE, names),
-    })
-    return sections
+    framework_files = []
+    for module in FRAMEWORK_MODULES.get(slug, []):
+        path = _framework_path(module)
+        if path and path.exists():
+            framework_files.append(_file(path, path.name, f"third-party · {module}"))
+    if framework_files:
+        groups.append({"name": "Torch-RecHub 框架源码", "files": framework_files})
+    return groups

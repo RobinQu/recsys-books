@@ -2,53 +2,26 @@
 from __future__ import annotations
 
 import math
+from importlib import import_module
 
-import numpy as np
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import log_loss, mean_squared_error, roc_auc_score
-from sklearn.preprocessing import OneHotEncoder
-
-from .data import leave_last_out, load_movielens
 from .industrial_experiments import run_deepfm, run_dssm, run_mind, run_mmoe, run_openonerec
 
 
-def _hr_at_k(scores, seen, targets, k):
-    scores = scores.copy(); scores[seen > 0] = -np.inf
-    top = np.argpartition(-scores, kth=k - 1, axis=1)[:, :k]
-    return float(np.mean([target in row for target, row in zip(targets, top)]))
-
-
 def run_classic(epochs: int = 8) -> dict:
-    ratings, _ = load_movielens(max_users=80, max_items=360, min_user_events=12)
-    train, test = leave_last_out(ratings)
-    n_users, n_items = ratings.user_id.nunique(), ratings.item_id.nunique()
-    matrix = np.zeros((n_users, n_items), dtype=np.float32)
-    for row in train.itertuples(): matrix[row.user_id, row.item_id] = float(row.rating >= 4.0)
-    norms = np.linalg.norm(matrix, axis=0, keepdims=True) + 1e-8
-    similarity = (matrix.T @ matrix) / (norms.T @ norms); np.fill_diagonal(similarity, 0)
-    cf_recall = _hr_at_k(matrix @ similarity, matrix, test.sort_values("user_id").item_id.to_numpy(), 5)
-    user_mean = train.groupby("user_id").rating.mean()
-    predictions = test.user_id.map(user_mean).fillna(train.rating.mean()).to_numpy()
-    mf_rmse = float(np.sqrt(mean_squared_error(test.rating, predictions)))
+    """Aggregate chapter-local classic experiments for comparison notebooks."""
+    def execute(slug: str):
+        return import_module(f"chapter_code.{slug}.train").train_and_evaluate(epochs)
 
-    frame = ratings.sort_values("timestamp").tail(4200).copy(); split = int(len(frame) * .8)
-    categorical = frame[["user_id", "item_id", "genre_id", "hour", "decade_id"]]
-    encoder = OneHotEncoder(handle_unknown="ignore")
-    x_train = encoder.fit_transform(categorical.iloc[:split]); x_test = encoder.transform(categorical.iloc[split:])
-    labels = frame.like.to_numpy()
-    fm_proxy = LogisticRegression(max_iter=300, solver="liblinear").fit(x_train, labels[:split])
-    fm_probability = fm_proxy.predict_proba(x_test)[:, 1]
-    gbdt_input = frame[["genre_id", "hour", "decade_id", "item_popularity", "user_activity"]].to_numpy()
-    gbdt = GradientBoostingClassifier(n_estimators=max(8, epochs), max_depth=3, random_state=2026).fit(gbdt_input[:split], labels[:split])
-    gbdt_probability = gbdt.predict_proba(gbdt_input[split:])[:, 1]
+    cf = execute("3_1_1_collaborative_filtering")
+    mf = execute("3_1_2_matrix_factorization")
+    fm = execute("3_1_3_factorization_machine")
+    gbdt_lr = execute("3_1_4_gbdt_lr")
     return {
         "dataset": "MovieLens latest-small",
         "randomly_fabricated_rows": 0,
-        "cf_recall@5": round(cf_recall, 4), "mf_rmse": round(mf_rmse, 4),
-        "fm_auc": round(float(roc_auc_score(labels[split:], fm_probability)), 4),
-        "gbdt_lr_auc": round(float(roc_auc_score(labels[split:], gbdt_probability)), 4),
-        "gbdt_lr_logloss": round(float(log_loss(labels[split:], gbdt_probability)), 4),
+        "cf_recall@5": round(cf["recall@5"], 4), "mf_rmse": round(mf["rmse"], 4),
+        "fm_auc": round(fm["auc"], 4), "gbdt_lr_auc": round(gbdt_lr["auc"], 4),
+        "gbdt_lr_logloss": round(gbdt_lr["logloss"], 4),
     }
 
 

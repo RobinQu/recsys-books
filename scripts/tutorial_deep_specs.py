@@ -396,7 +396,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from IPython.display import Markdown, display
-from recsys_lab.industrial_experiments import {meta['function']}, save_records
+from importlib import import_module
+from recsys_lab.runtime import save_records
+
+# 算法实现就在当前章节目录，不再通过公共模块隐藏。
+chapter_train = import_module("chapter_code.{meta['slug']}.train")
+{meta['function']} = chapter_train.{meta['function']}
 
 print("实际执行函数源码（包含数据、训练、推理和测试）：")
 print(inspect.getsource({meta['function']}))"""),
