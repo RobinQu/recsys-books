@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="从协同过滤到生成式推荐的交互式技术图谱与可执行实验室">
+  <title>RecSys Atlas · 推荐算法技术图谱与实验室</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/navigation.css">
+  <link rel="stylesheet" href="/static/foundations.css">
+  <link rel="stylesheet" href="/static/history.css">
+  <link rel="stylesheet" href="/static/flat-navigation.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#overview"><span>R</span> RecSys Atlas</a>
+    <div class="search-wrap"><label class="sr-only" for="global-search">搜索模型</label><input id="global-search" placeholder="搜索 DSSM、DIN、HSTU…" autocomplete="off"><div id="search-results" class="search-results" hidden></div></div>
+    <div class="top-actions"><button class="ghost sidebar-toggle" aria-label="打开章节导航" aria-expanded="false">☰</button><button id="theme-toggle" class="ghost" aria-label="切换明暗主题">◐</button><a class="button" href="{{ jupyter_url }}/lab/tree/notebooks?token=recsys" target="_blank" rel="noreferrer">启动实验室 ↗</a></div>
+  </header>
+
+  <aside class="sidebar" aria-label="章节导航">
+    <nav>
+      <a href="#overview" data-section="overview">总览</a>
+      <a href="#evolution" data-section="evolution"><b>1</b> 召回 × 排序演进</a>
+      <a href="#history" data-section="history"><b>2</b> 发展历程综述</a>
+      <details open><summary><b>3</b><span>模型讲解与实战</span></summary>
+        <div class="sidebar-subnav"><a href="/notebooks/3_0_math_foundations">3.0 通用数学</a><a href="/notebooks/3_1_0_classic_foundations">3.1 经典算法导读</a><a href="/notebooks/3_2_0_retrieval_foundations">3.2 召回导读</a><a href="/notebooks/3_3_0_ranking_foundations">3.3 排序导读</a><a href="/notebooks/3_4_0_multitask_foundations">3.4 多目标导读</a><a href="/notebooks/3_5_0_transformer_foundations">3.5 Transformer 导读</a></div>
+      </details>
+      <details open><summary><b>4</b><span>生成式推荐</span></summary>
+        <div class="sidebar-subnav"><a href="/notebooks/4_0_generative_foundations">4.0 数学导读</a><a href="/notebooks/4_1_generative_overview">4.1 发展与总结</a><a href="/notebooks/4_2_openonerec_practice">4.2 OpenOneRec</a><a href="/notebooks/4_3_dlrm_hstu_practice">4.3 DLRM HSTU</a></div>
+      </details>
+      <a href="#frameworks"><b>F</b> 框架选型</a><a href="#datasets"><b>D</b> 数据集</a><a href="#sources"><b>5</b> 证据清单</a>
+    </nav>
+  </aside>
+
+  <main>
+    <section id="overview" class="hero reveal">
+      <div class="eyebrow">RECOMMENDER SYSTEMS · 1992—2026</div>
+      <h1>从相似度，到向量检索，<br><em>再到生成一个推荐列表</em></h1>
+      <p class="lede">以召回与排序两条主线解释推荐系统为何演进，并把论文思想、工业架构与可执行 Notebook 放在同一张图里。</p>
+      <div class="hero-actions"><a class="button" href="#evolution">进入技术图谱 ↓</a><a class="ghost button-like" href="#labs">查看 27 个实验</a></div>
+      <div class="stats"><div><strong>14</strong><span>核心模型族</span></div><div><strong>27</strong><span>可执行 Notebook</span></div><div><strong>7</strong><span>开放数据集方案</span></div><div><strong>21+</strong><span>论文与官方资料</span></div></div>
+    </section>
+
+    <section id="evolution" class="section reveal">
+      <div class="section-kicker">01 · TWO-VIEW EVOLUTION</div><h2>召回与排序双视角的完整技术演进</h2>
+      <p class="section-intro">召回追求全库效率，排序追求候选内精度。两者的结构性张力，决定了双塔可预计算、交叉模型难索引，也解释了生成式推荐为何尝试重画边界。</p>
+      <div class="funnel" aria-label="推荐漏斗"><div><b>10⁸</b><span>全量 Item</span></div><i>→</i><div><b>10³</b><span>多路召回</span></div><i>→</i><div><b>10²</b><span>预排 / 精排</span></div><i>→</i><div><b>10¹</b><span>重排与策略</span></div></div>
+      <div class="timeline-table"><div class="timeline-head"><span>时期</span><span>召回主线</span><span>排序主线</span><span>关键变化</span><span>主要瓶颈</span></div>{% for row in evolution %}<button class="timeline-row" aria-expanded="false"><span>{{ row.period }}</span><span>{{ row.recall }}</span><span>{{ row.rank }}</span><span>{{ row.shift }}</span><span>{{ row.limit }}</span></button>{% endfor %}</div>
+      <div class="callout"><b>核心判断</b><p>级联系统没有“过时”：它是延迟、成本、可控性约束下的帕累托解。生成式系统的进步，是逐步把更强交互前移，并用 token 化和统一目标降低阶段错配。</p></div>
+      <p class="footnote">主线依据包括 <a href="https://dl.acm.org/doi/10.1145/371920.372071" target="_blank" rel="noreferrer">ItemCF</a>、<a href="https://www.microsoft.com/en-us/research/publication/learning-deep-structured-semantic-models-for-web-search-using-clickthrough-data/" target="_blank" rel="noreferrer">DSSM</a>、<a href="https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/" target="_blank" rel="noreferrer">YouTube DNN</a>、<a href="https://arxiv.org/abs/2305.05065" target="_blank" rel="noreferrer">TIGER</a> 与 <a href="https://arxiv.org/abs/2402.17152" target="_blank" rel="noreferrer">HSTU</a>。时间轴表示技术重心变化，不表示旧方法被完全替代。</p>
+    </section>
+
+    <section id="history" class="section reveal">
+      <div class="section-kicker">02 · HISTORY</div><h2>推荐算法发展历程综述</h2>
+      <p class="section-intro">推荐模型的演进不是“模型越来越深”这么简单，而是表示、监督信号和服务约束不断共同变化。下面每一阶段都回答四个问题：压缩了什么、召回怎样做、排序怎样做、又留下了什么问题。</p>
+      <div class="prose-grid history-grid">
+        <article><span>1990s—2013</span><h3>邻域与低秩表示</h3><p><a href="https://dl.acm.org/doi/10.1145/192844.192905" target="_blank">GroupLens</a> 从相似用户借信号，ItemCF 把关系转到更稳定的物品侧；Netflix Prize 时代的 <a href="https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf" target="_blank">MF</a> 用低维 user/item 坐标重构评分；FM 再把低秩交互推广到任意稀疏 field。召回与排序尚未完全分工，冷启动和时序仍弱。</p></article>
+        <article><span>2013—2017</span><h3>深度级联定型</h3><p><a href="https://www.microsoft.com/en-us/research/publication/learning-deep-structured-semantic-models-for-web-search-using-clickthrough-data/" target="_blank">DSSM</a> 的双塔结构让 item 向量可预计算，ANN 支撑亿级全库检索；GBDT+LR、Wide&Deep 和 <a href="https://arxiv.org/abs/1703.04247" target="_blank">DeepFM</a> 在较小候选集恢复非线性交互。召回追求可索引，排序追求表达力，现代漏斗由此成形。</p></article>
+        <article><span>2017—2023</span><h3>兴趣序列、Transformer 与多目标</h3><p><a href="https://arxiv.org/abs/1904.08030" target="_blank">MIND</a> 用多个向量覆盖多意图；DIN/DIEN 建模候选相关兴趣；<a href="https://arxiv.org/abs/1808.09781" target="_blank">SASRec</a> 与 BERT4Rec 把自注意力引入行为序列；MMoE 和 PLE 管理多个业务目标。模型开始从“用户是谁”转向“用户此刻处于什么状态”。</p></article>
+        <article><span>2023—2026</span><h3>Semantic ID 与生成统一</h3><p><a href="https://arxiv.org/abs/2305.05065" target="_blank">TIGER</a> 把全库召回转成受约束 Semantic ID 生成；OpenOneRec 探索列表生成和偏好对齐；<a href="https://arxiv.org/abs/2402.17152" target="_blank">HSTU</a> 把长期行为流作为统一序列。新的难点变为合法解码、目录更新、吞吐、规模收益和全链路 ROI。</p></article>
+      </div>
+    </section>
+
+    <section id="foundations" class="section reveal">
+      <div class="section-kicker">3.0 · MATH FOUNDATIONS</div><h2>先把公式翻译成可以手算的直觉</h2>
+      <p class="section-intro">后续模型反复使用的数学其实只有几块积木。这里从“3 个用户 × 4 个物品”的小表开始，不预设大学线性代数或微积分背景；每个概念都配数字、图和 Python 验证。</p>
+      <div class="foundation-flow" aria-label="推荐算法数学学习路径">
+        <article><span>01 · DATA</span><b>行为表 → 矩阵</b><p>行代表用户，列代表物品；1 表示发生过行为，0 表示没有观察到。</p><code>R ∈ ℝ<sup>用户×物品</sup></code></article>
+        <i>→</i><article><span>02 · SIMILARITY</span><b>向量 → 相似度</b><p>点积统计共同选择；除以长度后得到余弦相似度，避免活跃用户天然占优。</p><code>cos(a,b)</code></article>
+        <i>→</i><article><span>03 · LEARNING</span><b>误差 → 参数更新</b><p>损失函数给错误打分；梯度指出“往哪边改会更好”，学习率控制每一步大小。</p><code>θ ← θ − η∇L</code></article>
+        <i>→</i><article><span>04 · EVALUATION</span><b>预测 → 指标</b><p>Recall 看是否找回目标，RMSE 看数值误差，AUC 看正样本能否排在负样本之前。</p><code>Recall / RMSE / AUC</code></article>
+      </div>
+      <div class="hero-actions"><a class="button" href="/notebooks/3_0_math_foundations">进入 3.0 图解教程</a></div>
+    </section>
+
+    <section id="model-explorer" class="section reveal">
+      <div class="section-kicker">03 · MODEL EXPLORER</div><h2>主流模型讲解与对比</h2>
+      <div class="filters" role="group" aria-label="模型阶段筛选"><button class="chip active" data-filter="all">全部</button><button class="chip" data-filter="经典">经典</button><button class="chip" data-filter="召回">召回</button><button class="chip" data-filter="排序">排序</button><button class="chip" data-filter="多目标">多目标</button><button class="chip" data-filter="Transformer">Transformer</button><button class="chip" data-filter="生成式">生成式</button></div>
+      <div id="model-grid" class="model-grid">{% for model in models %}<article class="model-card" data-stage="{{ model.stage }}" data-model="{{ model.id }}"><div class="model-meta"><span>{{ model.stage }}</span><button class="compare-toggle" data-compare="{{ model.id }}" aria-label="加入对比">＋ 对比</button></div><h3>{{ model.name }}</h3><p>{{ model.idea }}</p><dl><div><dt>优势</dt><dd>{{ model.pros }}</dd></div><div><dt>短板</dt><dd>{{ model.cons }}</dd></div><div><dt>评测</dt><dd>{{ model.metric }}</dd></div></dl><a href="/notebooks/{{ model.notebook }}">进入算法章节 →</a></article>{% endfor %}</div>
+      <div id="compare-drawer" class="compare-drawer" hidden><div><b>模型对比</b><span id="compare-count">0/3</span></div><button id="compare-open">展开对比</button><button id="compare-clear" class="ghost">清空</button></div>
+      <dialog id="compare-dialog"><form method="dialog"><button class="dialog-close" aria-label="关闭">×</button><h2>典型模型横向对比</h2><div id="compare-table"></div></form></dialog>
+    </section>
+
+    <section id="classic" class="section lab-section reveal"><div class="section-kicker">3.1 · HANDS-ON</div><div class="lab-head"><div><h2>经典算法：一个方案，一个 Notebook</h2><p>从本章数学导读进入，再分别学习协同过滤、MF、FM、GBDT+LR，最后打开基于四个实验结果的总结。</p></div><div class="lab-actions"><a class="button" href="/notebooks/3_1_0_classic_foundations">数学导读</a><a class="ghost button-like" href="/notebooks/3_1_summary">结果总结</a></div></div>
+      <div class="notebook-list chapter-notebooks">{% for n in notebooks %}{% if n.slug[:4] == '3_1_' %}<article><div><span>{{ n.framework }}</span><h3>{{ n.title }}</h3><p>{{ n.dataset }} · {{ n.runtime }}</p></div><div><a href="/notebooks/{{ n.slug }}" target="_blank">预览</a><a href="{{ jupyter_url }}/lab/tree/notebooks/{{ n.slug }}.ipynb?token=recsys" target="_blank">运行 ↗</a></div></article>{% endif %}{% endfor %}</div>
+    </section>
+
+    {% set chapter_groups = [
+      ('retrieval','3.2','召回模型：DSSM 双塔、MIND','3_2_0_retrieval_foundations','3_2_summary','DSSM 与 MIND 已拆为独立教程；每篇分别完成数学演示、Torch-RecHub 训练、真实推理路径和 Recall 评测，再由总结读取实验产物。'),
+      ('ranking','3.3','排序模型：DeepFM、DIN / DIEN','3_3_0_ranking_foundations','3_3_summary','DeepFM、DIN、DIEN 各自独立成篇，分别讲静态交叉、候选注意力和兴趣演化，并统一比较 AUC、LogLoss、baseline 与服务成本。'),
+      ('multitask','3.4','多目标模型：MMoE / PLE','3_4_0_multitask_foundations','3_4_summary','MMoE 与 PLE 使用同一批 MovieLens 真实评分事件和两个明确阈值目标，汇总逐任务指标、负迁移风险与专家服务成本。'),
+      ('transformer','3.5','Transformer 序列推荐：SASRec 及其演进','3_5_0_transformer_foundations','3_5_summary','从 SASRec 的 causal self-attention 出发，比较 BERT4Rec 与 HSTU；实战严格按 MovieLens 真实时间戳训练并对照热门基线。')
+    ] %}
+    {% for anchor,num,title,opening,summary,desc in chapter_groups %}<section id="{{ anchor }}" class="section lab-section reveal"><div class="section-kicker">{{ num }} · HANDS-ON</div><div class="lab-head"><div><h2>{{ title }}</h2><p>{{ desc }}</p></div><div class="lab-actions"><a class="button" href="/notebooks/{{ opening }}">数学导读</a><a class="ghost button-like" href="/notebooks/{{ summary }}">结果总结</a></div></div><div class="direct-chapter-links">{% for model in models if model.chapter == anchor %}<a href="/notebooks/{{ model.notebook }}"><span>{{ model.stage }}</span><b>{{ model.name }}</b><small>{{ model.idea }}</small></a>{% endfor %}</div></section>{% endfor %}
+
+    <section id="generative" class="section reveal">
+      <div class="section-kicker">04 · GENERATIVE RECOMMENDATION</div><h2>生成式召回、排序与召排融合</h2><div class="hero-actions"><a class="button" href="/notebooks/4_0_generative_foundations">数学与任务导读</a><a class="ghost button-like" href="/notebooks/4_1_generative_overview">发展与结果总结</a></div>
+      <div class="gen-path"><article><span>RETRIEVAL</span><h3>生成式召回</h3><p>TIGER 先用 RQ-VAE 将 item 压成多级 Semantic ID，再由序列模型自回归生成 ID。语义相近 item 共享前缀，利于冷启动；必须约束到合法 ID trie 并处理码本漂移。</p></article><article><span>RANKING</span><h3>生成式排序</h3><p>把候选与上下文放入语言模型，让模型输出排列或相关性 token。优势是指令与语义迁移；瓶颈是候选长度、位置偏差、校准、吞吐和可复现实验。</p></article><article><span>UNIFICATION</span><h3>召排融合</h3><p>OneRec 直接生成推荐 session/list，并以奖励模型、DPO 对齐；HSTU 用面向高基数、非平稳行为流的序列转换单元统一预训练与下游任务。</p></article></div>
+      <h3 class="subheading">国内外公开工业实践</h3><div class="practice-grid">{% for p in practices %}<a href="{{ p.url }}" target="_blank" rel="noreferrer" class="practice-card"><span>{{ p.company }} · Evidence {{ p.evidence }}</span><h4>{{ p.system }}</h4><p>{{ p.lesson }}</p></a>{% endfor %}</div>
+    </section>
+
+    {% set genlabs = [
+      ('openonerec','4.2','基于 OpenOneRec 的实战','4_2_openonerec_practice','轻量档实际执行 RecIF-Bench schema、Semantic ID/trie 约束、列表级指标和 DPO 样本构造；完整档给出官方 1.7B/8B 训练入口与显存前置条件。'),
+      ('hstu','4.3','基于 DLRM HSTU 的实战','4_3_dlrm_hstu_practice','CPU 档用 Torch-RecHub HSTU 跑 next-item 训练与 NDCG；工业档映射到 Meta generative-recommenders 的 DLRM-v3 配置、M-FALCON 与多 GPU 要求。')
+    ] %}
+    {% for anchor,num,title,slug,desc in genlabs %}<section id="{{ anchor }}" class="section lab-section reveal"><div class="section-kicker">{{ num }} · HANDS-ON</div><div class="lab-head"><div><h2>{{ title }}</h2><p>{{ desc }}</p></div><div class="lab-actions"><a class="button" href="/notebooks/{{ slug }}">进入算法教程</a></div></div></section>{% endfor %}
+
+    <section id="frameworks" class="section reveal"><div class="section-kicker">FRAMEWORK DECISION</div><h2>TorchEasyRec vs Torch-RecHub</h2><p class="section-intro">结论不是二选一：TorchEasyRec 更适合作为工业主框架；Torch-RecHub 更适合 Notebook 和快速验证。本项目让同一数据契约从教学后端迁移到工业配置。</p><div class="compare-framework"><div class="framework-head"><span>评估轴</span><strong>TorchEasyRec</strong><strong>Torch-RecHub</strong></div>{% for row in frameworks %}<div><b>{{ row.axis }}</b><span>{{ row.torcheasyrec }}</span><span>{{ row.rechub }}</span></div>{% endfor %}</div></section>
+
+    <section id="datasets" class="section reveal"><div class="section-kicker">OPEN DATA</div><h2>固定数据集与近期开放数据</h2><p class="section-intro">全部 Notebook 默认读取仓库内固定版本的 GroupLens MovieLens latest-small：真实评分、电影 metadata 与时间戳均来自官方文件。CPU 档只做确定性截取和任务重构，不随机制造交互或标签；所有序列评测按时间切分。</p><div class="dataset-grid">{% for d in datasets %}<a href="{{ d.url }}" target="_blank" rel="noreferrer"><span>{{ d.year }} · {{ d.scale }}</span><h3>{{ d.name }}</h3><p><b>适用：</b>{{ d.fit }}</p><p>{{ d.note }}</p></a>{% endfor %}</div></section>
+
+    <section id="labs" class="section reveal"><div class="section-kicker">EXECUTABLE LABS</div><h2>Notebook 实验目录</h2><div class="notebook-list">{% for n in notebooks %}<article id="{{ n.slug }}"><div><span>{{ n.framework }}</span><h3>{{ n.title }}</h3><p>{{ n.dataset }} · {{ n.runtime }}</p></div><div><a href="/notebooks/{{ n.slug }}" target="_blank">预览</a><a href="{{ jupyter_url }}/lab/tree/notebooks/{{ n.slug }}.ipynb?token=recsys" target="_blank">运行 ↗</a></div></article>{% endfor %}</div></section>
+
+    <section id="sources" class="section reveal"><div class="section-kicker">05 · EVIDENCE LEDGER</div><h2>论文及官方资料的证据清单</h2><p class="section-intro">优先原始论文、作者/公司官方代码与工程博客；A=生产或一手论文证据，B=官方技术说明，C=研究原型。在线增益不可跨公司直接比较。</p><div class="source-list">{% for name,url,type in sources %}<a href="{{ url }}" target="_blank" rel="noreferrer"><span>{{ loop.index }}</span><b>{{ name }}</b><em>{{ type }}</em><i>↗</i></a>{% endfor %}</div><p class="footnote">完整来源注释与口径见 <a href="/research-ledger">research ledger</a>；本轮汇总的章节与内容验收标准见 <a href="/tutorial-requirements">教程编写规范</a>。旧版长报告保留在 <a href="/legacy">legacy report</a>。</p></section>
+  </main>
+  <footer><span>RecSys Atlas · 研究、教学与可执行实验的一体化工作台</span><a href="#overview">回到顶部 ↑</a></footer>
+  <script id="model-data" type="application/json">{{ models | tojson }}</script>
+  <script src="/static/app.js" defer></script>
+</body></html>

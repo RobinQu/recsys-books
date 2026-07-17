@@ -1,0 +1,20 @@
+.direct-chapter-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.direct-chapter-links a {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--panel);
+}
+
+.direct-chapter-links a:hover { border-color: var(--lime); }
+.direct-chapter-links span { color: var(--lime); font-size: 11px; font-weight: 800; }
+.direct-chapter-links small { color: var(--muted); line-height: 1.55; }

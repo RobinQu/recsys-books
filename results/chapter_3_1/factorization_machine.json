@@ -1,0 +1,14 @@
+{
+  "records": [
+    {
+      "algorithm": "FM",
+      "task": "CTR",
+      "metric": "AUC ↑",
+      "value": 0.596390560300207,
+      "secondary_metric": "LogLoss ↓",
+      "secondary_value": 2.6060633407790834,
+      "online_inference": "线性项 + 二阶隐向量交互",
+      "source_notebook": "3_1_3_factorization_machine"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "records": [
+    {
+      "algorithm": "MMoE 多目标学习",
+      "primary_metric": "click_auc",
+      "primary_value": 0.5537171075837742,
+      "secondary_metric": "conversion_auc",
+      "secondary_value": 0.5143572751917673,
+      "baseline_metric": null,
+      "baseline_value": null,
+      "framework": "torch_rechub.models.multi_task.MMOE",
+      "source_notebook": "3_4_1_mmoe",
+      "dataset": "MovieLens latest-small",
+      "randomly_fabricated_rows": 0
+    }
+  ]
+}

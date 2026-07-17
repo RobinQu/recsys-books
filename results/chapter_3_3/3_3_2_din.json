@@ -1,0 +1,17 @@
+{
+  "records": [
+    {
+      "algorithm": "DIN 候选感知排序",
+      "primary_metric": "auc",
+      "primary_value": 0.578690700330257,
+      "secondary_metric": "logloss",
+      "secondary_value": 1.7068458076429882,
+      "baseline_metric": "static_overlap_auc",
+      "baseline_value": 0.5,
+      "framework": "torch_rechub.models.ranking.DIN",
+      "source_notebook": "3_3_2_din",
+      "dataset": "MovieLens latest-small",
+      "randomly_fabricated_rows": 0
+    }
+  ]
+}

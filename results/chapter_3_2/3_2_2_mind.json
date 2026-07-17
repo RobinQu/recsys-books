@@ -1,0 +1,17 @@
+{
+  "records": [
+    {
+      "algorithm": "MIND 多兴趣召回",
+      "primary_metric": "recall@10",
+      "primary_value": 0.03125,
+      "secondary_metric": "positive_top1",
+      "secondary_value": 0.65625,
+      "baseline_metric": null,
+      "baseline_value": null,
+      "framework": "torch_rechub.models.matching.MIND",
+      "source_notebook": "3_2_2_mind",
+      "dataset": "MovieLens latest-small",
+      "randomly_fabricated_rows": 0
+    }
+  ]
+}

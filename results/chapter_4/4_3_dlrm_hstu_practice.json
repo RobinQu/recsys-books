@@ -1,0 +1,17 @@
+{
+  "records": [
+    {
+      "algorithm": "DLRM HSTU：长行为序列实战",
+      "primary_metric": "hr@5",
+      "primary_value": 0.03125,
+      "secondary_metric": "popularity_hr@5",
+      "secondary_value": 0.020833333333333332,
+      "baseline_metric": null,
+      "baseline_value": null,
+      "framework": "torch_rechub.models.generative.HSTUModel",
+      "source_notebook": "4_3_dlrm_hstu_practice",
+      "dataset": "MovieLens latest-small",
+      "randomly_fabricated_rows": 0
+    }
+  ]
+}

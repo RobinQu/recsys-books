@@ -1,0 +1,17 @@
+{
+  "records": [
+    {
+      "algorithm": "OpenOneRec：受约束列表生成实战",
+      "primary_metric": "invalid_constrained",
+      "primary_value": 0.0,
+      "secondary_metric": "invalid_unconstrained",
+      "secondary_value": 1.0,
+      "baseline_metric": null,
+      "baseline_value": null,
+      "framework": "OpenOneRec contract + PyTorch executable proxy",
+      "source_notebook": "4_2_openonerec_practice",
+      "dataset": "MovieLens latest-small",
+      "randomly_fabricated_rows": 0
+    }
+  ]
+}

@@ -1,0 +1,1313 @@
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+import nbformat as nbf
+
+from tutorial_deep_specs import build_deep_specs
+from tutorial_opening_specs import build_opening_specs
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / "notebooks"
+
+
+def md(text: str): return nbf.v4.new_markdown_cell(text.strip())
+def code(text: str): return nbf.v4.new_code_cell(text.strip())
+
+
+SETUP = """
+from pathlib import Path
+import os, sys, json
+ROOT = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+sys.path.insert(0, str(ROOT))
+os.environ.setdefault("RECSYS_PROFILE", "smoke")
+PROFILE = os.environ["RECSYS_PROFILE"]
+from recsys_lab.data import load_movielens, movielens_provenance
+real_ratings, real_movies = load_movielens()
+REAL_DATASET = movielens_provenance(real_ratings)
+print({"profile": PROFILE, "root": str(ROOT), "real_dataset": REAL_DATASET})
+assert REAL_DATASET["randomly_fabricated_rows"] == 0
+"""
+
+
+def notebook(title: str, goal: str, source: str, cells: list):
+    nb = nbf.v4.new_notebook()
+    nb["metadata"] = {
+        "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
+        "language_info": {"name": "python", "version": "3.11"},
+        "recsys": {"profile": "smoke", "source_of_truth": "HTML and notebook share app/content.py + recsys_lab"},
+    }
+    nb["cells"] = [
+        md(f"# {title}\n\n> 阅读版与 Web 应用内容一致；实验数值来自本 Notebook 的已执行输出。\n\n## Goal\n\n{goal}"),
+        md(f"## Setup\n\n默认 `smoke` 档使用仓库内固定版本的 GroupLens **MovieLens latest-small** 真实行为子集，CPU 可重复执行；`full` 档只扩大真实数据规模与训练配置，不切换到合成数据。数据包含真实匿名用户、电影、评分和时间戳；实验只做确定性截取与任务重构，不随机制造交互、标签或行为序列。原始许可与引用保存在 `data/ml-latest-small/README.txt`。\n\n**主要资料：** {source}"),
+        code(SETUP),
+        *cells,
+    ]
+    return nb
+
+
+def main():
+    OUT.mkdir(exist_ok=True)
+    specs = {}
+    specs["3_0_math_foundations"] = notebook(
+        "3.0 推荐算法数学基础：从矩阵到梯度下降",
+        "面向初次接触推荐算法的读者，用可手算的小例子和图理解后续模型共同依赖的数学积木：数据表、向量、矩阵乘法、点积、余弦相似度、概率、Sigmoid、损失函数、梯度下降，以及 Recall、RMSE、AUC。",
+        "[MIT OCW Linear Algebra](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/) · [Google ML Crash Course: Logistic Regression](https://developers.google.com/machine-learning/crash-course/logistic-regression) · [scikit-learn Model Evaluation](https://scikit-learn.org/stable/modules/model_evaluation.html)",
+        [
+            md(r"""
+## Steps
+
+## 1. 从“行为表”到矩阵
+
+推荐系统最原始的数据不是公式，而是一张行为表：谁在什么时间看了什么。为了同时观察许多用户与物品，我们把它整理成矩阵 $R$：
+
+- 每一行是一位用户；
+- 每一列是一个物品；
+- 数字 1 表示发生过喜欢/点击，0 表示没有观察到；
+- $R\in\mathbb R^{3\times4}$ 只是在说“这张表有 3 行、4 列”。
+
+注意：0 通常表示“未知”，不一定表示讨厌。把未知误当负反馈，是推荐系统常见的数据错误。
+"""),
+            code(r"""
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+users = ["u0", "u1", "u2"]
+items = ["i0", "i1", "i2", "i3"]
+R = np.array([
+    [1, 1, 0, 0],
+    [1, 0, 1, 0],
+    [0, 1, 1, 1],
+], dtype=float)
+
+display(pd.DataFrame(R, index=users, columns=items))
+fig, ax = plt.subplots(figsize=(6.4, 3.1))
+image = ax.imshow(R, cmap="YlGn", vmin=0, vmax=1)
+ax.set_xticks(range(len(items)), items); ax.set_yticks(range(len(users)), users)
+ax.set_xlabel("items (columns)"); ax.set_ylabel("users (rows)")
+for row in range(R.shape[0]):
+    for col in range(R.shape[1]): ax.text(col, row, int(R[row, col]), ha="center", va="center", fontsize=13)
+ax.set_title("User-item interaction matrix R")
+plt.colorbar(image, ax=ax, ticks=[0, 1], label="observed interaction")
+plt.tight_layout(); plt.show()
+"""),
+            md(r"""
+### 1.1 向量只是“一行数字”
+
+用户 `u0` 的行为向量是 $[1,1,0,0]$。四个位置像四个问题的答案：“看过 i0 吗？看过 i1 吗？……”因此向量不是抽象符号，而是把一个对象沿多个维度描述成一行数字。
+
+向量的**长度**使用勾股定理：$\|a\|_2=\sqrt{a_1^2+\cdots+a_n^2}$。`u0` 有两个 1，所以长度是 $\sqrt2$。
+"""),
+            code(r"""
+u0 = R[0]
+u1 = R[1]
+print({"u0 vector": u0.tolist(), "u0 length": np.linalg.norm(u0), "expected": np.sqrt(2)})
+assert np.isclose(np.linalg.norm(u0), np.sqrt(2))
+"""),
+            md(r"""
+## 2. 点积与余弦：把“共同选择”变成相似度
+
+两个等长向量逐位置相乘再求和，叫作**点积**：
+
+$$a\cdot b=a_1b_1+a_2b_2+\cdots+a_nb_n$$
+
+对 0/1 行为来说，只有“两个人都为 1”的位置会贡献 1，所以点积正好数出共同选择。`u0·u1 = 1`，因为两人共同看过 i0。
+
+但活跃用户可能仅仅因为看得多而获得更大点积。余弦相似度再除以两人的向量长度，把答案压到 0～1：
+
+$$\cos(a,b)=\frac{a\cdot b}{\|a\|_2\|b\|_2}$$
+
+可以把它理解为“方向有多一致”：1 表示选择比例完全一致，0 表示没有共同选择。
+"""),
+            code(r"""
+dot = float(u0 @ u1)
+cosine = dot / (np.linalg.norm(u0) * np.linalg.norm(u1))
+print({"common choices / dot product": dot, "cosine similarity": round(cosine, 3)})
+
+fig, ax = plt.subplots(figsize=(5.4, 5.0))
+a2, b2 = np.array([1, 1]), np.array([1, 0])
+ax.quiver(0, 0, *a2, angles="xy", scale_units="xy", scale=1, color="#4f8f00", label="u0=(1,1)")
+ax.quiver(0, 0, *b2, angles="xy", scale_units="xy", scale=1, color="#e36b2c", label="u1=(1,0)")
+ax.set_xlim(-.1, 1.4); ax.set_ylim(-.1, 1.4); ax.set_aspect("equal")
+ax.grid(alpha=.25); ax.legend(); ax.set_title(f"Same direction means larger cosine = {cosine:.3f}")
+ax.set_xlabel("interaction dimension 1"); ax.set_ylabel("interaction dimension 2")
+plt.tight_layout(); plt.show()
+"""),
+            md(r"""
+## 3. 矩阵乘法：一次完成许多次点积
+
+矩阵乘法没有增加新的神秘规则，它只是批量点积：
+
+- $R R^\top$：每个用户与每个用户做点积，得到用户共现矩阵；
+- $R^\top R$：每个物品与每个物品做点积，得到物品共现矩阵。
+
+乘法能否进行，只需检查“中间尺寸相同”。$R$ 是 $3\times4$，$R^\top$ 是 $4\times3$，所以 $(3\times4)(4\times3)$ 得到 $3\times3$。
+"""),
+            code(r"""
+user_cooccurrence = R @ R.T
+item_cooccurrence = R.T @ R
+fig, axes = plt.subplots(1, 3, figsize=(12, 3.4))
+for ax, matrix, title, xlabels, ylabels in [
+    (axes[0], R, "R: behavior", items, users),
+    (axes[1], user_cooccurrence, "R @ R.T: user-user", users, users),
+    (axes[2], item_cooccurrence, "R.T @ R: item-item", items, items),
+]:
+    ax.imshow(matrix, cmap="YlGn")
+    ax.set_xticks(range(len(xlabels)), xlabels); ax.set_yticks(range(len(ylabels)), ylabels)
+    for row in range(matrix.shape[0]):
+        for col in range(matrix.shape[1]): ax.text(col, row, int(matrix[row, col]), ha="center", va="center")
+    ax.set_title(title)
+plt.tight_layout(); plt.show()
+print({"R": R.shape, "R @ R.T": user_cooccurrence.shape, "R.T @ R": item_cooccurrence.shape})
+"""),
+            md(r"""
+## 4. 概率、Sigmoid 与 LogLoss
+
+排序模型常先输出任意实数 $z$，叫 **logit**。它可能是 -3、0 或 5，不能直接当概率。Sigmoid 把整条实数轴平滑压到 0～1：
+
+$$p=\sigma(z)=\frac{1}{1+e^{-z}}$$
+
+- $z=0$ 时 $p=0.5$，表示模型拿不准；
+- $z$ 很大时概率接近 1；$z$ 很小时接近 0。
+
+LogLoss 衡量概率预测有多糟。真实点击 $y=1$ 时，预测 0.9 只受很小惩罚，预测 0.01 会受到很大惩罚，因为模型“非常自信但答错了”：
+
+$$L=-[y\log p+(1-y)\log(1-p)]$$
+"""),
+            code(r"""
+logits = np.linspace(-6, 6, 300)
+probabilities = 1 / (1 + np.exp(-logits))
+p_grid = np.linspace(.01, .99, 300)
+loss_when_clicked = -np.log(p_grid)
+loss_when_not_clicked = -np.log(1 - p_grid)
+
+fig, axes = plt.subplots(1, 2, figsize=(11, 3.8))
+axes[0].plot(logits, probabilities, color="#4f8f00", lw=3); axes[0].axhline(.5, ls="--", color="gray")
+axes[0].set(title="Sigmoid: score to probability", xlabel="logit z", ylabel="p(click)"); axes[0].grid(alpha=.2)
+axes[1].plot(p_grid, loss_when_clicked, label="actual y=1", lw=2); axes[1].plot(p_grid, loss_when_not_clicked, label="actual y=0", lw=2)
+axes[1].set(title="LogLoss punishes confident mistakes", xlabel="predicted p(click)", ylabel="loss"); axes[1].legend(); axes[1].grid(alpha=.2)
+plt.tight_layout(); plt.show()
+print({"sigmoid(0)": .5, "loss if y=1,p=.9": round(float(-np.log(.9)), 3), "loss if y=1,p=.01": round(float(-np.log(.01)), 3)})
+"""),
+            md(r"""
+## 5. 梯度下降：沿着下坡方向一点点改参数
+
+把模型参数想成山坡上的横坐标 $w$，损失 $L(w)$ 是高度。**梯度**就是当前位置的坡度：
+
+- 坡度为正，向左走能下降；
+- 坡度为负，向右走能下降；
+- 接近 0，说明来到谷底附近。
+
+更新公式 $w\leftarrow w-\eta\nabla L$ 中，$\eta$ 是学习率，像每一步的步长。过大会跨过谷底甚至发散，过小则走得很慢。下面在一元二次函数 $L(w)=(w-3)^2+1$ 上亲手走 12 步。
+"""),
+            code(r"""
+learning_rate = 0.18
+w = -2.0
+path = [w]
+for _ in range(12):
+    gradient = 2 * (w - 3)
+    w = w - learning_rate * gradient
+    path.append(w)
+
+x = np.linspace(-3, 6, 300); loss_curve = (x - 3) ** 2 + 1
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(x, loss_curve, color="#66736b", label="L(w)=(w-3)^2+1")
+ax.scatter(path, [(point-3)**2+1 for point in path], c=np.arange(len(path)), cmap="YlGn", s=52, zorder=3)
+for step, point in enumerate(path[::3]): ax.annotate(f"step {step*3}", (point, (point-3)**2+1), xytext=(4, 7), textcoords="offset points", fontsize=8)
+ax.set(title="Gradient descent walks downhill", xlabel="parameter w", ylabel="loss"); ax.grid(alpha=.2); ax.legend()
+plt.tight_layout(); plt.show()
+print({"start": path[0], "after 12 steps": round(path[-1], 4), "optimal": 3.0})
+"""),
+            md(r"""
+## 6. 训练集、测试集与推荐指标
+
+模型在做过的题上得高分，不代表会做新题。因此必须：
+
+1. **训练集**用来修改参数；
+2. **验证集**用来选择超参数和停止时机；
+3. **测试集**只在最后评估一次。
+
+推荐系统还必须按时间切分：用过去预测未来，不能让未来行为泄漏进训练。下面用统一符号讲清指标：
+
+- $u$：一位用户，$U$：参与评测的用户集合；
+- $K$：只看推荐列表的前 $K$ 个位置；
+- $R_u@K$：模型给用户 $u$ 的前 $K$ 个推荐；
+- $G_u$：测试集中用户 $u$ 真正喜欢或点击的物品（ground truth）；
+- $H_u@K=R_u@K\cap G_u$：推荐列表中的命中集合；
+- $y_i$：真实标签或评分，$\hat y_i$：模型预测，$N$：样本数。
+
+### 6.1 Top-K 集合指标：找得准、找得全、是否命中
+
+**Precision@K（准确率）**问：“推荐出来的 $K$ 个物品中，有多少是对的？”
+
+$$
+\mathrm{Precision@K}(u)=\frac{|H_u@K|}{K}
+$$
+
+**Recall@K（召回率）**问：“用户真正喜欢的物品中，有多少被找回来了？”
+
+$$
+\mathrm{Recall@K}(u)=\frac{|H_u@K|}{|G_u|}
+$$
+
+**HitRate@K（命中率）**只关心有没有至少命中一个，不关心命中了几个：
+
+$$
+\mathrm{HitRate@K}=\frac{1}{|U|}\sum_{u\in U}\mathbb{I}(|H_u@K|>0)
+$$
+
+其中指示函数 $\mathbb I(\text{条件})$ 在条件成立时等于 1，否则等于 0。若每位用户测试集只有一个目标物品（leave-one-out），Recall@K 和 HitRate@K 数值相同；当每人有多个目标时二者不同。
+
+**F1@K**是 Precision 与 Recall 的调和平均，只有两者都高时才会高：
+
+$$
+\mathrm{F1@K}=\frac{2\,\mathrm{Precision@K}\,\mathrm{Recall@K}}
+{\mathrm{Precision@K}+\mathrm{Recall@K}}
+$$
+
+> 直觉：扩大 $K$ 通常会提高 Recall，却可能降低 Precision。因此比较模型时必须使用相同的 $K$。
+"""),
+            code(r"""
+# 一位用户的 Top-K 手算：5 个推荐里命中 2 个；真正相关物品有 3 个
+recommended = ["i3", "i7", "i2", "i9", "i1"]
+relevant = {"i2", "i3", "i8"}
+hits = set(recommended) & relevant
+
+precision_at_5 = len(hits) / len(recommended)
+recall_at_5 = len(hits) / len(relevant)
+hit_at_5 = float(len(hits) > 0)
+f1_at_5 = 2 * precision_at_5 * recall_at_5 / (precision_at_5 + recall_at_5)
+
+print({
+    "hits": sorted(hits),
+    "Precision@5": round(precision_at_5, 3),  # 2/5
+    "Recall@5": round(recall_at_5, 3),        # 2/3
+    "Hit@5": hit_at_5,                        # 至少命中一次
+    "F1@5": round(f1_at_5, 3),
+})
+"""),
+            md(r"""
+### 6.2 顺序敏感的列表指标：好东西是否排在前面
+
+Precision/Recall 只看集合，不看命中的位置。推荐页面首屏尤其在意顺序。
+
+**MRR（Mean Reciprocal Rank）**只看第一个相关结果的位置。若第一个命中在第 $r_u$ 位，则倒数排名为 $1/r_u$：
+
+$$
+\mathrm{MRR@K}=\frac{1}{|U|}\sum_{u\in U}
+\begin{cases}
+1/r_u,&r_u\le K\\
+0,&\text{前 K 位无命中}
+\end{cases}
+$$
+
+**DCG@K**允许每个结果有不同相关程度 $rel_{u,r}$，并用 $\log_2(r+1)$ 惩罚靠后的位置：
+
+$$
+\mathrm{DCG@K}(u)=\sum_{r=1}^{K}\frac{2^{rel_{u,r}}-1}{\log_2(r+1)}
+$$
+
+把相同物品按真实相关性从高到低排列可得到理想值 $\mathrm{IDCG@K}$。归一化以后，不同用户才方便平均：
+
+$$
+\mathrm{NDCG@K}(u)=\frac{\mathrm{DCG@K}(u)}{\mathrm{IDCG@K}(u)}\in[0,1]
+$$
+
+**AP@K（Average Precision）**在每个相关结果出现的位置计算 Precision，再取平均；**MAP@K**是所有用户 AP 的平均：
+
+$$
+\mathrm{AP@K}(u)=\frac{1}{\min(|G_u|,K)}
+\sum_{r=1}^{K}\mathrm{Precision@r}(u)\cdot rel_{u,r},\qquad
+\mathrm{MAP@K}=\frac{1}{|U|}\sum_u\mathrm{AP@K}(u)
+$$
+
+二值相关时 $rel_{u,r}\in\{0,1\}$。MRR 强调“第一次命中”，NDCG 能处理多档相关性，MAP 奖励把多个相关结果都提前。
+"""),
+            code(r"""
+# 同样命中两个物品，放在更靠前的位置会得到更高的 MRR / NDCG / AP
+binary_relevance = np.array([1, 0, 1, 0, 0])
+graded_relevance = np.array([3, 0, 1, 0, 0])
+
+first_hit_rank = np.flatnonzero(binary_relevance)[0] + 1
+mrr_at_5 = 1 / first_hit_rank
+
+ranks = np.arange(1, len(graded_relevance) + 1)
+discounts = np.log2(ranks + 1)
+dcg_at_5 = np.sum((2**graded_relevance - 1) / discounts)
+ideal = np.sort(graded_relevance)[::-1]
+idcg_at_5 = np.sum((2**ideal - 1) / discounts)
+ndcg_at_5 = dcg_at_5 / idcg_at_5
+
+precision_at_each_rank = np.cumsum(binary_relevance) / ranks
+ap_at_5 = np.sum(precision_at_each_rank * binary_relevance) / min(binary_relevance.sum(), 5)
+print({"MRR@5": round(mrr_at_5, 3), "NDCG@5": round(ndcg_at_5, 3), "AP@5": round(ap_at_5, 3)})
+"""),
+            md(r"""
+### 6.3 评分误差：预测值离真实值多远
+
+**MAE（平均绝对误差）**直接平均距离，单位与原评分相同：
+
+$$
+\mathrm{MAE}=\frac{1}{N}\sum_{i=1}^{N}|y_i-\hat y_i|
+$$
+
+**RMSE（均方根误差）**先平方再平均，因此对少数大错误惩罚更重：
+
+$$
+\mathrm{RMSE}=\sqrt{\frac{1}{N}\sum_{i=1}^{N}(y_i-\hat y_i)^2}
+$$
+
+二者都是越小越好。RMSE/MAE 适合 1～5 星等评分预测，却不保证 Top-K 排序更好。
+
+### 6.4 概率与二分类排序：LogLoss、AUC 与 GAUC
+
+点击率模型对样本 $i$ 输出概率 $p_i\in(0,1)$，真实标签 $y_i\in\{0,1\}$。
+
+**LogLoss（二元交叉熵）**衡量概率预测本身是否可信，越小越好：
+
+$$
+\mathrm{LogLoss}=-\frac{1}{N}\sum_{i=1}^{N}
+\left[y_i\log p_i+(1-y_i)\log(1-p_i)\right]
+$$
+
+预测正确但不够自信仍会有小损失；非常自信地答错会受到巨大惩罚。因此 LogLoss 同时关心区分能力和概率质量。
+
+**AUC**等价于随机抽一个正样本 $+$ 和一个负样本 $-$，正样本得分更高的概率：
+
+$$
+\mathrm{AUC}=P(s^+>s^-)+\frac{1}{2}P(s^+=s^-)
+$$
+
+AUC 为 0.5 表示接近随机排序，1 表示所有正样本都在负样本前。它只关心顺序：对所有分数做保持顺序的变换，AUC 不变，但 LogLoss 可能明显变化。
+
+工业推荐常计算每位用户内部的 AUC，再按该用户曝光数 $n_u$ 加权，称为 **GAUC**：
+
+$$
+\mathrm{GAUC}=\frac{\sum_{u\in U'}n_u\,\mathrm{AUC}_u}{\sum_{u\in U'}n_u}
+$$
+
+$U'$ 只包含同时具有正、负样本的用户。GAUC 避免“用户之间本来就有不同点击率”虚增全局 AUC，更接近同一用户内部的排序质量。
+"""),
+            code(r"""
+# 用 NumPy 手算评分、概率和排序指标
+true_ratings = np.array([5.0, 3.0, 1.0, 4.0])
+pred_ratings = np.array([4.5, 2.0, 2.0, 4.0])
+mae = np.mean(np.abs(true_ratings - pred_ratings))
+rmse = np.sqrt(np.mean((true_ratings - pred_ratings) ** 2))
+
+labels = np.array([1, 0, 1, 0, 1, 0])
+probabilities_for_metric = np.array([.9, .8, .7, .4, .6, .2])
+eps = 1e-12
+logloss = -np.mean(labels*np.log(probabilities_for_metric+eps) + (1-labels)*np.log(1-probabilities_for_metric+eps))
+positive_scores = probabilities_for_metric[labels == 1]
+negative_scores = probabilities_for_metric[labels == 0]
+pairwise_auc = np.mean(
+    (positive_scores[:, None] > negative_scores[None, :])
+    + 0.5 * (positive_scores[:, None] == negative_scores[None, :])
+)
+
+print({"MAE": round(mae, 3), "RMSE": round(rmse, 3), "LogLoss": round(logloss, 3), "AUC": round(float(pairwise_auc), 3)})
+"""),
+            md(r"""
+### 6.5 覆盖率与指标选择
+
+准确率高不代表所有用户都在看到丰富的目录。**Catalog Coverage@K** 衡量全部用户的 Top-K 列表一共触达多少种物品：
+
+$$
+\mathrm{Coverage@K}=\frac{|\bigcup_{u\in U}R_u@K|}{|I|}
+$$
+
+其中 $I$ 是可推荐物品全集。Coverage 越高说明系统不只反复推荐少数热门物品，但覆盖率不能单独代表相关性或用户满意度。
+
+| 任务问题 | 优先指标 | 必须搭配观察 |
+|---|---|---|
+| 百万物品召回是否漏掉目标 | Recall@K、HitRate@K | Coverage、延迟、分人群 Recall |
+| Top-K 列表是否把好内容提前 | NDCG@K、MAP@K、MRR | Recall@K、多样性 |
+| 星级评分是否接近真实值 | RMSE、MAE | Top-K 指标 |
+| CTR/CVR 排序是否正确 | AUC、GAUC | LogLoss、校准、分桶稳定性 |
+
+用户平均通常采用 **macro average**：先算每位用户的指标，再对用户平均，让每位用户权重相同；把所有命中数和分母先汇总再相除是 **micro average**，活跃用户会占更大权重。论文或报表必须明确平均方式、$K$、负样本策略和时间切分，否则数值不可复现。
+"""),
+            code(r"""
+catalog = {"i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8", "i9", "i10"}
+recommendations_by_user = {
+    "u1": ["i3", "i7", "i2"],
+    "u2": ["i1", "i7", "i5"],
+    "u3": ["i3", "i9", "i5"],
+}
+exposed_items = set().union(*map(set, recommendations_by_user.values()))
+coverage_at_3 = len(exposed_items) / len(catalog)
+print({"exposed_items": sorted(exposed_items), "Catalog Coverage@3": round(coverage_at_3, 3)})
+"""),
+            md(r"""
+## Checks
+
+这些检查不是为了“证明数学”，而是训练把公式翻译成可验证事实的习惯：矩阵尺寸正确、相似度在合法范围、Sigmoid 输出是概率、梯度下降确实降低损失、指标位于 0～1。
+"""),
+            code(r"""
+assert user_cooccurrence.shape == (3, 3)
+assert item_cooccurrence.shape == (4, 4)
+assert 0 <= cosine <= 1
+assert np.all((probabilities > 0) & (probabilities < 1))
+assert (path[-1] - 3) ** 2 < (path[0] - 3) ** 2
+assert 0 <= precision_at_5 <= 1 and 0 <= recall_at_5 <= 1 and 0 <= f1_at_5 <= 1
+assert 0 <= mrr_at_5 <= 1 and 0 <= ndcg_at_5 <= 1 and 0 <= ap_at_5 <= 1
+assert mae <= rmse and 0 <= pairwise_auc <= 1 and logloss >= 0
+assert 0 <= coverage_at_3 <= 1
+print("PASS：矩阵、相似度、概率、优化和指标示例全部通过。")
+"""),
+            md(r"""
+## Next Steps
+
+现在可以进入 3.1：
+
+- UserCF / ItemCF 会复用矩阵乘法和余弦相似度；
+- MF 会把一个大矩阵近似拆成两个较小矩阵；
+- FM 会复用点积来共享稀疏特征交互；
+- GBDT+LR 会复用 Sigmoid、概率和 LogLoss。
+
+遇到公式时，按四步阅读：**每个符号代表什么 → 数组形状是什么 → 用小数字手算一遍 → 用代码检查**。不需要先记住公式。
+"""),
+        ],
+    )
+    specs["3_1_classic_models"] = notebook(
+        "3.1 经典推荐算法：从邻域、低秩分解到特征交叉",
+        "从零实现并理解 UserCF / ItemCF、矩阵分解（MF）、因子分解机（FM）与 GBDT+LR。读完后应能回答：每种算法压缩了什么信息、训练目标是什么、线上如何推理、应该用什么指标，以及何时不该使用它。",
+        "[GroupLens MovieLens](https://grouplens.org/datasets/movielens/) · [Matrix Factorization Techniques](https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf) · [FM](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf) · [Facebook GBDT+LR](https://research.facebook.com/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/)",
+        [
+         md(r"""
+## 学习路线
+
+四种算法其实对应三种不同的“信息压缩”方式：
+
+| 方法 | 压缩对象 | 学到的核心信息 | 常见位置 |
+|---|---|---|---|
+| UserCF / ItemCF | 共现邻域 | 谁和谁相似 | 召回、相关推荐 |
+| MF | user–item 矩阵 | 用户与物品的低维隐语义 | 召回、评分预测 |
+| FM | 稀疏特征交叉 | 任意两个特征的低秩交互 | CTR 排序 |
+| GBDT+LR | 表格特征与树规则 | 非线性分桶、条件组合与概率校准 | CTR 排序 |
+
+建议按顺序运行。前两类使用 user–item 行为；后两类使用“曝光—点击”样本。二者的数据生成机制和评价指标不同，不能把 RMSE、Recall 与 AUC 混为一谈。
+"""),
+         md(r"""
+## Steps
+
+## 1. 数据集与评测协议
+
+### 1.1 MovieLens 是什么？
+
+[MovieLens](https://grouplens.org/datasets/movielens/) 是推荐系统最常用的公开教学数据之一。MovieLens 100K 包含用户对电影的 1–5 星评分，核心字段为：
+
+- `user_id`：用户标识；
+- `item_id`：电影标识；
+- `rating`：显式偏好强度；
+- `timestamp`：行为发生时间；
+- 电影标题、类型等 metadata。
+
+本 Notebook 使用仓库内固定版本的 **MovieLens latest-small 真实评分**。为控制 CPU 时间，只确定性选取活跃用户和高频电影；所有行仍来自 GroupLens 原始文件，不制造评分或时间戳。这里的数值用于教学回归，不作为统一公开 benchmark 成绩。
+
+### 1.2 为什么按时间切分？
+
+真实推荐只能用过去预测未来。我们把每个用户最后一次行为作为测试目标、其余行为作为训练历史。随机切分会让“未来行为”进入训练集，从而高估效果。
+"""),
+         code(r"""
+import numpy as np
+import pandas as pd
+import torch
+from sklearn.metrics import mean_squared_error, roc_auc_score, log_loss
+
+SEED = 2026
+torch.manual_seed(SEED)
+from recsys_lab.data import load_movielens, leave_last_out, movielens_provenance
+
+ratings, movies = load_movielens(max_users=48, max_items=360, min_user_events=12)
+train_ratings, test_ratings = leave_last_out(ratings)
+n_users, n_items = ratings.user_id.nunique(), ratings.item_id.nunique()
+
+print({
+    "rows": len(ratings), "users": ratings.user_id.nunique(), "items": ratings.item_id.nunique(),
+    "train_rows": len(train_ratings), "test_rows": len(test_ratings),
+    "sparsity": round(1 - len(train_ratings) / (n_users * n_items), 3),
+    "source": movielens_provenance(ratings)["source"], "fabricated_rows": 0,
+})
+display(ratings[["userId", "movieId", "rating", "timestamp", "title", "genres"]].head(8))
+"""),
+         md(r"""
+### 1.3 两组任务、四类指标
+
+1. **Top-K 推荐**：对每位用户生成 K 个未见物品，检查测试物品是否命中。使用 HitRate@K、Recall@K、Coverage。
+2. **评分预测**：预测 1–5 星，使用 RMSE。RMSE 越低越好，但它不直接等价于 Top-K 体验。
+3. **点击率预估**：预测曝光后是否点击，使用 AUC 与 LogLoss。AUC 衡量排序，LogLoss 同时惩罚错误且过度自信的概率。
+
+下面先定义几个透明、可复用的评测函数。
+"""),
+         code(r"""
+def topk_items(score_matrix, seen_matrix, k=10):
+    scores = score_matrix.copy()
+    scores[seen_matrix > 0] = -np.inf
+    return np.argsort(-scores, axis=1)[:, :k]
+
+def hit_rate_at_k(topk, targets):
+    return float(np.mean([target in row for row, target in zip(topk, targets)]))
+
+def catalog_coverage(topk, catalog_size):
+    return float(len(np.unique(topk)) / catalog_size)
+
+test_targets = test_ratings.sort_values("user_id").item_id.to_numpy()
+"""),
+         md(r"""
+---
+
+## 2. 协同过滤：直接利用邻域
+
+### 2.1 直觉
+
+- **UserCF**：如果 Alice 与 Bob 过去喜欢的电影相似，那么 Bob 喜欢、Alice 没看过的电影可以推荐给 Alice。
+- **ItemCF**：如果《A》和《B》经常被同一批用户喜欢，那么看过《A》的用户可能也喜欢《B》。
+
+UserCF 的邻居会随用户兴趣变化，适合用户关系明显的场景；ItemCF 的物品相似度通常更稳定，且“因为你看过 A”更容易解释，因此电商、视频相关推荐中更常见。
+
+### 2.2 数学：余弦相似度与邻域加权
+
+令二值交互矩阵为 $R \in \{0,1\}^{|U|\times|I|}$。UserCF 的相似度为：
+
+$$
+s(u,v)=\frac{R_u\cdot R_v}{\|R_u\|_2\|R_v\|_2}
+$$
+
+对用户 $u$ 和候选物品 $i$，UserCF 分数为：
+
+$$
+\hat y_{ui}=\sum_{v\in N_k(u)}s(u,v)R_{vi}
+$$
+
+ItemCF 只是把矩阵转置，在物品邻域中做同样的加权。实际系统还会加入热门度惩罚、时间衰减和相似度截断。
+"""),
+         md("### 2.3 训练：计算 UserCF / ItemCF 相似度"),
+         code(r"""
+# 教学中把 rating >= 3 视为正向隐式行为。
+train_matrix = np.zeros((n_users, n_items), dtype=np.float32)
+for row in train_ratings.itertuples():
+    train_matrix[row.user_id, row.item_id] = float(row.rating >= 3)
+
+def cosine_similarity_rows(matrix):
+    norms = np.linalg.norm(matrix, axis=1, keepdims=True) + 1e-8
+    normalized = matrix / norms
+    similarity = normalized @ normalized.T
+    np.fill_diagonal(similarity, 0.0)
+    return similarity
+
+user_similarity = cosine_similarity_rows(train_matrix)
+item_similarity = cosine_similarity_rows(train_matrix.T)
+
+usercf_scores = user_similarity @ train_matrix
+itemcf_scores = train_matrix @ item_similarity
+print({"user_similarity": user_similarity.shape, "item_similarity": item_similarity.shape})
+"""),
+         md("### 2.4 推理：屏蔽已看物品并取 Top-K"),
+         code(r"""
+usercf_top10 = topk_items(usercf_scores, train_matrix, k=10)
+itemcf_top10 = topk_items(itemcf_scores, train_matrix, k=10)
+
+cf_metrics = {
+    "UserCF HR@10": hit_rate_at_k(usercf_top10, test_targets),
+    "ItemCF HR@10": hit_rate_at_k(itemcf_top10, test_targets),
+    "UserCF Coverage": catalog_coverage(usercf_top10, n_items),
+    "ItemCF Coverage": catalog_coverage(itemcf_top10, n_items),
+}
+display(pd.Series(cf_metrics, name="value").to_frame())
+
+example_user = 0
+print("user 0 的历史 item:", np.where(train_matrix[example_user] > 0)[0].tolist())
+print("UserCF 推荐:", usercf_top10[example_user].tolist())
+print("ItemCF 推荐:", itemcf_top10[example_user].tolist())
+print("真实下一 item:", int(test_targets[example_user]))
+"""),
+         md(r"""
+### 2.5 结果讨论与边界
+
+观察上表时不要只看命中率：Coverage 低可能表示模型只反复推荐热门物品。本小样本中每位用户历史很短，相似度容易受单个共现影响，这正是 CF 在稀疏数据上的典型弱点。
+
+**优点**：无需训练神经网络；解释直接；增量更新容易；ItemCF 可作为强兜底召回。  
+**缺点**：新用户、新物品无邻居；相似度矩阵可能很大；共现继承曝光偏差与热门偏差；无法自然使用文本、图片等内容。
+
+**推理复杂度**：离线相似度可截断为每个实体 Top-N 邻居；线上只聚合用户历史物品的邻居倒排表，避免扫描全库。
+"""),
+         md(r"""
+---
+
+## 3. 矩阵分解（MF）：把用户与物品投影到同一隐空间
+
+### 3.1 从相似度到隐语义
+
+CF 依赖显式邻域；MF 假设评分矩阵近似低秩。每个用户用向量 $p_u\in\mathbb R^d$ 表示，每个物品用 $q_i\in\mathbb R^d$ 表示，内积代表匹配程度。某一维可能与“动作片偏好”相关，但隐维度通常不可直接解释。
+
+### 3.2 数学：带偏置的评分预测
+
+$$
+\hat r_{ui}=\mu+b_u+b_i+p_u^\top q_i
+$$
+
+训练时只在已观察评分集合 $\Omega$ 上最小化正则化平方误差：
+
+$$
+\mathcal L=\sum_{(u,i)\in\Omega}(r_{ui}-\hat r_{ui})^2
++\lambda(\|p_u\|_2^2+\|q_i\|_2^2+b_u^2+b_i^2)
+$$
+
+偏置项吸收“有些用户打分偏高”和“有些电影普遍受欢迎”；embedding 则学习个性化偏离。
+"""),
+         md("### 3.3 训练：用 PyTorch 实现 BiasMF"),
+         code(r"""
+class BiasMF(torch.nn.Module):
+    def __init__(self, n_users, n_items, embedding_dim=12, global_mean=3.0):
+        super().__init__()
+        self.user_embedding = torch.nn.Embedding(n_users, embedding_dim)
+        self.item_embedding = torch.nn.Embedding(n_items, embedding_dim)
+        self.user_bias = torch.nn.Embedding(n_users, 1)
+        self.item_bias = torch.nn.Embedding(n_items, 1)
+        self.register_buffer("global_mean", torch.tensor(float(global_mean)))
+        torch.nn.init.normal_(self.user_embedding.weight, std=0.08)
+        torch.nn.init.normal_(self.item_embedding.weight, std=0.08)
+        torch.nn.init.zeros_(self.user_bias.weight)
+        torch.nn.init.zeros_(self.item_bias.weight)
+
+    def forward(self, user_ids, item_ids):
+        interaction = (self.user_embedding(user_ids) * self.item_embedding(item_ids)).sum(dim=1)
+        return self.global_mean + self.user_bias(user_ids).squeeze(1) + self.item_bias(item_ids).squeeze(1) + interaction
+
+train_users = torch.tensor(train_ratings.user_id.to_numpy(), dtype=torch.long)
+train_items = torch.tensor(train_ratings.item_id.to_numpy(), dtype=torch.long)
+train_targets = torch.tensor(train_ratings.rating.to_numpy(), dtype=torch.float32)
+test_users = torch.tensor(test_ratings.user_id.to_numpy(), dtype=torch.long)
+test_items = torch.tensor(test_ratings.item_id.to_numpy(), dtype=torch.long)
+test_targets_rating = test_ratings.rating.to_numpy()
+
+mf_model = BiasMF(n_users, n_items, embedding_dim=12, global_mean=train_targets.mean())
+optimizer = torch.optim.Adam(mf_model.parameters(), lr=0.03, weight_decay=1e-4)
+loss_curve = []
+for epoch in range(160):
+    prediction = mf_model(train_users, train_items)
+    loss = torch.nn.functional.mse_loss(prediction, train_targets)
+    optimizer.zero_grad(); loss.backward(); optimizer.step()
+    loss_curve.append(float(loss.detach()))
+
+print({"first_loss": round(loss_curve[0], 4), "last_loss": round(loss_curve[-1], 4)})
+"""),
+         md("### 3.4 测试与推理：RMSE 和全库 Top-K"),
+         code(r"""
+mf_model.eval()
+with torch.no_grad():
+    test_prediction = mf_model(test_users, test_items).numpy()
+    mf_rmse = float(np.sqrt(mean_squared_error(test_targets_rating, test_prediction)))
+    all_users = torch.arange(n_users).repeat_interleave(n_items)
+    all_items = torch.arange(n_items).repeat(n_users)
+    mf_score_matrix = mf_model(all_users, all_items).reshape(n_users, n_items).numpy()
+
+mf_top10 = topk_items(mf_score_matrix, train_matrix, k=10)
+mf_hr10 = hit_rate_at_k(mf_top10, test_targets)
+print({"MF test RMSE": round(mf_rmse, 4), "MF HR@10": round(mf_hr10, 4)})
+print("user 0 MF 推荐:", mf_top10[0].tolist())
+"""),
+         md(r"""
+### 3.5 结果讨论与边界
+
+训练损失下降只说明模型拟合了已观察评分；测试 RMSE 才反映未见行为的泛化。Top-K 推理时，MF 与双塔相似：物品向量可以预计算，并用 ANN 搜索内积最大项。
+
+**优点**：比邻域法更紧凑；可平滑稀疏共现；向量检索友好；偏置明确。  
+**缺点**：只看 ID 时仍无法解决新实体；平方误差把“未观察”当缺失而非负样本；内积表达能力有限。  
+**常见升级**：隐式反馈使用 BPR / sampled-softmax；加入时间偏置、内容特征，或发展为 DSSM 双塔。
+"""),
+         md(r"""
+---
+
+## 4. 因子分解机（FM）：为稀疏特征学习二阶交互
+
+### 4.1 为什么 MF 不够？
+
+CTR 排序不只有 `user_id` 和 `item_id`，还会有设备、小时、地域、品类、价格等上下文。直接为每一对特征做 one-hot 交叉会导致参数爆炸；普通 LR 又只能做加法，无法表达“某用户群在晚间更喜欢某品类”。
+
+FM 为每个特征 $i$ 学一个隐向量 $v_i$，用内积共享所有二阶交叉统计：
+
+$$
+\hat y(x)=w_0+\sum_i w_ix_i+\sum_{i<j}\langle v_i,v_j\rangle x_ix_j
+$$
+
+朴素二阶项是 $O(n^2)$，利用恒等式可化为 $O(nk)$：
+
+$$
+\sum_{i<j}\langle v_i,v_j\rangle x_ix_j
+=\frac12\sum_f\left[\left(\sum_i v_{if}x_i\right)^2-\sum_i v_{if}^2x_i^2\right]
+$$
+
+当特征只有 user one-hot 和 item one-hot 时，FM 的交叉项就退化为 MF；因此 FM 可以理解为 MF 对通用稀疏特征的扩展。
+"""),
+         md("### 4.2 数据：从真实评分构造可解释的二分类排序任务"),
+         code(r"""
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+ctr = ratings.sort_values("timestamp").tail(5000).copy().reset_index(drop=True)
+# `click` 是任务别名；标签由真实评分 rating >= 4.0 确定，不使用随机采样。
+ctr["click"] = ctr["like"].astype(int)
+split = int(len(ctr) * .8)  # 严格按真实 timestamp 切分
+categorical = ["user_id", "item_id", "genre_id", "hour", "decade_id"]
+encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+train_sparse = encoder.fit_transform(ctr.loc[:split-1, categorical])
+test_sparse = encoder.transform(ctr.loc[split:, categorical])
+scaler = StandardScaler()
+train_numeric = scaler.fit_transform(ctr.loc[:split-1, ["item_popularity", "user_activity"]])
+test_numeric = scaler.transform(ctr.loc[split:, ["item_popularity", "user_activity"]])
+fm_train_x = np.c_[train_sparse, train_numeric].astype("float32")
+fm_test_x = np.c_[test_sparse, test_numeric].astype("float32")
+ctr_train_y = ctr.loc[:split-1, "click"].to_numpy()
+ctr_test_y = ctr.loc[split:, "click"].to_numpy()
+print({"train": fm_train_x.shape, "test": fm_test_x.shape, "train_positive_rate": round(ctr_train_y.mean(), 3)})
+"""),
+         md("### 4.3 训练：显式实现 FM 的线性时间交叉"),
+         code(r"""
+class FactorizationMachine(torch.nn.Module):
+    def __init__(self, n_features, factor_dim=10):
+        super().__init__()
+        self.linear = torch.nn.Linear(n_features, 1)
+        self.factors = torch.nn.Parameter(torch.randn(n_features, factor_dim) * 0.03)
+
+    def forward(self, x):
+        linear_logit = self.linear(x).squeeze(1)
+        summed = x @ self.factors
+        squared_sum = summed.pow(2)
+        sum_squared = x.pow(2) @ self.factors.pow(2)
+        pairwise_logit = 0.5 * (squared_sum - sum_squared).sum(dim=1)
+        return linear_logit + pairwise_logit
+
+fm_model = FactorizationMachine(fm_train_x.shape[1], factor_dim=10)
+fm_optimizer = torch.optim.Adam(fm_model.parameters(), lr=.025, weight_decay=1e-5)
+x_train_tensor = torch.tensor(fm_train_x)
+y_train_tensor = torch.tensor(ctr_train_y, dtype=torch.float32)
+
+for epoch in range(100):
+    fm_logit = fm_model(x_train_tensor)
+    fm_loss = torch.nn.functional.binary_cross_entropy_with_logits(fm_logit, y_train_tensor)
+    fm_optimizer.zero_grad(); fm_loss.backward(); fm_optimizer.step()
+
+print({"FM final BCE": round(float(fm_loss.detach()), 4)})
+"""),
+         md("### 4.4 推理与测试：输出概率、AUC 与 LogLoss"),
+         code(r"""
+fm_model.eval()
+with torch.no_grad():
+    fm_probability = torch.sigmoid(fm_model(torch.tensor(fm_test_x))).numpy()
+fm_auc = float(roc_auc_score(ctr_test_y, fm_probability))
+fm_logloss = float(log_loss(ctr_test_y, fm_probability))
+display(pd.DataFrame({"label": ctr_test_y[:8], "p_click": fm_probability[:8].round(4)}))
+print({"FM AUC": round(fm_auc, 4), "FM LogLoss": round(fm_logloss, 4)})
+"""),
+         md(r"""
+### 4.5 结果讨论与边界
+
+AUC 关注正样本是否排在负样本前，LogLoss 关注概率本身是否可信。FM 能通过隐向量共享低频交叉的统计，但所有交互仍是二阶且形式相同。
+
+**优点**：适合超稀疏 one-hot；无需枚举交叉；参数能跨组合共享；计算复杂度线性。  
+**缺点**：主要建模二阶；不理解行为顺序；所有 field 共用同一种内积。  
+**常见升级**：FFM 为不同 field 学不同向量；DeepFM 共享 embedding，同时加入 DNN 学高阶非线性。
+"""),
+         md(r"""
+---
+
+## 5. GBDT+LR：树负责发现规则，LR 负责组合与校准
+
+### 5.1 核心思想
+
+Facebook 经典 CTR 工作把 GBDT 的每棵树视为一个自动特征生成器。样本落到某棵树的哪个叶子，代表它满足了一组条件，例如：
+
+> `hour > 18 AND device = mobile AND price < 20`
+
+将每棵树的叶节点编号 one-hot 后输入 LR：
+
+$$
+P(y=1\mid z)=\sigma(w_0+w^\top z)
+$$
+
+这里 $z$ 是所有树叶节点的稀疏指示向量。GBDT 学非线性分桶与条件组合；LR 学各条规则的稳定权重并输出概率。注意这通常是**两阶段训练**，不是端到端联合优化。
+"""),
+         md("### 5.2 训练阶段一：XGBoost 学习树规则"),
+         code(r"""
+from xgboost import XGBClassifier
+from sklearn.linear_model import LogisticRegression
+
+tree_features = ["user_id", "item_id", "genre_id", "hour", "decade_id", "item_popularity", "user_activity"]
+# GBDT 使用与 FM 相同的 one-hot 类别语义，避免把类别 ID 错当连续数值。
+gbdt_train_x = fm_train_x
+gbdt_test_x = fm_test_x
+
+gbdt = XGBClassifier(
+    n_estimators=80, max_depth=4, learning_rate=.05, subsample=.9,
+    colsample_bytree=.9, eval_metric="logloss", random_state=SEED, n_jobs=1
+)
+gbdt.fit(gbdt_train_x, ctr_train_y)
+train_leaf = gbdt.apply(gbdt_train_x)
+test_leaf = gbdt.apply(gbdt_test_x)
+print({"trees": train_leaf.shape[1], "train_leaf_matrix": train_leaf.shape})
+"""),
+         md("### 5.3 训练阶段二：叶节点 one-hot 后训练 LR"),
+         code(r"""
+leaf_encoder = OneHotEncoder(handle_unknown="ignore")
+train_leaf_onehot = leaf_encoder.fit_transform(train_leaf)
+test_leaf_onehot = leaf_encoder.transform(test_leaf)
+
+leaf_lr = LogisticRegression(max_iter=500, C=.7)
+leaf_lr.fit(train_leaf_onehot, ctr_train_y)
+gbdt_lr_probability = leaf_lr.predict_proba(test_leaf_onehot)[:, 1]
+
+gbdt_lr_auc = float(roc_auc_score(ctr_test_y, gbdt_lr_probability))
+gbdt_lr_logloss = float(log_loss(ctr_test_y, gbdt_lr_probability))
+print({"leaf_onehot_dim": train_leaf_onehot.shape[1], "GBDT+LR AUC": round(gbdt_lr_auc, 4), "GBDT+LR LogLoss": round(gbdt_lr_logloss, 4)})
+"""),
+         md("### 5.4 推理：同一条样本必须依次经过两阶段"),
+         code(r"""
+def predict_gbdt_lr(frame):
+    sparse_part = encoder.transform(frame[categorical])
+    numeric_part = scaler.transform(frame[["item_popularity", "user_activity"]])
+    encoded_features = np.c_[sparse_part, numeric_part].astype("float32")
+    leaf = gbdt.apply(encoded_features)
+    leaf_onehot = leaf_encoder.transform(leaf)
+    return leaf_lr.predict_proba(leaf_onehot)[:, 1]
+
+online_batch = ctr.loc[split:split+4].copy()
+online_batch["p_click"] = predict_gbdt_lr(online_batch)
+display(online_batch[tree_features + ["click", "p_click"]])
+"""),
+         md(r"""
+### 5.5 结果讨论与边界
+
+**优点**：连续变量无需手工分桶；树能发现条件组合；LR 服务成熟、输出易校准；对中等规模表格特征很强。  
+**缺点**：两阶段可能失配；叶节点空间随树数膨胀；高基数 ID 容易过拟合；树规则会随分布漂移而陈旧；难以表达长行为序列。  
+**工业注意**：训练与服务必须共享完全相同的树版本、叶编码器和缺失值处理；监控 unseen leaf、特征漂移与概率校准。
+
+与 FM 的关键区别：FM 假设交互可由低秩内积共享；GBDT+LR 假设有效模式可由一组树规则离散化。两者没有绝对胜负，取决于稀疏度、特征类型、数据量和延迟预算。
+"""),
+         md(r"""
+## Checks
+
+下面把不同任务的指标放在一张“不可横向混比”的检查表中。它的用途是确认每条代码路径确实学习到信号，而不是宣布某算法全面胜出。
+"""),
+         code(r"""
+summary = pd.DataFrame([
+    {"algorithm": "UserCF", "task": "Top-K", "primary_metric": "HR@10", "value": cf_metrics["UserCF HR@10"]},
+    {"algorithm": "ItemCF", "task": "Top-K", "primary_metric": "HR@10", "value": cf_metrics["ItemCF HR@10"]},
+    {"algorithm": "BiasMF", "task": "rating prediction", "primary_metric": "RMSE (lower)", "value": mf_rmse},
+    {"algorithm": "FM", "task": "CTR", "primary_metric": "AUC", "value": fm_auc},
+    {"algorithm": "GBDT+LR", "task": "CTR", "primary_metric": "AUC", "value": gbdt_lr_auc},
+])
+display(summary.round(4))
+
+assert 0 <= cf_metrics["UserCF HR@10"] <= 1
+assert 0 <= cf_metrics["ItemCF HR@10"] <= 1
+assert np.isfinite(mf_rmse) and mf_rmse < 3.0
+assert fm_auc > .55 and gbdt_lr_auc > .55
+assert np.all((fm_probability >= 0) & (fm_probability <= 1))
+assert np.all((gbdt_lr_probability >= 0) & (gbdt_lr_probability <= 1))
+print("PASS：四类算法的训练、推理和测试路径均有效。")
+print(
+    f"本次固定样本：UserCF HR@10={cf_metrics['UserCF HR@10']:.3f}，"
+    f"ItemCF HR@10={cf_metrics['ItemCF HR@10']:.3f}；"
+    f"MF RMSE={mf_rmse:.3f}；FM AUC={fm_auc:.3f}；GBDT+LR AUC={gbdt_lr_auc:.3f}。"
+)
+print("注意：前三者与后两者属于不同任务，只能在各自指标和基线内解释。")
+"""),
+         md(r"""
+## 结果讨论：如何读这组实验
+
+1. **CF 的 HR@10 与 Coverage 要一起看。** 命中率相近时，覆盖更多目录的方案通常更有探索价值；但离线覆盖也不能替代线上多样性指标。
+2. **MF 的 RMSE 与 HR@10回答不同问题。** 前者衡量星级拟合，后者衡量下一物品是否进入候选。优化平方误差不保证最佳 Top-K。
+3. **FM 与 GBDT+LR 才能在同一二分类测试集上比较 AUC/LogLoss。** 两者都使用真实评分派生的 `rating >= 4.0` 标签和相同的时间切分；MovieLens 不是曝光日志，因此这里验证的是稀疏特征建模链路，不能把结果解读为真实 CTR benchmark。
+4. **小样本结果首先用于查错。** 真正选型还要比较时间外推、冷启动、Coverage、校准、P99 延迟、内存和特征新鲜度。
+
+### 一句话选型
+
+- 需要简单、可解释的相关推荐：先用 ItemCF。
+- 只有稳定 ID 共现且目录很大：MF 是双塔召回的最小原型。
+- 大量稀疏类别特征且二阶交互重要：FM。
+- 表格连续特征丰富、需要自动分桶与条件规则：GBDT+LR。
+"""),
+         md(r"""
+## Next Steps
+
+1. 将 smoke 子集扩大到完整 MovieLens latest-small 或 MovieLens 1M，并保持逐用户时间外推评测。
+2. 为 CF 加入热门度惩罚、时间衰减和邻居 Top-N 截断。
+3. 将 MF 的 MSE 换为 BPR pairwise loss，直接优化正负物品排序。
+4. 比较 LR、FM、GBDT+LR 的 AUC、LogLoss 与校准曲线，再进入 DeepFM。
+5. 在下一版 Notebook 中加入可视化：相似度热力图、MF embedding 投影、FM 交互强度和树叶覆盖率。
+
+> 教学结论：模型演进不是“新模型替代旧模型”，而是从邻域统计、低维表示到上下文交叉，逐步扩大可表达的信息范围，同时付出更多训练、服务与治理成本。
+""")
+        ])
+
+    specs["3_2_retrieval_dssm_mind"] = notebook(
+        "3.2 召回：DSSM 双塔与 MIND",
+        "用 Torch-RecHub 的工业化模型契约理解双塔的可索引性、in-batch negatives 与 MIND 多兴趣合并，并用 Recall@K 检查召回链路。",
+        "[DSSM](https://www.microsoft.com/en-us/research/publication/learning-deep-structured-semantic-models-for-web-search-using-clickthrough-data/) · [MIND](https://arxiv.org/abs/1904.08030) · [Torch-RecHub](https://github.com/datawhalechina/torch-rechub)",
+        [md("## Steps\n\n### 1. 验证工业框架\n\nTorch-RecHub 0.8 提供 `DSSM`、`MIND`、`MatchTrainer`、双塔分开 ONNX 导出和 ANN 插件；TorchEasyRec 工业档增加分片 embedding、Parquet/Kafka 与分布式训练。"),
+         code("import torch_rechub\nfrom torch_rechub.models.matching import DSSM, MIND\nfrom torch_rechub.trainers import MatchTrainer\nprint({'torch_rechub': getattr(torch_rechub, '__version__', 'installed'), 'models': [DSSM.__name__, MIND.__name__], 'trainer': MatchTrainer.__name__})"),
+         md("### 2. 执行双塔与多兴趣小实验\n\n训练使用归一化 embedding、温度缩放和 in-batch softmax；item embedding 可离线预计算。MIND smoke 以两个兴趣簇演示多路向量检索与 max merge 的效果。"),
+         code("from recsys_lab import run_retrieval\nmetrics = run_retrieval(epochs=55 if PROFILE == 'smoke' else 160)\nmetrics"),
+         md("### 3. TorchEasyRec 工业配置映射\n\n完整档将 `user_id/history`、`item_id/category` 定义为 feature group，DSSM/MIND 输出塔分别导出；训练数据使用时间切分 Parquet，item 塔批量物化到向量库。"),
+         code("torcheasyrec_profile = {'model': 'DSSM or MIND', 'input': 'Parquet/MaxCompute/Kafka', 'distributed': 'TorchRec sharding', 'serving': 'separate user/item tower + ANN', 'monitor': ['Recall@K','coverage','index freshness','P99']}\ntorcheasyrec_profile"),
+         md("## Checks\n\n确认 embedding 维度固定、召回指标在 [0,1]，并单独监控热门/长尾/新 item。"),
+         code("assert metrics['embedding_dim'] == 16\nassert 0 <= metrics['dssm_recall@10'] <= 1 and 0 <= metrics['mind_recall@10'] <= 1\nprint('PASS: retrieval contract and metrics are valid')"),
+         md("## Next Steps\n\n切换 Amazon Reviews 2023 五核子集；用 FAISS/Milvus 替代精确内积；加入 sampled-softmax 频率校正、增量索引版本一致性和多兴趣去重。")])
+
+    specs["3_3_ranking_deepfm_din_dien"] = notebook(
+        "3.3 排序：DeepFM、DIN 与 DIEN",
+        "在统一 Torch-RecHub 排序管线中比较静态特征交叉、候选感知兴趣激活与兴趣演化，建立 AUC/GAUC、LogLoss 和服务成本的共同视角。",
+        "[DeepFM](https://arxiv.org/abs/1703.04247) · [DIN](https://arxiv.org/abs/1706.06978) · [DIEN](https://arxiv.org/abs/1809.03672)",
+        [md("## Steps\n\n### 1. 验证框架模型与数据契约\n\nDeepFM 接收 sparse/dense feature columns；DIN/DIEN 额外接收 behavior sequence、candidate item 与 padding mask。"),
+         code("import torch_rechub\nfrom torch_rechub.models.ranking import DeepFM, DIN, DIEN\nfrom torch_rechub.trainers import CTRTrainer\nprint({'models':[DeepFM.__name__,DIN.__name__,DIEN.__name__], 'trainer':CTRTrainer.__name__})"),
+         md("### 2. 训练与比较\n\nsmoke 档的 DeepFM 真实训练 FM+DNN 共享输入；DIN 对照加入候选—历史相关信号。DIEN 的工业实现应包含兴趣抽取 GRU、逐步辅助损失和目标感知演化 GRU。"),
+         code("from recsys_lab import run_ranking\nmetrics = run_ranking(epochs=45 if PROFILE == 'smoke' else 140)\nmetrics"),
+         md("## Checks\n\nAUC 只验证模型能学习固定信号。线上还要测 GAUC、校准、分桶稳定性、序列截断损失与 P99。"),
+         code("assert metrics['deepfm_auc'] > .55\nassert metrics['din_auc'] > .55\nprint('PASS: ranking models learn non-random affinity')"),
+         md("## Next Steps\n\nDeepFM 用 Criteo；DIN/DIEN 用 Amazon 2023 时间序列。导出 ONNX 前固定 padding/mask 语义，并对 20/50/100/200 长度做质量—延迟曲线。")])
+
+    specs["3_4_multitask_mmoe_ple"] = notebook(
+        "3.4 多目标：MMoE 与 PLE",
+        "用共享专家与任务门控联合学习点击/转化，理解 PLE 如何进一步拆分共享和任务专属知识，并检查每任务指标而非只看总损失。",
+        "[MMoE](https://dl.acm.org/doi/10.1145/3219819.3220007) · [PLE](https://dl.acm.org/doi/10.1145/3383313.3412236)",
+        [md("## Steps\n\n### 1. 验证 Torch-RecHub 多任务组件\n\n统一 `MTLTrainer` 支持每任务 loss、metric 与 ONNX 导出；完整数据可用 Ali-CCP 或 MerRec 多动作 schema。"),
+         code("import torch_rechub\nfrom torch_rechub.models.multi_task import MMOE, PLE\nfrom torch_rechub.trainers import MTLTrainer\nprint({'models':[MMOE.__name__,PLE.__name__], 'trainer':MTLTrainer.__name__})"),
+         md("### 2. MMoE 小实验\n\n四个专家输出共享表示；click 与 conversion 各自通过 gate 选择专家，再进入任务塔。PLE 会逐层加入共享/专属专家，避免所有知识被迫共享。"),
+         code("from recsys_lab import run_multitask\nmetrics = run_multitask(epochs=55 if PROFILE == 'smoke' else 160)\nmetrics"),
+         md("## Checks\n\n分别检查任务 AUC；conversion 正样本只来自 click 正样本时，要警惕样本选择偏差。工业验收还需监控专家利用率、梯度余弦和任务跷跷板。"),
+         code("assert metrics['mmoe_click_auc'] > .55\nassert metrics['mmoe_conversion_auc'] > .55\nprint('PASS: both task heads learn signal')"),
+         md("## Next Steps\n\n用 PLE 对照 MMoE；引入不确定性加权/GradNorm；业务层将 pCTR、pCVR、时长和负反馈校准后进入显式价值函数，而非直接相加原始概率。")])
+
+    specs["4_2_openonerec_practice"] = notebook(
+        "4.2 OpenOneRec 实战：从 RecIF-Bench 到约束列表生成",
+        "复现 OpenOneRec 的关键数据与生成接口：行为序列、Semantic ID、合法前缀约束、列表 NDCG、无效 ID 率和 DPO 偏好样本；提供官方大模型运行入口。",
+        "[OpenOneRec](https://github.com/Kuaishou-OneRec/OpenOneRec) · [OneRec](https://arxiv.org/abs/2502.18965)",
+        [md("## Steps\n\n### 1. 运行边界\n\nOpenOneRec 公开 1.7B/8B Qwen3 基座与 RecIF-Bench（100M 交互、200K 用户）。CI 不下载权重；smoke 档验证与官方接口一致的数据/约束/指标，full 档按官方 README 在多 GPU 环境运行。"),
+         code("openonerec_runtime = {'smoke':'local constrained decoder + MovieLens-derived RecIF schema','full':'clone OpenOneRec; prepare RecIF-Bench; launch official SFT/DPO scripts','models':['OneRec-1.7B','OneRec-8B'],'guardrails':['legal item trie','dedup','inventory filter','fallback']}\nopenonerec_runtime"),
+         md("### 2. Semantic ID 与约束解码\n\nitem 由多级码组成；每一步只允许目录 trie 中仍可完成为合法 item 的 token。这把 invalid ID rate 从开放生成的风险变成可测试的不变量。"),
+         code("from recsys_lab import run_generative\nmetrics = run_generative()\nmetrics"),
+         md("### 3. 列表级训练与对齐\n\nOneRec 不是逐 item CTR 的简单替代：session-wise generation 优化整张列表；奖励模型评估观看/转化/多样性，DPO 用 chosen/rejected 列表对齐偏好。"),
+         code("chosen, rejected = metrics['dpo_pair']['chosen'], metrics['dpo_pair']['rejected']\nprint({'prompt':'user history + context','chosen':chosen,'rejected':rejected,'training':'DPO preference pair'})"),
+         md("## Checks\n\n同时报告 NDCG/Recall、覆盖、新 item、重复率、invalid ID、P99、tokens/s 与 GPU 成本。离线提升不能替代线上 session 级 A/B。"),
+         code("assert metrics['invalid_id_rate'] == 0\nassert metrics['allowed_next_tokens'] == [2,3]\nassert 0 <= metrics['ndcg@5'] <= 1\nprint('PASS: constrained generation only emits catalog-valid continuations')"),
+         md("## Next Steps\n\n按 OpenOneRec 官方许可获取 RecIF-Bench；建立 item 目录版本与 Semantic ID 码本版本绑定；先旁路生成候选，再灰度生成排序，最后评估端到端召排融合。")])
+
+    specs["4_3_dlrm_hstu_practice"] = notebook(
+        "4.3 DLRM HSTU 实战：行为序列生成式推荐",
+        "理解 HSTU 的序列建模接口、next-item 目标和 DLRM-v3 工业运行边界；CPU 档验证 schema 与指标，完整档映射 Meta 官方 generative-recommenders。",
+        "[HSTU paper](https://arxiv.org/abs/2402.17152) · [Meta official code](https://github.com/meta-recsys/generative-recommenders) · [Torch-RecHub HSTU](https://datawhalechina.github.io/torch-rechub/models/generative.html)",
+        [md("## Steps\n\n### 1. 验证轻量工业框架入口\n\nTorch-RecHub `generative` extra 提供 HSTU；输入包括 item sequence、time difference、padding mask，目标是 next-item。Meta 官方仓库面向 Ubuntu/CUDA，MovieLens 1M/20M/Amazon Books，DLRM-v3 示例需要多 GPU。"),
+         code("import torch_rechub\ntry:\n    from torch_rechub.models.generative import HSTUModel\n    hstu_entry = HSTUModel.__name__\nexcept (ImportError, ModuleNotFoundError) as exc:\n    hstu_entry = f'install torch-rechub[generative]: {exc.__class__.__name__}'\nprint({'torch_rechub':getattr(torch_rechub,'__version__','installed'),'hstu_entry':hstu_entry})"),
+         md("### 2. 序列数据契约与指标 smoke\n\n本实验复用确定性目录约束与 NDCG 检查；完整训练需把每个用户按时间排序，最后一项测试、倒数第二项验证，训练窗口只看过去。"),
+         code("from recsys_lab import run_generative\nmetrics = run_generative()\nsequence_contract = {'item_seq':'int64[B,L]','time_delta':'float32[B,L]','mask':'bool[B,L]','target':'int64[B]'}\nsequence_contract, metrics"),
+         md("### 3. Meta DLRM-v3 工业档\n\n官方栈含 TorchRec/FBGEMM、HSTU 与 M-FALCON。先跑 MovieLens debug 配置，再逐步放大序列长度、层数、embedding 与负样本；不要在 CPU smoke 数值上推断工业收益。"),
+         code("meta_profile = {'repository':'meta-recsys/generative-recommenders','environment':'Ubuntu 22.04, CUDA 12.4, Python 3.10','data':['MovieLens-1M','MovieLens-20M','Amazon Books'],'hardware':'official DLRM-v3 debug documents 4 GPUs; >=24GB each','evaluate':['HR@10','NDCG@10','throughput','P99','peak memory']}\nmeta_profile"),
+         md("## Checks\n\n检查严格时间切分、padding 不参与 attention、候选目录合法、NDCG 范围和可重复 seed。"),
+         code("assert 0 <= metrics['ndcg@5'] <= 1\nassert metrics['invalid_id_rate'] == 0\nprint('PASS: HSTU data/metric contract is valid; full GPU training is intentionally separate')"),
+         md("## Next Steps\n\n执行 Meta 官方 MovieLens-1M debug；记录相同召回集下的 SASRec/HSTU 增益与成本；验证 M-FALCON 的增量推断，并在迁移生产前做目录更新、回滚和线上新鲜度实验。")])
+
+    # 3.1 的长稿是编辑母版；交付时按“一种算法一个 Notebook”拆分，并新增章节总结。
+    chapter31_source = specs.pop("3_1_classic_models")
+    source_cells = chapter31_source["cells"]
+    chapter31_sources = "[MovieLens](https://grouplens.org/datasets/movielens/) · [MF](https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf) · [FM](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf) · [GBDT+LR](https://research.facebook.com/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/)"
+
+    specs["3_1_overview"] = notebook(
+        "3.1 经典推荐算法总结与横向对比",
+        "在完成四个独立实验后，从任务、表示、训练目标、指标、推理方式和工业边界六个角度进行横向比较。本文不重复完整实现，只提供章节地图、结果快照和选型评论。",
+        chapter31_sources,
+        [
+            source_cells[3],
+            md(r"""
+## 来源论文与本章解读
+
+本章不是按发表年份罗列名词，而是沿着“表示什么、怎样推理”阅读四条原始工作：
+
+- **Resnick et al. (1994), GroupLens**：早期系统展示了如何依据用户间评分相似度形成邻域预测；关键遗产是“从群体行为借信号”，而不是某个固定相似度公式。
+- **Sarwar et al. (2001), Item-based CF**：把邻域移到更稳定、可离线物化的 item 侧，直接影响了后来的相关推荐和倒排召回。
+- **Koren, Bell & Volinsky (2009), Matrix Factorization Techniques**：以全局/用户/物品偏置加低秩内积解释评分；其 user/item 向量结构也是双塔召回的最小原型。
+- **Rendle (2010), Factorization Machines**：用特征隐向量共享稀疏二阶交叉统计，并用恒等式把计算从 $O(n^2k)$ 降为 $O(nk)$。
+- **He et al. (2014), Practical Lessons from Predicting Clicks on Ads at Facebook**：树负责产生非线性叶规则，LR 负责稀疏组合与概率输出，代表经典的两阶段 CTR 工程路线。
+
+阅读时请区分两组问题：CF/MF 面向 user–item 评分或 Top-K；FM/GBDT+LR 面向曝光后的点击概率。不同任务的指标不能直接排名。
+"""),
+            md(r"""
+## Steps
+
+## 1. 四个独立实验
+
+| Notebook | 核心问题 | 主要指标 |
+|---|---|---|
+| 3.1.1 协同过滤 | 谁与谁相似，如何用邻域产生候选？ | HR@K、Recall@K、Coverage |
+| 3.1.2 矩阵分解（BiasMF） | 如何把稀疏矩阵压缩成用户/物品隐向量？ | RMSE、HR@K |
+| 3.1.3 FM | 如何在线性复杂度内学习稀疏二阶交互？ | AUC、LogLoss |
+| 3.1.4 GBDT+LR | 如何用树叶规则生成特征，再由 LR 校准概率？ | AUC、LogLoss |
+
+这四篇均可独立从头执行，不依赖其他 Notebook 的内存状态。
+"""),
+            md(r"""
+## 2. 结果快照
+
+以下数值由四个算法 Notebook 在执行末尾写入 `results/chapter_3_1/*.json`，本总结只读取产物，不手填实验值。CF/MF 与 FM/GBDT+LR 属于不同任务，表格用于确认代码路径和理解指标，不能按数值大小直接排名。
+"""),
+            code(r"""
+import json
+import pandas as pd
+
+result_dir = ROOT / "results" / "chapter_3_1"
+result_files = sorted(result_dir.glob("*.json"))
+assert len(result_files) == 4, f"需要先执行四个算法 Notebook；当前产物：{[p.name for p in result_files]}"
+records = []
+for path in result_files:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    records.extend(payload["records"])
+comparison = pd.DataFrame(records)
+display(comparison.round(4))
+print("指标来源：", [p.name for p in result_files])
+"""),
+            md(r"""
+## 3. 横向评论
+
+| 维度 | CF | MF | FM | GBDT+LR |
+|---|---|---|---|---|
+| 输入 | user–item 行为 | user–item 评分/行为 | 任意稀疏与连续特征 | 表格特征 |
+| 表示 | 邻域/相似度 | 低维 embedding | 特征 embedding | 树叶规则 |
+| 交互能力 | 共现传播 | user-item 内积 | 全部二阶交互 | 非线性条件组合 |
+| 冷启动 | 弱 | 弱 | 可加入内容特征 | 可加入内容特征 |
+| 序列能力 | 无 | 无 | 无 | 无 |
+| 典型位置 | 召回/相关推荐 | 召回/评分 | CTR 排序 | CTR 排序 |
+| 主要风险 | 稀疏、热门偏差 | 未观察样本、内积限制 | 仅二阶 | 两阶段失配、规则漂移 |
+
+技术演进不是简单替换关系：ItemCF 常作为覆盖与兜底通道长期保留；MF 是双塔向量召回的最小原型；FM 和 GBDT+LR 则代表排序阶段两条经典特征交叉路线。
+"""),
+            md(r"""
+## Checks
+
+- 比较 Top-K 模型时同时看命中、覆盖和新颖度。
+- 比较 CTR 模型时至少同时看 AUC、LogLoss 与校准。
+- 只在相同数据、相同时间切分、相同负样本下横向比较。
+- smoke 指标用于代码与理解验证，不当作公开 benchmark。
+"""),
+            code("assert len(comparison) == 5\nassert set(comparison.task) == {'Top-K', '评分预测', 'CTR'}\nassert comparison.source_notebook.nunique() == 4\nprint('PASS：章节总结从四个独立实验聚合了全部经典算法与三类任务。')"),
+            md(r"""
+## Next Steps
+
+按顺序阅读四篇算法 Notebook。若目标是构建系统基线，建议先落地 ItemCF 与 GBDT+LR/FＭ，再根据目录规模和特征类型引入 MF/双塔与 DeepFM。
+"""),
+        ],
+    )
+
+    specs["3_1_1_collaborative_filtering"] = notebook(
+        "3.1.1 协同过滤：UserCF 与 ItemCF",
+        "单独掌握邻域推荐：从真实 MovieLens 评分数据、余弦相似度，到 UserCF/ItemCF 训练、Top-K 推理、HR@10 与 Coverage 评测。",
+        "[GroupLens MovieLens](https://grouplens.org/datasets/movielens/) · [Collaborative Filtering](https://dl.acm.org/doi/10.1145/192844.192905)",
+        [md(r"""
+## 来源论文与阅读提示
+
+**Resnick et al. (1994), GroupLens** 将“相似用户的评分加权”落成了可运行系统，是 UserCF 的代表性早期来源；**Sarwar et al. (2001), Item-based Collaborative Filtering Recommendation Algorithms** 则系统比较 item 相似度与预测方式。后者的重要工业含义是：item 关系通常比用户兴趣稳定，可以离线计算 Top-N 近邻表，线上只聚合用户历史。
+
+本实验用二值矩阵突出共现传播。真实评分 UserCF 还可做均值中心化；隐式反馈则常加入热门度惩罚、时间衰减和置信度权重。
+
+### 公式怎么读（直觉版）
+
+若向量、点积或矩阵乘法还陌生，请先运行 **3.0 推荐算法数学基础**。这里的 $R_u\cdot R_v$ 只是把两位用户在每个物品上的 0/1 逐项相乘再相加，因此等于共同喜欢数；分母是两行的“勾股长度”，用于避免行为多的人天然得分更高。后面的 `similarity @ train_matrix` 则是一次批量完成所有邻居加权。
+""")] + [source_cells[i] for i in [4, 5, 6, 7, 8]] + [
+            md(r"""
+### 2.3 小矩阵演示：共现矩阵怎样变成推荐分数
+
+先不用完整数据，手工构造 3 个用户 × 4 个物品。`R @ R.T` 统计用户共同喜欢多少物品，`R.T @ R` 统计物品被多少用户共同喜欢；余弦归一化消除活跃度/热门度的量纲。最后的矩阵乘法正对应邻域加权公式。
+"""),
+            code(r"""
+toy_R = np.array([
+    [1, 1, 0, 0],  # u0 看过 i0、i1
+    [1, 0, 1, 0],  # u1 看过 i0、i2
+    [0, 1, 1, 1],  # u2 看过 i1、i2、i3
+], dtype=float)
+
+toy_user_cooccurrence = toy_R @ toy_R.T
+toy_item_cooccurrence = toy_R.T @ toy_R
+display(pd.DataFrame(toy_R, index=["u0","u1","u2"], columns=["i0","i1","i2","i3"]))
+display(pd.DataFrame(toy_user_cooccurrence, index=["u0","u1","u2"], columns=["u0","u1","u2"]))
+display(pd.DataFrame(toy_item_cooccurrence, index=["i0","i1","i2","i3"], columns=["i0","i1","i2","i3"]))
+
+def toy_cosine(matrix):
+    normalized = matrix / np.maximum(np.linalg.norm(matrix, axis=1, keepdims=True), 1e-12)
+    similarity = normalized @ normalized.T
+    np.fill_diagonal(similarity, 0)
+    return similarity
+
+toy_user_similarity = toy_cosine(toy_R)
+toy_item_similarity = toy_cosine(toy_R.T)
+toy_usercf_scores = toy_user_similarity @ toy_R
+toy_itemcf_scores = toy_R @ toy_item_similarity
+toy_usercf_scores[toy_R > 0] = -np.inf
+toy_itemcf_scores[toy_R > 0] = -np.inf
+
+print("u0 UserCF 未见物品分数:", {f"i{i}": round(v, 3) for i, v in enumerate(toy_usercf_scores[0]) if np.isfinite(v)})
+print("u0 ItemCF 未见物品分数:", {f"i{i}": round(v, 3) for i, v in enumerate(toy_itemcf_scores[0]) if np.isfinite(v)})
+assert np.allclose(toy_user_cooccurrence, toy_R @ toy_R.T)
+assert np.allclose(toy_item_cooccurrence, toy_R.T @ toy_R)
+""")
+        ] + [source_cells[i] for i in [9, 10, 11, 12, 13]] + [
+            md("## Checks\n\n检查相似度矩阵对角线、已见物品屏蔽、Top-K 范围以及 Coverage。"),
+            code("assert np.allclose(np.diag(user_similarity), 0)\nassert np.allclose(np.diag(item_similarity), 0)\nassert 0 <= cf_metrics['UserCF HR@10'] <= 1\nassert 0 <= cf_metrics['ItemCF Coverage'] <= 1\nprint('PASS：UserCF / ItemCF 训练、推理与评测均有效。')"),
+            code(r"""
+result_dir = ROOT / "results" / "chapter_3_1"
+result_dir.mkdir(parents=True, exist_ok=True)
+payload = {"records": [
+    {"algorithm":"UserCF", "task":"Top-K", "metric":"HR@10 ↑", "value":cf_metrics["UserCF HR@10"], "secondary_metric":"Coverage", "secondary_value":cf_metrics["UserCF Coverage"], "online_inference":"聚合相似用户的历史", "source_notebook":"3_1_1_collaborative_filtering"},
+    {"algorithm":"ItemCF", "task":"Top-K", "metric":"HR@10 ↑", "value":cf_metrics["ItemCF HR@10"], "secondary_metric":"Coverage", "secondary_value":cf_metrics["ItemCF Coverage"], "online_inference":"聚合历史物品的近邻", "source_notebook":"3_1_1_collaborative_filtering"},
+]}
+(result_dir / "collaborative_filtering.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+print("已写出章节指标：collaborative_filtering.json")
+"""),
+            md("## Next Steps\n\n加入热门度惩罚、时间衰减、邻居 Top-N 截断，并在 MovieLens 100K 上比较 UserCF 与 ItemCF 的 HR、Coverage 和长尾表现。"),
+        ],
+    )
+
+    specs["3_1_2_matrix_factorization"] = notebook(
+        "3.1.2 矩阵分解：BiasMF",
+        "单独掌握低秩推荐：理解偏置与 embedding，使用 PyTorch 训练 BiasMF，并分别完成评分预测和全库 Top-K 推理。",
+        "[Matrix Factorization Techniques for Recommender Systems](https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf)",
+        [md(r"""
+## 来源论文与阅读提示
+
+**Koren, Bell & Volinsky (2009)** 总结了 Netflix Prize 时代的矩阵分解实践。论文最值得关注的不是“做一次 SVD”，而是：只在观察集合 $\Omega$ 上优化、显式建模全局/用户/物品偏置，并用正则化控制 user/item 隐向量。本文的 BiasMF 正对应这一结构。
+
+### 公式怎么读（直觉版）
+
+若矩阵或点积陌生，请先阅读 **3.0 推荐算法数学基础**。MF 可以想成给每位用户和每部电影各发一张“兴趣坐标卡”：例如 `[动作偏好, 喜剧偏好]`。两张卡逐项相乘再相加，方向越一致，预测喜欢程度越高。$R\approx PQ^\top$ 只是说：用“用户坐标表 × 物品坐标表”近似原本巨大且稀疏的评分表。
+""")] + [source_cells[i] for i in [4, 5, 6, 7]] + [
+            code("train_matrix = np.zeros((n_users, n_items), dtype=np.float32)\nfor row in train_ratings.itertuples():\n    train_matrix[row.user_id, row.item_id] = float(row.rating >= 3)\nprint({'interaction_matrix': train_matrix.shape, 'observed_positive': int(train_matrix.sum())})"),
+        ] + [source_cells[i] for i in [14, 15, 16, 17, 18, 19]] + [
+            md("## Checks\n\n确认训练损失下降、测试 RMSE 有限、推荐结果不包含已见物品。"),
+            code("assert loss_curve[-1] < loss_curve[0]\nassert np.isfinite(mf_rmse) and mf_rmse < 3\nassert not set(mf_top10[0]).intersection(np.where(train_matrix[0] > 0)[0])\nprint('PASS：BiasMF 训练、评分推理和 Top-K 推理均有效。')"),
+            code(r"""
+result_dir = ROOT / "results" / "chapter_3_1"; result_dir.mkdir(parents=True, exist_ok=True)
+payload = {"records": [{"algorithm":"BiasMF", "task":"评分预测", "metric":"RMSE ↓", "value":mf_rmse, "secondary_metric":"HR@10", "secondary_value":mf_hr10, "online_inference":"user/item 向量内积", "source_notebook":"3_1_2_matrix_factorization"}]}
+(result_dir / "matrix_factorization.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+print("已写出章节指标：matrix_factorization.json")
+"""),
+            md("## Next Steps\n\n把平方误差替换为 BPR pairwise loss；比较 embedding 维数与正则强度；再将 item 向量放入 ANN 索引。"),
+        ],
+    )
+
+    specs["3_1_3_factorization_machine"] = notebook(
+        "3.1.3 因子分解机：FM",
+        "单独掌握稀疏二阶交互：从曝光—点击数据、FM 数学恒等式，到 PyTorch 训练、概率推理、AUC 与 LogLoss。",
+        "[Factorization Machines](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf)",
+        [md(r"""
+## 来源论文与阅读提示
+
+**Rendle (2010), Factorization Machines** 的核心贡献是把矩阵分解的隐向量交互推广到任意稀疏特征，并通过代数恒等式在线性时间内计算全部二阶项。阅读时应特别看稀疏条件下“未直接观察过的特征组合”如何借各自隐向量共享统计。
+
+### 公式怎么读（直觉版）
+
+先把 one-hot 理解成一排开关：当前用户、物品、设备对应的开关为 1，其余为 0。FM 为每个开关配置一张小坐标卡；任意两个打开的开关都做一次点积。恒等式不是新模型，只是把“逐对计算”重新整理为“先求和再平方”，避免重复工作。相关向量、点积和概率知识见 **3.0**。
+"""), source_cells[5]] + [source_cells[i] for i in [20, 21, 22, 23, 24, 25, 26, 27]] + [
+            md("## Checks\n\n确认概率合法、AUC 高于随机水平，并同时观察 LogLoss，避免只看排序不看校准。"),
+            code("assert np.all((fm_probability >= 0) & (fm_probability <= 1))\nassert fm_auc > .55\nassert np.isfinite(fm_logloss)\nprint('PASS：FM 训练、概率推理和 CTR 指标均有效。')"),
+            code(r"""
+result_dir = ROOT / "results" / "chapter_3_1"; result_dir.mkdir(parents=True, exist_ok=True)
+payload = {"records": [{"algorithm":"FM", "task":"CTR", "metric":"AUC ↑", "value":fm_auc, "secondary_metric":"LogLoss ↓", "secondary_value":fm_logloss, "online_inference":"线性项 + 二阶隐向量交互", "source_notebook":"3_1_3_factorization_machine"}]}
+(result_dir / "factorization_machine.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+print("已写出章节指标：factorization_machine.json")
+"""),
+            md("## Next Steps\n\n加入 LR 基线；拆解不同 field 的交互；继续学习 FFM、DeepFM 与 DCN。"),
+        ],
+    )
+
+    specs["3_1_4_gbdt_lr"] = notebook(
+        "3.1.4 GBDT+LR：树叶特征与概率校准",
+        "单独掌握经典两阶段 CTR 模型：用 XGBoost 学条件规则，将叶节点 one-hot 后训练 LR，并复现完整在线推理链。",
+        "[Practical Lessons from Predicting Clicks on Ads at Facebook](https://research.facebook.com/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/)",
+        [md(r"""
+## 来源论文与阅读提示
+
+**He et al. (2014), Practical Lessons from Predicting Clicks on Ads at Facebook** 的关键工程判断是把 GBDT 当作监督式特征变换：每棵树的叶节点代表一组条件规则，叶 one-hot 再进入 LR。它不是端到端模型，因此训练/服务必须同时版本化树、叶编码器和 LR。
+
+### 公式怎么读（直觉版）
+
+一棵决策树像连续做选择题：“是否晚间？”“是否移动设备？”最终落到一个叶子。把每棵树落到的叶子变成 0/1 开关，再由 LR 做加权求和。Sigmoid 最后把任意实数分数压到 0～1，变成点击概率；为什么要用 LogLoss 训练，可先看 **3.0 推荐算法数学基础** 的概率图。
+"""), source_cells[5]] + [source_cells[i] for i in [20, 21, 22, 28, 29, 30, 31, 32, 33, 34, 35]] + [
+            md("## Checks\n\n确认树数、叶特征维数、概率范围和 AUC；推理必须复用同一编码器、树模型与 LR。"),
+            code("assert train_leaf.shape[1] == gbdt.n_estimators\nassert train_leaf_onehot.shape[1] > train_leaf.shape[1]\nassert np.all((gbdt_lr_probability >= 0) & (gbdt_lr_probability <= 1))\nassert gbdt_lr_auc > .55\nprint('PASS：GBDT、叶编码、LR 与在线推理链均有效。')"),
+            code(r"""
+result_dir = ROOT / "results" / "chapter_3_1"; result_dir.mkdir(parents=True, exist_ok=True)
+payload = {"records": [{"algorithm":"GBDT+LR", "task":"CTR", "metric":"AUC ↑", "value":gbdt_lr_auc, "secondary_metric":"LogLoss ↓", "secondary_value":gbdt_lr_logloss, "online_inference":"树叶编码 → LR 概率", "source_notebook":"3_1_4_gbdt_lr"}]}
+(result_dir / "gbdt_lr.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+print("已写出章节指标：gbdt_lr.json")
+"""),
+            md("## Next Steps\n\n与原始特征 LR、FM 对照；加入概率校准曲线；模拟数据漂移并监控叶节点覆盖变化。"),
+        ],
+    )
+
+    # 统一重写 3.2 之后的教程：每种算法独立成篇，并新增读取实验产物的总结。
+    for legacy_slug in [
+        "3_2_retrieval_dssm_mind",
+        "3_3_ranking_deepfm_din_dien",
+        "3_4_multitask_mmoe_ple",
+        "4_2_openonerec_practice",
+        "4_3_dlrm_hstu_practice",
+    ]:
+        specs.pop(legacy_slug, None)
+    specs["3_1_summary"] = specs.pop("3_1_overview")
+    specs.update(build_opening_specs(md, code, notebook))
+    specs.update(build_deep_specs(md, code, notebook))
+    specs["3_5_summary"] = notebook(
+        "3.5 总结：SASRec 与 Transformer 序列推荐",
+        "读取 SASRec 在真实 MovieLens 时间序列上的实验产物，与热门基线对照，并总结 SASRec、BERT4Rec、HSTU 的目标、信息边界和工程成本。",
+        "[SASRec](https://arxiv.org/abs/1808.09781) · [BERT4Rec](https://arxiv.org/abs/1904.06690) · [HSTU](https://arxiv.org/abs/2402.17152)",
+        [
+            md("""## Steps
+
+## 1. 模型演进对比
+
+| 模型 | Attention 可见范围 | 目标 | 推理输出 | 主要代价 |
+|---|---|---|---|---|
+| SASRec | 仅过去 | next-item pairwise | 最后位置向量 Top-K | $O(L^2)$ attention |
+| BERT4Rec | 左右上下文 | masked item | mask 位置分布 | 训练—在线目标差异 |
+| HSTU | 仅过去、推荐特化 | next-item | next-item / 行为流 | 模型—系统协同复杂 |
+
+SASRec 是本章可执行主线；BERT4Rec 作为双向预训练分支介绍，HSTU 在 4.3 以生成式行为序列模型继续展开。"""),
+            md("""## 2. 真实实验结果
+
+下表不手填数值，只读取 `3_5_1_sasrec` 在 MovieLens latest-small 真实时间序列上写出的 JSON。热门基线与 SASRec 使用相同测试目标。"""),
+            code("""import json, pandas as pd
+result_path = ROOT / 'results' / 'chapter_3_5' / '3_5_1_sasrec.json'
+payload = json.loads(result_path.read_text(encoding='utf-8'))
+comparison = pd.DataFrame(payload['records'])
+display(comparison.round(4))
+assert len(comparison)==1
+print('指标来源：', result_path.name)"""),
+            md("""## 3. 如何解释
+
+- 若 SASRec 未超过热门基线，不应调换测试集或制造更容易的序列；应检查数据密度、负样本、训练轮数、序列长度和目标定义。
+- MovieLens 是评分日志而不是连续曝光流，无法完整代表短视频、电商或广告的工业序列。
+- 公平比较必须固定真实用户集合、时间切分、候选库、已见过滤和 K。
+- 模型选型需同时记录 HR/NDCG、Coverage、P99、显存和增量更新成本。"""),
+            md("## Checks"),
+            code("""assert comparison.iloc[0]['dataset'] == 'MovieLens latest-small'
+assert comparison.iloc[0]['randomly_fabricated_rows'] == 0
+print('PASS：总结只聚合真实数据实验产物。')"""),
+            md("## Next Steps\n\n进入 4.0 比较 Transformer next-item 建模与 Semantic ID / 列表生成；在 4.3 使用相同真实时间序列观察 HSTU。"),
+        ],
+    )
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--only", choices=sorted(specs), help="只生成一个 Notebook，保留其他已执行输出")
+    args = parser.parse_args()
+    selected = {args.only: specs[args.only]} if args.only else specs
+    if not args.only:
+        for stale in OUT.glob("*.ipynb"):
+            stale.unlink()
+    for slug, nb in selected.items():
+        nbf.write(nb, OUT / f"{slug}.ipynb")
+    print(f"generated {len(selected)} notebooks in {OUT}")
+
+
+if __name__ == "__main__":
+    main()

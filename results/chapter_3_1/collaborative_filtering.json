@@ -1,0 +1,24 @@
+{
+  "records": [
+    {
+      "algorithm": "UserCF",
+      "task": "Top-K",
+      "metric": "HR@10 ↑",
+      "value": 0.125,
+      "secondary_metric": "Coverage",
+      "secondary_value": 0.32222222222222224,
+      "online_inference": "聚合相似用户的历史",
+      "source_notebook": "3_1_1_collaborative_filtering"
+    },
+    {
+      "algorithm": "ItemCF",
+      "task": "Top-K",
+      "metric": "HR@10 ↑",
+      "value": 0.125,
+      "secondary_metric": "Coverage",
+      "secondary_value": 0.3277777777777778,
+      "online_inference": "聚合历史物品的近邻",
+      "source_notebook": "3_1_1_collaborative_filtering"
+    }
+  ]
+}

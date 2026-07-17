@@ -1,0 +1,712 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "互联网推荐算法：从协同过滤到生成式推荐",
+    "description": "以召回与排序双视角梳理推荐算法演进、典型方法优缺点和国内外工业实践。",
+    "generatedAt": "2026-07-17T00:00:00+08:00",
+    "sources": [
+      {
+        "id": "research_synthesis",
+        "label": "论文与官方工业资料综合来源",
+        "path": "recommendation_algorithm_sources.md"
+      }
+    ],
+    "charts": [
+      {
+        "id": "funnel_chart",
+        "title": "多阶段推荐漏斗中的候选规模",
+        "subtitle": "对数尺度示意值，仅用于解释计算预算；不同产品的真实规模会显著不同",
+        "type": "bar",
+        "dataset": "funnel_scale",
+        "source": {
+          "id": "illustrative_funnel",
+          "label": "推荐漏斗示意数据",
+          "query": {
+            "engine": "duckdb",
+            "language": "sql",
+            "description": "构造明确标注为示意值的候选规模，用于解释多阶段计算预算，不代表任何特定公司的生产配置。",
+            "sql": "SELECT stage, candidates, LOG10(candidates) AS log10_candidates, stage_order, note FROM (VALUES ('全量物品库', 100000000, 1, '示意：亿级目录'), ('多路召回后', 10000, 2, '示意：万级合并候选'), ('预排后', 2000, 3, '示意：千级候选'), ('精排后', 500, 4, '示意：数百候选'), ('最终展示池', 50, 5, '示意：几十个结果')) AS t(stage, candidates, stage_order, note)",
+            "executed_at": "2026-07-17T00:00:00+08:00",
+            "filters": [
+              "Illustrative values only; not a production benchmark"
+            ],
+            "metric_definitions": [
+              "candidates: illustrative number of items remaining at each stage",
+              "log10_candidates: base-10 logarithm of candidates, used only for chart readability"
+            ]
+          }
+        },
+        "layout": "full",
+        "valueFormat": "number",
+        "encodings": {
+          "x": {
+            "field": "stage",
+            "type": "nominal",
+            "label": "处理阶段",
+            "sort": "none"
+          },
+          "y": {
+            "field": "log10_candidates",
+            "type": "quantitative",
+            "label": "候选数数量级（log10）"
+          },
+          "tooltip": [
+            {
+              "field": "candidates",
+              "type": "quantitative",
+              "label": "示意候选数",
+              "format": "number"
+            },
+            {
+              "field": "note",
+              "type": "nominal",
+              "label": "说明"
+            }
+          ]
+        }
+      }
+    ],
+    "tables": [
+      {
+        "id": "evolution_table",
+        "title": "推荐算法的双线发展阶段",
+        "subtitle": "年代为代表性范式形成区间；旧方法通常继续作为多路召回和兜底",
+        "dataset": "evolution",
+        "source": {
+          "id": "evolution_snapshot_source",
+          "label": "evolution 报告快照",
+          "query": {
+            "engine": "artifact-snapshot",
+            "language": "sql",
+            "description": "按代表性范式出现时间整理召回与排序技术演进。",
+            "sql": "SELECT * FROM report_snapshot.evolution ORDER BY period ASC",
+            "executed_at": "2026-07-17T00:00:00+08:00",
+            "tables_used": [
+              "report_snapshot.evolution"
+            ],
+            "filters": [
+              "Research snapshot current through 2026-07-17"
+            ]
+          }
+        },
+        "defaultSort": {
+          "field": "period",
+          "direction": "asc"
+        },
+        "density": "spacious",
+        "layout": "full",
+        "columns": [
+          {
+            "field": "period",
+            "label": "时期",
+            "type": "text"
+          },
+          {
+            "field": "retrieval",
+            "label": "召回主线",
+            "type": "text"
+          },
+          {
+            "field": "ranking",
+            "label": "排序主线",
+            "type": "text"
+          },
+          {
+            "field": "shift",
+            "label": "关键变化",
+            "type": "text"
+          },
+          {
+            "field": "bottleneck",
+            "label": "主要瓶颈",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "id": "method_table",
+        "title": "典型算法摘要与对比",
+        "subtitle": "从核心机制、强项、短板和默认适用场景比较",
+        "dataset": "methods",
+        "source": {
+          "id": "methods_snapshot_source",
+          "label": "methods 报告快照",
+          "query": {
+            "engine": "artifact-snapshot",
+            "language": "sql",
+            "description": "基于原始论文提炼典型推荐算法的机制、优缺点与适用场景。",
+            "sql": "SELECT * FROM report_snapshot.methods ORDER BY stage ASC",
+            "executed_at": "2026-07-17T00:00:00+08:00",
+            "tables_used": [
+              "report_snapshot.methods"
+            ],
+            "filters": [
+              "Research snapshot current through 2026-07-17"
+            ]
+          }
+        },
+        "defaultSort": {
+          "field": "stage",
+          "direction": "asc"
+        },
+        "density": "spacious",
+        "layout": "full",
+        "columns": [
+          {
+            "field": "stage",
+            "label": "环节",
+            "type": "text"
+          },
+          {
+            "field": "model",
+            "label": "算法",
+            "type": "text"
+          },
+          {
+            "field": "idea",
+            "label": "核心思路",
+            "type": "text"
+          },
+          {
+            "field": "strengths",
+            "label": "典型优点",
+            "type": "text"
+          },
+          {
+            "field": "weaknesses",
+            "label": "典型缺点",
+            "type": "text"
+          },
+          {
+            "field": "fit",
+            "label": "适用场景",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "id": "overseas_table",
+        "title": "国外大厂公开工业方案",
+        "subtitle": "截至 2026-07；在线指标按各公司原始口径陈列，不作横向排名",
+        "dataset": "overseas",
+        "source": {
+          "id": "overseas_snapshot_source",
+          "label": "overseas 报告快照",
+          "query": {
+            "engine": "artifact-snapshot",
+            "language": "sql",
+            "description": "汇总国外公司原始论文和官方工程博客中的生产架构与披露结果。",
+            "sql": "SELECT * FROM report_snapshot.overseas ORDER BY company ASC",
+            "executed_at": "2026-07-17T00:00:00+08:00",
+            "tables_used": [
+              "report_snapshot.overseas"
+            ],
+            "filters": [
+              "Research snapshot current through 2026-07-17"
+            ]
+          }
+        },
+        "defaultSort": {
+          "field": "company",
+          "direction": "asc"
+        },
+        "density": "spacious",
+        "layout": "full",
+        "columns": [
+          {
+            "field": "company",
+            "label": "公司",
+            "type": "text"
+          },
+          {
+            "field": "architecture",
+            "label": "公开方案",
+            "type": "text"
+          },
+          {
+            "field": "evidence",
+            "label": "证据",
+            "type": "text"
+          },
+          {
+            "field": "result",
+            "label": "公开结果",
+            "type": "text"
+          },
+          {
+            "field": "lesson",
+            "label": "工程启示",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "id": "domestic_table",
+        "title": "国内大厂公开工业方案",
+        "subtitle": "截至 2026-07；A/B 数字仅代表原论文或官方披露场景",
+        "dataset": "domestic",
+        "source": {
+          "id": "domestic_snapshot_source",
+          "label": "domestic 报告快照",
+          "query": {
+            "engine": "artifact-snapshot",
+            "language": "sql",
+            "description": "汇总国内公司原始论文和官方材料中的生产架构与披露结果。",
+            "sql": "SELECT * FROM report_snapshot.domestic ORDER BY company ASC",
+            "executed_at": "2026-07-17T00:00:00+08:00",
+            "tables_used": [
+              "report_snapshot.domestic"
+            ],
+            "filters": [
+              "Research snapshot current through 2026-07-17"
+            ]
+          }
+        },
+        "defaultSort": {
+          "field": "company",
+          "direction": "asc"
+        },
+        "density": "spacious",
+        "layout": "full",
+        "columns": [
+          {
+            "field": "company",
+            "label": "公司",
+            "type": "text"
+          },
+          {
+            "field": "architecture",
+            "label": "公开方案",
+            "type": "text"
+          },
+          {
+            "field": "evidence",
+            "label": "证据",
+            "type": "text"
+          },
+          {
+            "field": "result",
+            "label": "公开结果",
+            "type": "text"
+          },
+          {
+            "field": "lesson",
+            "label": "工程启示",
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "blocks": [
+      {
+        "id": "title",
+        "type": "markdown",
+        "body": "# 互联网推荐算法：从协同过滤到生成式推荐"
+      },
+      {
+        "id": "summary",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 技术结论\n\n**推荐算法的主线不是模型名称的简单更替，而是“信息压缩方式”和“系统边界”的三次变化。** 第一阶段用相似度、矩阵分解和 FM 从稀疏共现中提取统计规律；第二阶段形成“多路召回 → 预排 → 精排 → 重排”的级联架构，双塔负责全库效率，DeepFM、DIN、多任务模型负责高精度交互；第三阶段把用户行为和 item 变成 token 序列，尝试用生成目标统一召回、排序乃至跨场景推荐。\n\n**召回与排序长期存在结构性张力。** 召回要求 item 可预计算、打分可索引，因此偏好双塔内积；排序要求充分的 user-item 交互，因此偏好交叉网络、attention 和序列模型。工业演进的本质，是在严格延迟和成本下逐步把更强交互前移：从 DSSM/ANN，到多兴趣召回，再到 SilverTorch 式“索引即模型”和 OneRec 式统一列表生成。\n\n**生成式推荐已经出现生产证据，但尚未普遍替代级联系统。** TIGER 代表 Semantic ID 生成式召回；RankGPT 代表生成式排序；OneRec 代表召排融合；HSTU/Netflix Foundation Model 代表行为序列基础模型。当前主要障碍是解码延迟、无效 ID、目录更新、负反馈与多目标约束，以及相对于成熟级联系统的算力 ROI。"
+      },
+      {
+        "id": "evolution_intro",
+        "type": "markdown",
+        "body": "## 召回与排序的双线演进\n\n下表中的年代是“形成代表性范式”的近似区间，不表示旧方法退出生产。现实系统往往长期保留 ItemCF、热度、地理位置、关注关系和业务规则等召回通道，与深度模型并存。"
+      },
+      {
+        "id": "evolution_table",
+        "type": "table",
+        "tableId": "evolution_table"
+      },
+      {
+        "id": "pipeline",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 为什么工业系统形成多阶段漏斗\n\n一个典型请求会从千万/亿级 item 缩到数百个结果：\n\n1. **多路召回**：协同过滤、双塔 ANN、内容、社交、热门、新内容等通道各取数百至数千候选，目标是高 Recall 与覆盖。\n2. **预排**：用较轻模型提前加入部分交叉特征，把候选压到几百；控制精排成本。\n3. **精排**：DeepFM、DIN/DIEN、DCN、Transformer 与多任务模型预测点击、时长、转化、负反馈等。\n4. **重排与策略**：做去重、多样性、新鲜度、生态约束、广告混排、安全和探索。\n\n这个结构并非“算法落后”，而是计算预算的解法。双塔能把 item 向量离线化并用 ANN 做亚线性检索，但无法在全库阶段计算复杂交叉；精排能计算复杂交互，却只能处理有限候选。"
+      },
+      {
+        "id": "funnel_chart",
+        "type": "chart",
+        "chartId": "funnel_chart"
+      },
+      {
+        "id": "classic",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 早期方法：从邻域共现到低秩表示\n\n### 协同过滤（CF）\n\n**UserCF** 计算用户行为向量相似度，将相似用户喜欢但当前用户未见的 item 汇总推荐；**ItemCF** 计算 item 共现相似度，将用户最近交互 item 的相似邻居合并。余弦、Jaccard、Pearson，以及对热门 item 降权的共现分数都很常见。\n\n- 优点：不依赖内容理解；可解释为“与你相似的人喜欢”或“看过 A 的人也看 B”；ItemCF 可预计算，工程简单。\n- 缺点：稀疏用户难找邻居，新 item 没共现；容易放大热门偏置；行为噪声和时间变化处理弱。\n\n### 矩阵分解（MF）\n\n把稀疏偏好矩阵近似为 **R ≈ P × Qᵀ**，预测为 **p_u · q_i + bias**。隐式反馈常用带置信度的加权平方损失或 BPR pairwise loss。MF 把离散共现压入可泛化的低维空间，是双塔 embedding 的直接先声。\n\n### FM / FFM\n\nFM 的二阶项为 **Σ(i<j) <v_i, v_j> x_i x_j**。不同交叉共享隐向量，所以即使某一特征对很少共同出现，也能借其他样本估计。FFM 让同一特征在面对不同 field 时使用不同向量，表达更强但参数和内存显著增加。"
+      },
+      {
+        "id": "dssm",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 深度召回：DSSM 双塔把全库匹配变成向量检索\n\n[DSSM](https://www.microsoft.com/en-us/research/publication/learning-deep-structured-semantic-models-for-web-search-using-clickthrough-data/) 最初用于 Web 搜索：Query 塔和 Document 塔分别把输入映射到同一低维空间，以余弦相似度学习点击文档的条件概率。推荐系统把两侧换成用户/上下文与 item/内容，即今天广义的双塔。\n\n**训练。** 正样本是发生交互的 **(user, item)**；负样本来自随机、曝光未点、in-batch 或 hard negative。常用 sampled softmax/对比损失：提高正样本内积并压低负样本。必须校正流行度采样偏差，否则模型可能只学到热门先验。\n\n**服务。** Item 塔离线计算向量并写入 ANN/MIPS 索引；在线只计算用户塔一次，取 Top-K。Faiss、HNSW、IVF/PQ 等索引在召回率、内存和延迟间权衡。\n\n**核心优点**是计算可分离，能从超大库实时取候选；内容特征还可改善新 item。**核心缺点**也来自分离：打分前没有 user-item 深交互；一个用户向量会混合多兴趣。MIND 用多个兴趣向量、多路 ANN 与 label-aware attention 缓解这一问题，但增加检索合并成本。"
+      },
+      {
+        "id": "gbdt_lr",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 经典排序：GBDT+LR 自动构造非线性交叉\n\n[Facebook 2014 工业论文](https://ai.meta.com/research/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/) 的典型做法是：先训练 GBDT；每棵树把样本路由到一个叶节点；把所有落叶编号做 one-hot，作为新的稀疏特征交给 LR 预测 CTR。\n\n直觉上，树完成了“年龄 > 30 且设备为移动端且历史活跃”这类非线性分桶与组合，LR 再对大量叶子规则做线性组合和概率校准。论文报告树与 LR 的组合优于单独模型 3% 以上（论文自身指标口径）。\n\n- 优点：连续变量无需手工分桶；能发现非线性和条件组合；LR 在线推断稳定、易校准、易做在线更新。\n- 缺点：GBDT 与 LR 通常分阶段训练；叶节点空间会膨胀，特征分布变化后易陈旧；对超高基数 ID、内容语义和行为序列不如 embedding 模型。\n- 与 DeepFM 的关系：二者都在减少手工交叉。GBDT+LR 用树生成离散规则，DeepFM 用共享 embedding + 神经网络端到端学习。"
+      },
+      {
+        "id": "deepfm",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## DeepFM：低阶记忆与高阶泛化共享同一套 embedding\n\n[DeepFM](https://arxiv.org/abs/1703.04247) 将 FM 分支和 DNN 分支相加后过 sigmoid。FM 分支显式学习一阶和二阶交互；DNN 对各 field embedding 的拼接学习高阶非线性；两者共享 embedding，避免 Wide&Deep 中 wide 侧大量人工交叉。\n\n- 优点：端到端、实现和部署成熟；兼顾低阶稳定信号与高阶非线性；常作为 CTR/CVR 强基线。\n- 缺点：DNN 的高阶交叉不透明且未必高效；用户历史通常仍被池化为固定向量；不直接解决时序、曝光选择偏差、多任务冲突或列表级目标。\n\n后续 DCN 用 Cross Network 显式控制交叉阶数，xDeepFM 用 CIN 建显式高阶交叉，AutoInt 用 self-attention 学 field 交互。工业选择通常取决于“增益/延迟/可维护性”，而非模型新旧。"
+      },
+      {
+        "id": "din",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## DIN：用户兴趣不是固定向量，而是相对候选动态激活\n\n[DIN](https://arxiv.org/abs/1706.06978) 的关键是 Local Activation Unit。对候选 item **e_a** 与每个历史行为 **e_j** 计算相关权重 **a(e_j, e_a)**，再聚合为 **v_u(e_a)=Σ a(e_j,e_a)e_j**。因此用户看手机壳时，历史手机行为权重大；看服装时，服饰行为权重大。\n\n- 优点：目标感知；同一用户对不同候选得到不同兴趣表示；特别适合多兴趣电商与广告。论文在超 20 亿样本的阿里数据验证，并说明服务主流量。\n- 缺点：每个候选都要与历史交互，复杂度近似 **候选数 × 序列长**；普通 DIN 没有显式建模行为顺序和兴趣状态变化；attention 权重也不天然等于因果贡献。\n\nDIEN 用 GRU、辅助 next-behavior loss 和目标感知兴趣演化补足时序；SIM、ETA 等后续工作则用两阶段检索/聚合处理超长行为序列。"
+      },
+      {
+        "id": "multitask",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 从单一 CTR 到序列、多任务和长期价值\n\n单一点击优化会诱导标题党、短内容或高频曝光。现代排序同时预测点击、长播、完播、点赞、分享、关注、转化、隐藏与退出等，再由价值函数组合。\n\n- **MMoE**：共享多个 expert，每个任务用自己的 gate 混合 expert，适应不同任务关系。\n- **PLE**：显式设置共享 expert 和任务专属 expert，并逐层抽取，缓解一个任务提升、另一个下降的“跷跷板”。\n- **ESMM**：在曝光全空间联合学习 CTR 与 CTCVR，通过概率链缓解只在点击样本上训练 CVR 的选择偏差和稀疏。\n- **SASRec/BERT4Rec**：把 item 行为当 token；前者因果 self-attention 预测下一项，后者用 Cloze masked-item 训练双向表示，成为生成式推荐的重要桥梁。\n\n这一步的主要矛盾从“能否拟合 CTR”变成“如何定义长期用户价值，并控制多任务负迁移、曝光偏差和反馈回路”。"
+      },
+      {
+        "id": "method_compare_intro",
+        "type": "markdown",
+        "body": "## 典型方法摘要与横向对比\n\n表中的“适用场景”是默认工程判断，不是排他结论。同一系统常同时运行多种召回与排序模型。"
+      },
+      {
+        "id": "method_table",
+        "type": "table",
+        "tableId": "method_table"
+      },
+      {
+        "id": "gen_overview",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 生成式推荐：三条路线\n\n**生成式召回**直接生成 item ID 或 Semantic ID。TIGER 先用内容/协同 embedding 经 RQ-VAE 量化成多级离散码，再用 encoder-decoder 根据历史码自回归生成目标码，并通过受约束 beam search 映射到合法 item。好处是把语义、协同和 next-token 目标统一；难点是码冲突、无效前缀、beam 延迟、新 item 编码和索引更新。\n\n**生成式排序**不一定生成新 item，而是对给定候选序列自回归输出顺序、选择 token 或序列条件概率。小红书 RankGPT 的公开结论是：主要收益来自生成式架构本身，而非仅把 pointwise loss 换成生成 loss；工程重点是并行化、KV cache 和控制候选长度。\n\n**召回排序融合**让一个模型直接生成一个 session/list。OneRec 使用 encoder-decoder、session-wise generation、Sparse MoE，并以奖励模型和 DPO 做偏好对齐；公开论文称在快手主场景带来观看时长 +1.6%。HSTU 则把推荐重构为用户动作的生成式序列转换，以面向高基数、非平稳流数据的模块支撑超长序列和大规模参数。\n\n不要把“生成推荐理由”与上述范式混为一谈。通用 LLM 可以做意图理解、内容表征、对话和解释，但若最终候选仍由传统双塔/精排产生，它属于 LLM-enhanced recommendation，而不是端到端生成式推荐。"
+      },
+      {
+        "id": "gen_tradeoffs",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 生成式方案的真实优缺点\n\n### 可能的优势\n\n- 统一表示：item、行为、文本和多模态语义可转成 token/embedding 序列。\n- 统一目标：next-item、列表生成、多场景迁移和自监督预训练共享同一骨干。\n- 规模效应：Meta HSTU、Netflix Foundation Model 均报告随数据、参数和计算增长的可扩展趋势。\n- 冷启动潜力：Semantic ID 与内容 metadata 可让新 item 在缺少协同信号时仍有合理位置。\n\n### 当前硬约束\n\n- **延迟**：长度为 L 的 Semantic ID 自回归需 L 次解码，beam search 进一步放大；单步 item ID 和并行码生成因此成为研究热点。\n- **合法性与业务约束**：模型会生成不存在、重复、下架或不合规 item，必须做 trie/约束解码、过滤和候补策略。\n- **目录动态性**：tokenizer、codebook、item embedding 和输出头要处理持续新增/删除；重新量化会造成 token 漂移。\n- **偏好不等于行为模仿**：日志含曝光偏差、位置偏差和短期噪声，SFT next-item 会复制旧策略；需反事实学习、奖励建模或在线探索。\n- **成本与可靠性**：成熟级联系统的 CPU/GPU 服务、灰度、回滚和可解释策略已高度优化；一体化模型的故障半径更大。"
+      },
+      {
+        "id": "overseas_intro",
+        "type": "markdown",
+        "body": "## 国外大厂近期工业实践\n\n证据等级：A=官方明确部署/上线并披露生产结果；B=明确生产集成但量化信息有限；C=公司研究、工业数据或公开实验，不能据此断言全面上线。不同公司的在线数字不可横向比较。"
+      },
+      {
+        "id": "overseas_table",
+        "type": "table",
+        "tableId": "overseas_table"
+      },
+      {
+        "id": "domestic_intro",
+        "type": "markdown",
+        "body": "## 国内大厂典型工业实践\n\n国内公开路线呈现清晰连续性：阿里把行为兴趣建模推入精排并发展多兴趣召回；字节强调在线训练与稀疏 embedding 新鲜度；腾讯推动多任务分离；快手和小红书分别在召排融合与生成式排序上给出线上证据。"
+      },
+      {
+        "id": "domestic_table",
+        "type": "table",
+        "tableId": "domestic_table"
+      },
+      {
+        "id": "blueprint",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 2026 年可落地的参考架构\n\n对多数团队，推荐的演进不是“一步替换成大模型”，而是双轨迁移：\n\n1. **候选层**保留 ItemCF/热门/规则保障覆盖与兜底；主路使用双塔或多兴趣双塔，item 侧融合文本、图像、视频 embedding；对负采样做频率校正。\n2. **预排层**采用蒸馏后的轻量交叉模型，在 GPU 可用时把 ANN、过滤、轻交互和多任务打分做融合，减少跨服务数据搬运。\n3. **精排层**以 DeepFM/DCNv2 为稳定基线，叠加 DIN/Transformer 行为序列和 MMoE/PLE 多目标头；训练日志需要位置/曝光去偏与时间切分评估。\n4. **重排层**显式处理多样性、新鲜度、创作者/商家生态、疲劳、安全、频控和探索，不把所有约束寄托于一个预测分数。\n5. **生成式试验**先在旁路召回、低流量场景或教师模型中验证：比较 Recall@K、NDCG、覆盖、冷启动、P99 延迟、GPU 成本和无效 ID 率；再尝试生成式排序，最后才评估召排统一。\n6. **系统底座**支持流式特征、在线/近线更新、embedding 版本一致性、ANN 增量更新、模型回滚、特征监控和长期 A/B。\n\n这一架构允许经典模型、深度模型与生成式模型共存，并把风险限制在可灰度、可回滚的边界内。"
+      },
+      {
+        "id": "selection",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 选型建议\n\n- **数据和团队规模较小**：ItemCF/MF + GBDT+LR 或 DeepFM，先把样本、时间切分、负采样、特征新鲜度和 A/B 体系做对。\n- **百万级以上目录且在线取候选**：DSSM 双塔 + ANN 是优先基座；多兴趣明显时再上 MIND 类模型。\n- **行为历史决定候选相关性**：精排采用 DIN；时序演化强且算力允许时用 DIEN/Transformer。\n- **同时优化多个行为**：从 MMoE 开始，任务冲突明显时用 PLE；价值函数和校准要与模型共同设计。\n- **新内容多、语义强**：item 塔融合多模态内容表示，并保留探索/冷启通道；不要只依赖 ID embedding。\n- **计划生成式迁移**：先验证 Semantic ID 的稳定性和单步/并行解码，再验证端到端列表生成；线上必须保留合法 item 约束与传统兜底。\n\n最值得持续关注的方向是：行为序列基础模型的规模律是否稳定、Semantic ID 是否能动态更新、生成式推荐如何做可信的反事实/偏好对齐，以及模型—索引—过滤—排序能否在统一 GPU 图中以更低 TCO 运行。"
+      },
+      {
+        "id": "limits",
+        "type": "markdown",
+        "sourceId": "research_synthesis",
+        "body": "## 口径、限制与进一步问题\n\n- 公开资料只能反映各公司愿意披露的局部栈；本报告的参考架构是证据综合，不代表任何公司的完整内部实现。\n- 论文中的离线 Recall/NDCG 与线上 CTR/时长不存在稳定换算；工业结论应以同一产品、同一流量和同一价值函数下的 A/B 为准。\n- 推荐日志由旧策略产生，存在曝光、位置、存活者和反馈回路偏差；随机流量、IPS/DR、反事实评估和长期实验仍不可替代。\n- 生成式推荐的“规模律”目前主要来自少数头部平台；中等数据规模和严格成本约束下是否优于成熟级联，需要逐业务验证。\n\n**进一步问题**：你的业务瓶颈究竟是漏召、精排区分度、冷启动、长期价值，还是系统延迟？只有先用分阶段指标定位瓶颈，模型升级才可能产生可归因的线上收益。"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-07-17T00:00:00+08:00",
+    "status": "ready",
+    "datasets": {
+      "evolution": [
+        {
+          "period": "1990s–2008",
+          "retrieval": "UserCF / ItemCF；倒排与共现",
+          "ranking": "规则、流行度、线性模型",
+          "shift": "从编辑规则转向利用群体行为",
+          "bottleneck": "稀疏、冷启动、相似度计算与覆盖率"
+        },
+        {
+          "period": "2006–2013",
+          "retrieval": "矩阵分解、隐语义向量",
+          "ranking": "LR、GBDT、FM/FFM",
+          "shift": "统一到可学习的低维表示与特征交叉",
+          "bottleneck": "依赖 ID；高阶交叉和非线性不足"
+        },
+        {
+          "period": "2013–2017",
+          "retrieval": "DSSM/双塔 + ANN",
+          "ranking": "GBDT+LR、Wide&Deep、DeepFM、DCN",
+          "shift": "召回与排序形成清晰的多阶段漏斗",
+          "bottleneck": "双塔交互弱；排序仍偏静态特征"
+        },
+        {
+          "period": "2017–2020",
+          "retrieval": "YouTube DNN、MIND 多兴趣、图召回",
+          "ranking": "DIN/DIEN、MMoE/PLE、ESMM",
+          "shift": "用户兴趣由单向量变为目标感知、序列化、多任务",
+          "bottleneck": "长序列成本、目标冲突、曝光偏差"
+        },
+        {
+          "period": "2018–2023",
+          "retrieval": "SASRec/BERT4Rec、内容/行为多模态向量",
+          "ranking": "Transformer、长序列、蒸馏与重排",
+          "shift": "推荐逐渐成为行为序列建模问题",
+          "bottleneck": "训练—服务不一致、算力和新鲜度"
+        },
+        {
+          "period": "2023–2026",
+          "retrieval": "TIGER/Semantic ID、生成 item token",
+          "ranking": "RankGPT、序列生成式打分",
+          "shift": "OneRec/HSTU/基础模型尝试统一召回与排序",
+          "bottleneck": "解码延迟、无效 ID、目录更新、可控性与 ROI"
+        }
+      ],
+      "funnel_scale": [
+        {
+          "stage": "全量物品库",
+          "candidates": 100000000,
+          "log10_candidates": 8,
+          "order": 1,
+          "note": "示意：亿级目录"
+        },
+        {
+          "stage": "多路召回后",
+          "candidates": 10000,
+          "log10_candidates": 4,
+          "order": 2,
+          "note": "示意：万级合并候选"
+        },
+        {
+          "stage": "预排后",
+          "candidates": 2000,
+          "log10_candidates": 3.3,
+          "order": 3,
+          "note": "示意：千级候选"
+        },
+        {
+          "stage": "精排后",
+          "candidates": 500,
+          "log10_candidates": 2.7,
+          "order": 4,
+          "note": "示意：数百候选"
+        },
+        {
+          "stage": "最终展示池",
+          "candidates": 50,
+          "log10_candidates": 1.7,
+          "order": 5,
+          "note": "示意：几十个结果"
+        }
+      ],
+      "methods": [
+        {
+          "stage": "召回",
+          "model": "UserCF / ItemCF",
+          "idea": "按用户或物品交互向量计算邻域相似度，再聚合邻居偏好",
+          "strengths": "直观、无需内容特征、可解释；ItemCF 易做离线预计算",
+          "weaknesses": "稀疏与冷启动明显；热门偏置；大规模近邻维护成本高",
+          "fit": "中小规模、强共现、相似物品召回基线"
+        },
+        {
+          "stage": "召回",
+          "model": "矩阵分解 MF",
+          "idea": "把用户—物品矩阵分解为两个低维向量矩阵，以内积拟合偏好",
+          "strengths": "压缩稀疏矩阵；比邻域法更能泛化；训练和 ANN 检索成熟",
+          "weaknesses": "主要依赖 ID；非线性与上下文表达弱；新用户/新物品困难",
+          "fit": "稳定目录、隐式反馈、召回基线"
+        },
+        {
+          "stage": "召回",
+          "model": "DSSM 双塔",
+          "idea": "用户/Query 与 Item 各自编码，点积或余弦匹配；Item 向量离线建 ANN 索引",
+          "strengths": "可从百万/亿级库低延迟取 Top-K；可纳入内容和上下文；新物品更友好",
+          "weaknesses": "候选对在打分前不深度交互；负采样偏差；单用户向量压缩多兴趣",
+          "fit": "主力向量召回、搜索语义召回"
+        },
+        {
+          "stage": "召回",
+          "model": "MIND 多兴趣",
+          "idea": "用动态路由把行为聚成多个兴趣胶囊，每个兴趣向量分别 ANN 检索",
+          "strengths": "缓解单向量兴趣混叠；提升多样性与长尾覆盖",
+          "weaknesses": "兴趣数和路由稳定性难调；多路检索、合并与去重增加成本",
+          "fit": "电商、内容流等多兴趣明显场景"
+        },
+        {
+          "stage": "排序",
+          "model": "GBDT+LR",
+          "idea": "GBDT 学非线性分桶与交叉；样本落到的叶子 one-hot 后交给 LR 校准点击概率",
+          "strengths": "对连续/非线性特征强；自动产生组合特征；LR 服务与校准成熟",
+          "weaknesses": "两阶段训练；叶子特征易膨胀和过时；稀疏 ID/序列表示能力弱",
+          "fit": "CTR 经典基线、表格特征充足且需稳定低延迟"
+        },
+        {
+          "stage": "排序",
+          "model": "FM / FFM",
+          "idea": "用特征隐向量内积参数化二阶交叉；FFM 为不同 field 学不同向量",
+          "strengths": "稀疏场景共享统计强；二阶交叉计算高效；比手工交叉泛化好",
+          "weaknesses": "主要是二阶；FFM 参数大；难表达行为次序和复杂非线性",
+          "fit": "广告 CTR、稀疏类别特征"
+        },
+        {
+          "stage": "排序",
+          "model": "DeepFM",
+          "idea": "FM 分支学一阶/二阶交叉，DNN 分支学高阶非线性，并共享 embedding",
+          "strengths": "端到端兼顾低阶与高阶；少于 Wide&Deep 的手工交叉；实现成熟",
+          "weaknesses": "DNN 的交叉是隐式的；对序列兴趣、因果偏差和多目标无专门机制",
+          "fit": "通用 CTR/CVR 排序强基线"
+        },
+        {
+          "stage": "排序",
+          "model": "DIN",
+          "idea": "以候选 item 为 Query，对历史行为做 target-aware attention，生成候选相关兴趣",
+          "strengths": "同一用户面对不同候选得到不同表示；适合多兴趣；工业收益明确",
+          "weaknesses": "逐候选读取历史，成本随候选数和序列长增长；attention 不等于兴趣演化",
+          "fit": "电商/广告精排，历史行为丰富"
+        },
+        {
+          "stage": "排序",
+          "model": "DIEN",
+          "idea": "GRU 抽取兴趣序列，以辅助损失监督每步兴趣，再用目标感知演化层建模变化",
+          "strengths": "同时建模兴趣状态和演化；比 DIN 更重视次序",
+          "weaknesses": "RNN 串行、训练复杂；长序列服务成本较高",
+          "fit": "兴趣变化速度快、时序强的精排"
+        },
+        {
+          "stage": "排序",
+          "model": "MMoE / PLE",
+          "idea": "多个专家共享表示，各任务门控选择；PLE 进一步区分共享与任务专属专家",
+          "strengths": "统一 CTR、时长、转化等目标；缓解任务跷跷板和负迁移",
+          "weaknesses": "损失权重、专家塌缩、目标冲突仍需治理；业务价值函数不可省略",
+          "fit": "多目标精排与价值预估"
+        },
+        {
+          "stage": "融合",
+          "model": "生成式推荐",
+          "idea": "把 item/行为离散为 token，按序列生成下一个 item、列表或统一动作",
+          "strengths": "统一序列目标；可利用内容语义和规模化预训练；有机会减少级联错配",
+          "weaknesses": "自回归延迟、无效/重复 item、Semantic ID 更新、约束与安全复杂",
+          "fit": "已有强算力和序列数据、可渐进灰度的头部平台"
+        }
+      ],
+      "overseas": [
+        {
+          "company": "YouTube / Google",
+          "architecture": "深度候选生成 + 深度排序；NDR 双塔修正 in-batch 采样偏差；排序走多任务",
+          "evidence": "A",
+          "result": "生产部署；公开视频语料达千万级，公开在线质量改进",
+          "lesson": "多阶段漏斗仍是可靠工业基座；召回训练分布必须贴近真实库"
+        },
+        {
+          "company": "Meta",
+          "architecture": "HSTU 行为序列生成式建模；GEM 基础模型向模型群迁移知识",
+          "evidence": "A",
+          "result": "HSTU 论文称多场景部署；GEM 披露 Instagram 转化 +5%、Facebook Feed +3%（各自实验口径）",
+          "lesson": "基础模型未必直接替代所有在线模型，知识迁移可先获得 ROI"
+        },
+        {
+          "company": "Meta",
+          "architecture": "Adaptive Ranking：请求级计算共享、Wukong Turbo、选择性 FP8、多卡 embedding",
+          "evidence": "A",
+          "result": "2025 Q4 上线 Instagram；定向用户转化 +3%、CTR +5%；约 100ms 受控延迟",
+          "lesson": "排序扩模首先是模型—系统共设计问题"
+        },
+        {
+          "company": "Meta",
+          "architecture": "SilverTorch Index-as-Model：ANN、过滤、预排、多任务打分统一为 PyTorch 模块",
+          "evidence": "A",
+          "result": "80M item 回放下吞吐最高 23.7×、成本效率 20.9×；已在多应用采用",
+          "lesson": "召回—预排的系统边界正先于算法边界消失"
+        },
+        {
+          "company": "Netflix",
+          "architecture": "自回归交互基础模型；长历史、稀疏注意力、多 token 预测；下游用 embedding/微调/预测头",
+          "evidence": "B",
+          "result": "2025 公布框架，2026 说明接入首页、搜索等个性化应用；未统一披露可比在线增益",
+          "lesson": "中央化用户偏好表示可降低大量专用模型的维护和迁移成本"
+        },
+        {
+          "company": "Google Research",
+          "architecture": "把百万级 item ID 作为一等 token，单步生成而非多 token beam search",
+          "evidence": "C",
+          "result": "公开数据集上推理效率提升 5–14×；未据论文断言全面生产上线",
+          "lesson": "生成式推荐的关键竞争点之一是解码步数，而不只是模型参数"
+        }
+      ],
+      "domestic": [
+        {
+          "company": "阿里巴巴 / 淘宝",
+          "architecture": "DIN 目标感知兴趣；DIEN 兴趣演化；精排侧围绕行为序列深化",
+          "evidence": "A",
+          "result": "DIN 服务主流量；DIEN 论文报告相对既有系统 CTR 提升 20.7%（论文口径）",
+          "lesson": "候选相关的兴趣激活是从静态 Embedding&MLP 走向行为建模的关键一步"
+        },
+        {
+          "company": "阿里巴巴 / 天猫",
+          "architecture": "MIND 把单用户表示拆成多个兴趣向量并多路召回",
+          "evidence": "A",
+          "result": "论文明确部署于手机天猫首页主要流量",
+          "lesson": "召回阶段表达多兴趣，能减轻后续排序无法恢复的漏召"
+        },
+        {
+          "company": "字节跳动 / BytePlus",
+          "architecture": "Monolith：无冲突 embedding、过期与频次过滤、在线训练和实时反馈",
+          "evidence": "A",
+          "result": "公开说明落地 BytePlus Recommend",
+          "lesson": "短视频推荐的核心不只是网络结构，还包括分钟级新鲜度与稀疏参数治理"
+        },
+        {
+          "company": "腾讯 PCG",
+          "architecture": "PLE：共享专家和任务专属专家逐层抽取，处理多任务负迁移",
+          "evidence": "B",
+          "result": "在 10 亿样本腾讯视频数据上验证并显著优于多任务基线",
+          "lesson": "多目标系统要显式建模共享与冲突，不能只做 shared-bottom"
+        },
+        {
+          "company": "快手",
+          "architecture": "OneRec：encoder-decoder、session-wise 列表生成、Sparse MoE、奖励模型 + DPO 偏好对齐",
+          "evidence": "A",
+          "result": "主场景部署，论文报告观看时长 +1.6%",
+          "lesson": "召回和排序可被一次列表生成统一，但需要约束解码与在线偏好对齐"
+        },
+        {
+          "company": "小红书",
+          "architecture": "RankGPT：面向候选列表的工业级生成式排序，强调生成架构而非单纯生成损失",
+          "evidence": "A",
+          "result": "探索页在线 A/B 提升用户满意度，算力与原生产系统近似；未披露统一数值",
+          "lesson": "生成式排序可能先于全链路生成式替换落地"
+        }
+      ]
+    },
+    "accessIssues": []
+  },
+  "sources": [
+    {
+      "id": "research_synthesis",
+      "label": "论文与官方工业资料综合来源",
+      "path": "recommendation_algorithm_sources.md",
+      "query": {
+        "language": "markdown",
+        "description": "基于原始论文、公司研究页面和官方工程博客整理；含证据等级、口径限制与全部链接。",
+        "executed_at": "2026-07-17T00:00:00+08:00"
+      }
+    }
+  ]
+}

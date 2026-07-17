@@ -1,0 +1,39 @@
+services:
+  web:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      JUPYTER_PUBLIC_URL: http://localhost:8889
+    ports:
+      - "8010:8000"
+    volumes:
+      - .:/workspace
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  jupyter:
+    build: .
+    command: >-
+      jupyter lab --ip=0.0.0.0 --port=8888 --no-browser
+      --allow-root
+      --IdentityProvider.token=recsys --ServerApp.password=''
+      --ServerApp.allow_remote_access=True
+      --ServerApp.root_dir=/workspace
+    ports:
+      - "8889:8888"
+    volumes:
+      - .:/workspace
+
+  test:
+    build: .
+    command: >-
+      sh -c "python scripts/generate_notebooks.py &&
+      pytest -q &&
+      python scripts/execute_notebooks.py --profile smoke &&
+      python scripts/build_previews.py"
+    environment:
+      RECSYS_PROFILE: smoke
+      PYTHONPATH: /workspace
