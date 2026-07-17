@@ -23,15 +23,36 @@ ROOT = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
 sys.path.insert(0, str(ROOT))
 os.environ.setdefault("RECSYS_PROFILE", "smoke")
 PROFILE = os.environ["RECSYS_PROFILE"]
-from recsys_lab.data import load_movielens, movielens_provenance
-real_ratings, real_movies = load_movielens()
-REAL_DATASET = movielens_provenance(real_ratings)
+from recsys_lab.data import (load_movielens, movielens_provenance, load_amazon_2023,
+                             amazon_provenance, load_kuairand, kuairand_provenance)
+DATASET_KEY = "__DATASET_KEY__"
+if DATASET_KEY == "movielens":
+    real_ratings, real_movies = load_movielens()
+    real_interactions = real_ratings
+    REAL_DATASET = movielens_provenance(real_ratings)
+elif DATASET_KEY == "amazon-2023":
+    real_ratings = load_amazon_2023()
+    real_interactions, real_movies = real_ratings, None
+    REAL_DATASET = amazon_provenance(real_ratings)
+else:
+    real_interactions, real_movies = load_kuairand()
+    real_ratings = real_interactions
+    REAL_DATASET = kuairand_provenance(real_interactions)
 print({"profile": PROFILE, "root": str(ROOT), "real_dataset": REAL_DATASET})
 assert REAL_DATASET["randomly_fabricated_rows"] == 0
 """
 
 
+def dataset_for_title(title: str) -> tuple[str, str]:
+    if title.startswith(("3.0", "3.1")):
+        return "movielens", "GroupLens MovieLens latest-small：经典评分与邻域任务"
+    if title.startswith(("3.2", "3.5")):
+        return "amazon-2023", "Amazon Reviews 2023 Video Games 5-core：电商召回与 Transformer 序列"
+    return "kuairand", "KuaiRand-Pure：真实短视频曝光、点击、长播与多反馈序列"
+
+
 def notebook(title: str, goal: str, source: str, cells: list):
+    dataset_key, dataset_description = dataset_for_title(title)
     nb = nbf.v4.new_notebook()
     nb["metadata"] = {
         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
@@ -40,8 +61,8 @@ def notebook(title: str, goal: str, source: str, cells: list):
     }
     nb["cells"] = [
         md(f"# {title}\n\n> 阅读版与 Web 应用内容一致；实验数值来自本 Notebook 的已执行输出。\n\n## Goal\n\n{goal}"),
-        md(f"## Setup\n\n默认 `smoke` 档使用仓库内固定版本的 GroupLens **MovieLens latest-small** 真实行为子集，CPU 可重复执行；`full` 档只扩大真实数据规模与训练配置，不切换到合成数据。数据包含真实匿名用户、电影、评分和时间戳；实验只做确定性截取与任务重构，不随机制造交互、标签或行为序列。原始许可与引用保存在 `data/ml-latest-small/README.txt`。\n\n**主要资料：** {source}"),
-        code(SETUP),
+        md(f"## Setup\n\n本 Notebook 的默认真实数据是 **{dataset_description}**。`smoke` 档读取仓库内可审计的确定性切片，`full` 档扩大到官方完整文件；两档都不制造交互、曝光、标签或行为序列。切片规则、源地址、哈希与许可记录在 `data/README.md` 及对应数据目录。\n\n**主要资料：** {source}"),
+        code(SETUP.replace("__DATASET_KEY__", dataset_key)),
         *cells,
     ]
     return nb
@@ -50,8 +71,171 @@ def notebook(title: str, goal: str, source: str, cells: list):
 def main():
     OUT.mkdir(exist_ok=True)
     specs = {}
+    specs["3_0_data_pipeline"] = notebook(
+        "3.0B 数据与实验基础：从 import 到训练循环",
+        "拆开教程中常见的 recsys_lab.data 与 industrial_experiments：先阅读函数源码，再用真实 MovieLens 行为逐步重写时间切分、张量化、训练、推理和测试，建立从 Notebook 到工程模块的完整调用地图。",
+        "[Python inspect 官方文档](https://docs.python.org/3/library/inspect.html) · [PyTorch Optimizing Model Parameters](https://pytorch.org/tutorials/beginner/basics/optimization_tutorial.html)",
+        [
+            md(r"""
+## 1. 为什么可以 import，但不能把理解也藏起来
+
+工程代码把反复使用的数据读取、切分、训练和落盘封装成函数，优点是每个算法不用复制几百行相同代码，修复泄漏或指标错误时也只改一处。教程需要再加一层约束：
+
+1. Notebook 正文先解释输入、输出和关键步骤；
+2. 用一个小例子逐步重写核心逻辑；
+3. 给出函数源码与公式—代码映射；
+4. 完整工程文件可在“查看实现源码”或浏览器 IDE 中继续阅读。
+
+调用链不是黑盒：
+
+```text
+official CSV -> load_* -> deterministic subset -> time split
+             -> task tensors -> model.forward -> loss.backward
+             -> inference -> metrics -> results/*.json
+```
+
+`import` 只是告诉 Python“函数定义在另一个文件”，并不代表它来自不可见的库。下面让 Python 自己打印函数定义和文件位置。
+"""),
+            code(r"""
+import inspect
+from recsys_lab import data as data_tools
+from recsys_lab import industrial_experiments as experiments
+
+for fn in [data_tools.load_movielens, data_tools.leave_last_out, experiments.run_dssm]:
+    print(f"\n{fn.__name__}{inspect.signature(fn)}")
+    print("defined in:", inspect.getsourcefile(fn))
+print("\nleave_last_out source:\n", inspect.getsource(data_tools.leave_last_out))
+loader_lines = inspect.getsource(data_tools._load_cached).splitlines()
+print("\nMovieLens loader 的前 36 行（完整函数可在源码讲解页查看）：\n", "\n".join(loader_lines[:36]))
+"""),
+            md(r"""
+## 2. 数据加载：确定性切片不是随机造数据
+
+`load_movielens()` 做四件事：读官方 CSV；按行为数稳定选择用户与物品；把原始 ID 映射为连续整数；派生时间、类型和标签列。模型需要连续 ID 来查 embedding，但原始 `userId/movieId` 仍保留以便审计。
+
+下面直接查看真实行和来源记录。`randomly_fabricated_rows=0` 是机器可测试的数据承诺；它不表示数据没有抽样，而表示所有保留行都能追溯到官方文件。
+"""),
+            code(r"""
+from recsys_lab.data import load_movielens, movielens_provenance
+
+ratings, movies = load_movielens(max_users=12, max_items=80, min_user_events=8)
+display(ratings[["userId", "movieId", "user_id", "item_id", "rating", "timestamp"]].head())
+print(movielens_provenance(ratings))
+assert len(ratings) > 0 and ratings.userId.notna().all()
+"""),
+            md(r"""
+## 3. 时间切分：先手写，再与工具函数核对
+
+leave-last-out 对每位用户保留时间最晚的一条作为测试目标，其余进入训练。排序键中加入 `item_id`，是为了在时间戳相同时仍得到稳定结果。关键原则是用过去预测未来；如果随机切分，未来行为可能泄漏到用户历史。
+
+公式不复杂。对用户 $u$ 的事件时间集合 $T_u$，测试事件索引为 $t_u^*=\arg\max_{t\in T_u}t$，训练集为其余事件。
+"""),
+            code(r"""
+# 逐步重写工具函数
+ordered = ratings.sort_values(["user_id", "timestamp", "item_id"]).copy()
+last_indices = ordered.groupby("user_id").tail(1).index
+manual_test = ordered.loc[last_indices].sort_values("user_id")
+manual_train = ordered.drop(last_indices)
+
+helper_train, helper_test = data_tools.leave_last_out(ratings)
+assert manual_test[["user_id", "item_id"]].reset_index(drop=True).equals(
+    helper_test[["user_id", "item_id"]].reset_index(drop=True)
+)
+print({"train_rows": len(manual_train), "test_rows": len(manual_test),
+       "one_test_row_per_user": bool((manual_test.groupby("user_id").size() == 1).all())})
+"""),
+            md(r"""
+## 4. 从 DataFrame 到张量
+
+DataFrame 适合检查列和时间；模型计算需要张量。下面把 user/item ID 变成整数张量，把评分变成浮点目标。若有 $B$ 行样本、embedding 维数为 $d$，查表后 user/item 形状都是 $[B,d]$，逐维相乘再求和得到 $[B]$ 个预测。
+"""),
+            code(r"""
+import torch
+
+train_users = torch.tensor(manual_train.user_id.to_numpy(), dtype=torch.long)
+train_items = torch.tensor(manual_train.item_id.to_numpy(), dtype=torch.long)
+train_targets = torch.tensor(manual_train.rating.to_numpy(), dtype=torch.float32)
+print({"users": tuple(train_users.shape), "items": tuple(train_items.shape),
+       "targets": tuple(train_targets.shape), "dtypes": [str(train_users.dtype), str(train_targets.dtype)]})
+"""),
+            md(r"""
+## 5. 训练循环：forward、loss、backward、step
+
+训练循环的五个动作适用于 DSSM、DeepFM、DIN 和 HSTU，只是 `forward` 与损失定义不同：
+
+1. `model(...)` 计算预测；
+2. `loss_fn` 把预测错误压成一个数；
+3. `zero_grad()` 清除上一轮梯度；
+4. `backward()` 按链式法则计算每个参数对损失的影响；
+5. `step()` 沿降低损失的方向更新参数。
+
+这里用最小矩阵分解示范。预测 $\hat r_{ui}=p_u^\top q_i$，均方误差 $L=\frac1B\sum(\hat r-r)^2$。代码使用的每一行都来自真实评分。
+"""),
+            code(r"""
+class TinyMF(torch.nn.Module):
+    def __init__(self, users, items, dim=8):
+        super().__init__()
+        self.user = torch.nn.Embedding(users, dim)
+        self.item = torch.nn.Embedding(items, dim)
+    def forward(self, user_id, item_id):
+        return (self.user(user_id) * self.item(item_id)).sum(dim=1)
+
+torch.manual_seed(7)
+model = TinyMF(int(ratings.user_id.max()) + 1, int(ratings.item_id.max()) + 1)
+optimizer = torch.optim.Adam(model.parameters(), lr=.03)
+loss_fn = torch.nn.MSELoss()
+losses = []
+for epoch in range(20):
+    prediction = model(train_users, train_items)       # forward
+    loss = loss_fn(prediction, train_targets)          # score the error
+    optimizer.zero_grad()                              # clear old gradients
+    loss.backward()                                    # chain rule
+    optimizer.step()                                   # update parameters
+    losses.append(float(loss.detach()))
+print({"loss_start": round(losses[0], 4), "loss_end": round(losses[-1], 4)})
+assert losses[-1] < losses[0]
+"""),
+            md(r"""
+## 6. 推理与测试为什么必须分开
+
+推理只做前向计算，不修改参数，因此使用 `model.eval()` 和 `torch.no_grad()`。测试集 RMSE 为
+
+$$\mathrm{RMSE}=\sqrt{\frac1N\sum_{n=1}^N(\hat r_n-r_n)^2}.$$
+
+它回答“评分数值差多少”，不能替代 Top-K 召回指标。深度算法 Notebook 也遵循同样边界：训练函数可以封装，但测试目标、候选集和指标公式必须在正文中说清。
+"""),
+            code(r"""
+test_users = torch.tensor(helper_test.user_id.to_numpy(), dtype=torch.long)
+test_items = torch.tensor(helper_test.item_id.to_numpy(), dtype=torch.long)
+test_targets = torch.tensor(helper_test.rating.to_numpy(), dtype=torch.float32)
+model.eval()
+with torch.no_grad():
+    test_prediction = model(test_users, test_items)
+    rmse = torch.sqrt(torch.mean((test_prediction - test_targets) ** 2)).item()
+print({"test_rows": len(test_targets), "RMSE": round(rmse, 4)})
+assert torch.isfinite(test_prediction).all()
+"""),
+            md(r"""
+## 7. 怎样阅读 `run_dssm` 这类完整实验
+
+不要从第一行读到最后一行。按以下顺序定位：
+
+1. `_real_amazon`：数据从哪里来；
+2. 时间切分与 `fields`：一行表如何变成张量；
+3. `DSSM(...)`：模型结构和超参数；
+4. `_train_binary`：损失与反向传播；
+5. `model.mode = user/item`：两座塔如何分开推理；
+6. `_recall_single_target`：全库分数如何变成 Recall@K。
+
+网页顶部的“查看实现源码”会按这些函数分段显示；“在 IDE 中打开”适合跨文件搜索、跳转定义和临时修改。教程正文解释设计，源码页解释实现，IDE 负责自由探索，三者各司其职。
+"""),
+            md("## Checks\n\n本章已经用真实数据验证加载、时间切分、张量化、训练、推理和测试；也证明手写切分与公共工具一致。"),
+            code("assert REAL_DATASET['randomly_fabricated_rows'] == 0\nassert len(helper_test) == ratings.user_id.nunique()\nassert losses[-1] < losses[0]\nprint('PASS：公共管线已逐步展开并完成端到端验证。')"),
+            md("## Next Steps\n\n回到任一深度模型 Notebook，先读 Model Structure & Formula Walkthrough，再用源码讲解页把公式对应到实际函数；需要修改实现时进入浏览器 IDE。"),
+        ],
+    )
     specs["3_0_math_foundations"] = notebook(
-        "3.0 推荐算法数学基础：从矩阵到梯度下降",
+        "3.0A 数学基础：从矩阵到梯度下降",
         "面向初次接触推荐算法的读者，用可手算的小例子和图理解后续模型共同依赖的数学积木：数据表、向量、矩阵乘法、点积、余弦相似度、概率、Sigmoid、损失函数、梯度下降，以及 Recall、RMSE、AUC。",
         "[MIT OCW Linear Algebra](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/) · [Google ML Crash Course: Logistic Regression](https://developers.google.com/machine-learning/crash-course/logistic-regression) · [scikit-learn Model Evaluation](https://scikit-learn.org/stable/modules/model_evaluation.html)",
         [
@@ -1256,47 +1440,8 @@ print("已写出章节指标：gbdt_lr.json")
         specs.pop(legacy_slug, None)
     specs["3_1_summary"] = specs.pop("3_1_overview")
     specs.update(build_opening_specs(md, code, notebook))
+    specs.pop("3_5_0_transformer_foundations", None)
     specs.update(build_deep_specs(md, code, notebook))
-    specs["3_5_summary"] = notebook(
-        "3.5 总结：SASRec 与 Transformer 序列推荐",
-        "读取 SASRec 在真实 MovieLens 时间序列上的实验产物，与热门基线对照，并总结 SASRec、BERT4Rec、HSTU 的目标、信息边界和工程成本。",
-        "[SASRec](https://arxiv.org/abs/1808.09781) · [BERT4Rec](https://arxiv.org/abs/1904.06690) · [HSTU](https://arxiv.org/abs/2402.17152)",
-        [
-            md("""## Steps
-
-## 1. 模型演进对比
-
-| 模型 | Attention 可见范围 | 目标 | 推理输出 | 主要代价 |
-|---|---|---|---|---|
-| SASRec | 仅过去 | next-item pairwise | 最后位置向量 Top-K | $O(L^2)$ attention |
-| BERT4Rec | 左右上下文 | masked item | mask 位置分布 | 训练—在线目标差异 |
-| HSTU | 仅过去、推荐特化 | next-item | next-item / 行为流 | 模型—系统协同复杂 |
-
-SASRec 是本章可执行主线；BERT4Rec 作为双向预训练分支介绍，HSTU 在 4.3 以生成式行为序列模型继续展开。"""),
-            md("""## 2. 真实实验结果
-
-下表不手填数值，只读取 `3_5_1_sasrec` 在 MovieLens latest-small 真实时间序列上写出的 JSON。热门基线与 SASRec 使用相同测试目标。"""),
-            code("""import json, pandas as pd
-result_path = ROOT / 'results' / 'chapter_3_5' / '3_5_1_sasrec.json'
-payload = json.loads(result_path.read_text(encoding='utf-8'))
-comparison = pd.DataFrame(payload['records'])
-display(comparison.round(4))
-assert len(comparison)==1
-print('指标来源：', result_path.name)"""),
-            md("""## 3. 如何解释
-
-- 若 SASRec 未超过热门基线，不应调换测试集或制造更容易的序列；应检查数据密度、负样本、训练轮数、序列长度和目标定义。
-- MovieLens 是评分日志而不是连续曝光流，无法完整代表短视频、电商或广告的工业序列。
-- 公平比较必须固定真实用户集合、时间切分、候选库、已见过滤和 K。
-- 模型选型需同时记录 HR/NDCG、Coverage、P99、显存和增量更新成本。"""),
-            md("## Checks"),
-            code("""assert comparison.iloc[0]['dataset'] == 'MovieLens latest-small'
-assert comparison.iloc[0]['randomly_fabricated_rows'] == 0
-print('PASS：总结只聚合真实数据实验产物。')"""),
-            md("## Next Steps\n\n进入 4.0 比较 Transformer next-item 建模与 Semantic ID / 列表生成；在 4.3 使用相同真实时间序列观察 HSTU。"),
-        ],
-    )
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--only", choices=sorted(specs), help="只生成一个 Notebook，保留其他已执行输出")
     args = parser.parse_args()

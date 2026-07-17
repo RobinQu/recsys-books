@@ -12,34 +12,16 @@
   <link rel="stylesheet" href="/static/flat-navigation.css">
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="#overview"><span>R</span> RecSys Atlas</a>
-    <div class="search-wrap"><label class="sr-only" for="global-search">搜索模型</label><input id="global-search" placeholder="搜索 DSSM、DIN、HSTU…" autocomplete="off"><div id="search-results" class="search-results" hidden></div></div>
-    <div class="top-actions"><button class="ghost sidebar-toggle" aria-label="打开章节导航" aria-expanded="false">☰</button><button id="theme-toggle" class="ghost" aria-label="切换明暗主题">◐</button><a class="button" href="{{ jupyter_url }}/lab/tree/notebooks?token=recsys" target="_blank" rel="noreferrer">启动实验室 ↗</a></div>
-  </header>
-
-  <aside class="sidebar" aria-label="章节导航">
-    <nav>
-      <a href="#overview" data-section="overview">总览</a>
-      <a href="#evolution" data-section="evolution"><b>1</b> 召回 × 排序演进</a>
-      <a href="#history" data-section="history"><b>2</b> 发展历程综述</a>
-      <details open><summary><b>3</b><span>模型讲解与实战</span></summary>
-        <div class="sidebar-subnav"><a href="/notebooks/3_0_math_foundations">3.0 通用数学</a><a href="/notebooks/3_1_0_classic_foundations">3.1 经典算法导读</a><a href="/notebooks/3_2_0_retrieval_foundations">3.2 召回导读</a><a href="/notebooks/3_3_0_ranking_foundations">3.3 排序导读</a><a href="/notebooks/3_4_0_multitask_foundations">3.4 多目标导读</a><a href="/notebooks/3_5_0_transformer_foundations">3.5 Transformer 导读</a></div>
-      </details>
-      <details open><summary><b>4</b><span>生成式推荐</span></summary>
-        <div class="sidebar-subnav"><a href="/notebooks/4_0_generative_foundations">4.0 数学导读</a><a href="/notebooks/4_1_generative_overview">4.1 发展与总结</a><a href="/notebooks/4_2_openonerec_practice">4.2 OpenOneRec</a><a href="/notebooks/4_3_dlrm_hstu_practice">4.3 DLRM HSTU</a></div>
-      </details>
-      <a href="#frameworks"><b>F</b> 框架选型</a><a href="#datasets"><b>D</b> 数据集</a><a href="#sources"><b>5</b> 证据清单</a>
-    </nav>
-  </aside>
+  {% include "_site_header.html" %}
+  {% include "_site_sidebar.html" %}
 
   <main>
     <section id="overview" class="hero reveal">
       <div class="eyebrow">RECOMMENDER SYSTEMS · 1992—2026</div>
       <h1>从相似度，到向量检索，<br><em>再到生成一个推荐列表</em></h1>
       <p class="lede">以召回与排序两条主线解释推荐系统为何演进，并把论文思想、工业架构与可执行 Notebook 放在同一张图里。</p>
-      <div class="hero-actions"><a class="button" href="#evolution">进入技术图谱 ↓</a><a class="ghost button-like" href="#labs">查看 27 个实验</a></div>
-      <div class="stats"><div><strong>14</strong><span>核心模型族</span></div><div><strong>27</strong><span>可执行 Notebook</span></div><div><strong>7</strong><span>开放数据集方案</span></div><div><strong>21+</strong><span>论文与官方资料</span></div></div>
+      <div class="hero-actions"><a class="button" href="#evolution">进入技术图谱 ↓</a><a class="ghost button-like" href="#labs">查看 {{ notebooks|length }} 个实验</a></div>
+      <div class="stats"><div><strong>14</strong><span>核心模型族</span></div><div><strong>{{ notebooks|length }}</strong><span>可执行 Notebook</span></div><div><strong>7</strong><span>开放数据集方案</span></div><div><strong>21+</strong><span>论文与官方资料</span></div></div>
     </section>
 
     <section id="evolution" class="section reveal">
@@ -71,7 +53,7 @@
         <i>→</i><article><span>03 · LEARNING</span><b>误差 → 参数更新</b><p>损失函数给错误打分；梯度指出“往哪边改会更好”，学习率控制每一步大小。</p><code>θ ← θ − η∇L</code></article>
         <i>→</i><article><span>04 · EVALUATION</span><b>预测 → 指标</b><p>Recall 看是否找回目标，RMSE 看数值误差，AUC 看正样本能否排在负样本之前。</p><code>Recall / RMSE / AUC</code></article>
       </div>
-      <div class="hero-actions"><a class="button" href="/notebooks/3_0_math_foundations">进入 3.0 图解教程</a></div>
+      <div class="hero-actions"><a class="button" href="/notebooks/3_0_math_foundations">进入 3.0A 数学基础</a><a class="ghost button-like" href="/notebooks/3_0_data_pipeline">进入 3.0B 数据与实验基础</a><a class="ghost button-like" href="{{ ide_url }}/?folder=/home/coder/project" target="_blank">打开浏览器 IDE ↗</a></div>
     </section>
 
     <section id="model-explorer" class="section reveal">
@@ -87,10 +69,9 @@
     </section>
 
     {% set chapter_groups = [
-      ('retrieval','3.2','召回模型：DSSM 双塔、MIND','3_2_0_retrieval_foundations','3_2_summary','DSSM 与 MIND 已拆为独立教程；每篇分别完成数学演示、Torch-RecHub 训练、真实推理路径和 Recall 评测，再由总结读取实验产物。'),
+      ('retrieval','3.2','召回模型：DSSM、MIND 与 SASRec','3_2_0_retrieval_foundations','3_2_summary','从单向量双塔、多兴趣向量到 Transformer 序列召回；三篇教程分别完成结构推导、真实训练、全库推理和 Top-K 评测。'),
       ('ranking','3.3','排序模型：DeepFM、DIN / DIEN','3_3_0_ranking_foundations','3_3_summary','DeepFM、DIN、DIEN 各自独立成篇，分别讲静态交叉、候选注意力和兴趣演化，并统一比较 AUC、LogLoss、baseline 与服务成本。'),
-      ('multitask','3.4','多目标模型：MMoE / PLE','3_4_0_multitask_foundations','3_4_summary','MMoE 与 PLE 使用同一批 MovieLens 真实评分事件和两个明确阈值目标，汇总逐任务指标、负迁移风险与专家服务成本。'),
-      ('transformer','3.5','Transformer 序列推荐：SASRec 及其演进','3_5_0_transformer_foundations','3_5_summary','从 SASRec 的 causal self-attention 出发，比较 BERT4Rec 与 HSTU；实战严格按 MovieLens 真实时间戳训练并对照热门基线。')
+      ('multitask','3.4','多目标模型：MMoE / PLE','3_4_0_multitask_foundations','3_4_summary','MMoE 与 PLE 使用同一批 KuaiRand 真实曝光以及 is_click、long_view 原生目标，汇总逐任务指标、负迁移风险与专家服务成本。')
     ] %}
     {% for anchor,num,title,opening,summary,desc in chapter_groups %}<section id="{{ anchor }}" class="section lab-section reveal"><div class="section-kicker">{{ num }} · HANDS-ON</div><div class="lab-head"><div><h2>{{ title }}</h2><p>{{ desc }}</p></div><div class="lab-actions"><a class="button" href="/notebooks/{{ opening }}">数学导读</a><a class="ghost button-like" href="/notebooks/{{ summary }}">结果总结</a></div></div><div class="direct-chapter-links">{% for model in models if model.chapter == anchor %}<a href="/notebooks/{{ model.notebook }}"><span>{{ model.stage }}</span><b>{{ model.name }}</b><small>{{ model.idea }}</small></a>{% endfor %}</div></section>{% endfor %}
 
@@ -108,13 +89,12 @@
 
     <section id="frameworks" class="section reveal"><div class="section-kicker">FRAMEWORK DECISION</div><h2>TorchEasyRec vs Torch-RecHub</h2><p class="section-intro">结论不是二选一：TorchEasyRec 更适合作为工业主框架；Torch-RecHub 更适合 Notebook 和快速验证。本项目让同一数据契约从教学后端迁移到工业配置。</p><div class="compare-framework"><div class="framework-head"><span>评估轴</span><strong>TorchEasyRec</strong><strong>Torch-RecHub</strong></div>{% for row in frameworks %}<div><b>{{ row.axis }}</b><span>{{ row.torcheasyrec }}</span><span>{{ row.rechub }}</span></div>{% endfor %}</div></section>
 
-    <section id="datasets" class="section reveal"><div class="section-kicker">OPEN DATA</div><h2>固定数据集与近期开放数据</h2><p class="section-intro">全部 Notebook 默认读取仓库内固定版本的 GroupLens MovieLens latest-small：真实评分、电影 metadata 与时间戳均来自官方文件。CPU 档只做确定性截取和任务重构，不随机制造交互或标签；所有序列评测按时间切分。</p><div class="dataset-grid">{% for d in datasets %}<a href="{{ d.url }}" target="_blank" rel="noreferrer"><span>{{ d.year }} · {{ d.scale }}</span><h3>{{ d.name }}</h3><p><b>适用：</b>{{ d.fit }}</p><p>{{ d.note }}</p></a>{% endfor %}</div></section>
+    <section id="datasets" class="section reveal"><div class="section-kicker">OPEN DATA</div><h2>按任务选择真实数据，而不是一套数据跑到底</h2><p class="section-intro">经典算法使用便于理解的 MovieLens；深度召回与 SASRec 使用 Amazon Reviews 2023；CTR、行为序列、多目标和 HSTU 使用 KuaiRand 真实短视频曝光。CPU 档只做可复现的确定性切片，不随机制造交互、曝光或标签；所有序列评测按时间切分。</p><div class="dataset-grid">{% for d in datasets %}<a href="{{ d.url }}" target="_blank" rel="noreferrer"><span>{{ d.year }} · {{ d.scale }}</span><h3>{{ d.name }}</h3><p><b>适用：</b>{{ d.fit }}</p><p>{{ d.note }}</p></a>{% endfor %}</div></section>
 
     <section id="labs" class="section reveal"><div class="section-kicker">EXECUTABLE LABS</div><h2>Notebook 实验目录</h2><div class="notebook-list">{% for n in notebooks %}<article id="{{ n.slug }}"><div><span>{{ n.framework }}</span><h3>{{ n.title }}</h3><p>{{ n.dataset }} · {{ n.runtime }}</p></div><div><a href="/notebooks/{{ n.slug }}" target="_blank">预览</a><a href="{{ jupyter_url }}/lab/tree/notebooks/{{ n.slug }}.ipynb?token=recsys" target="_blank">运行 ↗</a></div></article>{% endfor %}</div></section>
 
     <section id="sources" class="section reveal"><div class="section-kicker">05 · EVIDENCE LEDGER</div><h2>论文及官方资料的证据清单</h2><p class="section-intro">优先原始论文、作者/公司官方代码与工程博客；A=生产或一手论文证据，B=官方技术说明，C=研究原型。在线增益不可跨公司直接比较。</p><div class="source-list">{% for name,url,type in sources %}<a href="{{ url }}" target="_blank" rel="noreferrer"><span>{{ loop.index }}</span><b>{{ name }}</b><em>{{ type }}</em><i>↗</i></a>{% endfor %}</div><p class="footnote">完整来源注释与口径见 <a href="/research-ledger">research ledger</a>；本轮汇总的章节与内容验收标准见 <a href="/tutorial-requirements">教程编写规范</a>。旧版长报告保留在 <a href="/legacy">legacy report</a>。</p></section>
   </main>
   <footer><span>RecSys Atlas · 研究、教学与可执行实验的一体化工作台</span><a href="#overview">回到顶部 ↑</a></footer>
-  <script id="model-data" type="application/json">{{ models | tojson }}</script>
   <script src="/static/app.js" defer></script>
 </body></html>

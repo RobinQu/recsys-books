@@ -1,0 +1,11 @@
+{
+  "dataset": "KuaiRand-Pure",
+  "source_url": "https://zenodo.org/records/10439422/files/KuaiRand-Pure.tar.gz",
+  "source_sha256": "c814bf6f3624c0cfae83c57de3df26b2ed206e5c57bab4c4dcbfabbabe20cbf0",
+  "selection": "top 256 users by standard-feed interaction count; ties by user_id; all standard and random-policy rows for those users retained",
+  "standard_rows": 79623,
+  "random_policy_rows": 14005,
+  "users": 256,
+  "items": 7388,
+  "randomly_fabricated_rows": 0
+}

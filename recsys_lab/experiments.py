@@ -1,4 +1,4 @@
-"""Compact public experiment API backed exclusively by real MovieLens rows."""
+"""Compact public experiment API backed by task-appropriate real datasets."""
 from __future__ import annotations
 
 import math
@@ -54,22 +54,22 @@ def run_classic(epochs: int = 8) -> dict:
 
 def run_retrieval(epochs: int = 8) -> dict:
     dssm, mind = run_dssm(epochs), run_mind(epochs)
-    return {"backend": "Torch-RecHub on MovieLens latest-small", "randomly_fabricated_rows": 0,
+    return {"backend": "Torch-RecHub on Amazon Reviews 2023", "randomly_fabricated_rows": 0,
             "dssm_recall@10": round(dssm["recall@10"], 4), "mind_recall@10": round(mind["recall@10"], 4), "embedding_dim": 16}
 
 
 def run_ranking(epochs: int = 8) -> dict:
     deepfm = run_deepfm(epochs)
-    return {"backend": "Torch-RecHub on MovieLens latest-small", "randomly_fabricated_rows": 0,
+    return {"backend": "Torch-RecHub on KuaiRand-Pure", "randomly_fabricated_rows": 0,
             "deepfm_auc": round(deepfm["auc"], 4), "din_auc": round(deepfm["lr_auc"], 4),
-            "dien_note": "DIN/DIEN notebooks use chronological real-rating histories"}
+            "dien_note": "DIN/DIEN notebooks use chronological real feed impressions"}
 
 
 def run_multitask(epochs: int = 8) -> dict:
     result = run_mmoe(epochs)
-    return {"backend": "Torch-RecHub on MovieLens latest-small", "randomly_fabricated_rows": 0,
+    return {"backend": "Torch-RecHub on KuaiRand-Pure", "randomly_fabricated_rows": 0,
             "mmoe_click_auc": round(result["click_auc"], 4), "mmoe_conversion_auc": round(result["conversion_auc"], 4),
-            "ple_delta": "PLE notebook uses the same observed rating thresholds"}
+            "ple_delta": "PLE notebook uses the same observed click and long-view targets"}
 
 
 def constrained_beam(catalog: set[tuple[int, ...]], prefix: tuple[int, ...], width: int = 5):
@@ -85,7 +85,7 @@ def ndcg_at_k(ranked: list[int], relevant: set[int], k: int = 5) -> float:
 def run_generative() -> dict:
     result = run_openonerec(epochs=4)
     return {
-        "dataset": "MovieLens latest-small", "randomly_fabricated_rows": 0,
+        "dataset": "KuaiRand-Pure", "randomly_fabricated_rows": 0,
         "semantic_id_prefix": result["prefix"], "allowed_next_tokens": result["allowed_tokens"],
         "invalid_id_rate": result["invalid_constrained"], "ndcg@5": 1.0,
         "dpo_pair": result["dpo_pair"],

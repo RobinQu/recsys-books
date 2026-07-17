@@ -58,23 +58,27 @@ print('PASS：共现、低秩近似和概率变换的基础形状正确。')""",
         },
         {
             "slug": "3_2_0_retrieval_foundations",
-            "title": "3.2 导读与数学基础：向量召回",
-            "goal": "在进入 DSSM 与 MIND 前，理解向量空间、对比学习、负样本、ANN、Top-K 指标和单兴趣/多兴趣的差别。",
-            "source": "[DSSM](https://www.microsoft.com/en-us/research/publication/learning-deep-structured-semantic-models-for-web-search-using-clickthrough-data/) · [MIND](https://arxiv.org/abs/1904.08030) · [YouTube DNN](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/)",
+            "title": "3.2 导读与数学基础：向量、多兴趣与序列召回",
+            "goal": "在进入 DSSM、MIND 与 SASRec 前，理解向量空间、对比学习、ANN、多兴趣、位置编码、因果注意力和 Top-K 指标。",
+            "source": "[DSSM](https://www.microsoft.com/en-us/research/publication/learning-deep-structured-semantic-models-for-web-search-using-clickthrough-data/) · [MIND](https://arxiv.org/abs/1904.08030) · [SASRec](https://arxiv.org/abs/1808.09781) · [BERT4Rec](https://arxiv.org/abs/1904.06690) · [HSTU](https://arxiv.org/abs/2402.17152) · [YouTube DNN](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/)",
             "layout": """## 本章布局与选型地图
 
 | 子章节 | 用户表示 | 检索次数 | 优势 | 主要代价 |
 |---|---:|---:|---|---|
 | 3.2.1 DSSM | 1 个向量 | 1 | 简单、低延迟、ANN 友好 | 多兴趣被平均 |
 | 3.2.2 MIND | K 个兴趣向量 | K | 覆盖多意图与长尾 | 路由、合并、去重成本 |
-| 3.2 总结 | 读取两个实验结果 | — | 同口径看 Recall 与成本 | smoke 不是 benchmark |
+| 3.2.3 SASRec | 1 个时序向量 | 1 | 捕捉近期转移与顺序依赖 | Attention 成本与序列延迟 |
+| 3.2 总结 | 读取三个实验结果 | — | 同口径看 Recall 与成本 | smoke 不是 benchmark |
 
-DSSM 适合通用亿级目录；MIND 适合行为长、意图明显分裂的内容或电商用户。工业系统通常还保留热门、ItemCF、规则和内容召回通道。""",
+DSSM 适合通用亿级目录；MIND 适合同时存在多个意图；SASRec 适合下一行为受先后顺序和近期行为影响明显的场景。三者最终都能产生可用于全库检索的用户表示。""",
             "papers": """## 来源论文解读
 
 - **Huang et al. (2013)** 用点击数据让两侧表示进入同一语义空间。后来推荐系统将这一结构发展为双塔：item 可离线编码，线上只做用户编码和 ANN。
 - **YouTube DNN (2016)** 明确区分 candidate generation 与 ranking，并讨论 sampled softmax 和训练/服务分布。
 - **MIND (2019)** 用动态路由抽取多个兴趣胶囊，训练时根据目标选择相关兴趣。
+- **SASRec (2018)** 用因果自注意力在每个位置预测下一物品。服务时取最后有效位置的表示，与全库 item embedding 点积，因此主要落在序列召回，也可把序列表征提供给排序。
+- **BERT4Rec (2019)** 改用双向上下文与 masked-item 训练，更适合离线表征和补全式预训练，但与在线 next-item 的信息边界不同。
+- **HSTU (2024)** 面向高基数、非平稳、超长行为流重新设计注意力和系统实现；它在 4.3 继续展开，不与 SASRec 的轻量实验混为同一规模结论。
 
 论文中的离线提升不等于任意目录上的线上增益；负采样、索引新鲜度和候选合并常比换一层 MLP 更重要。""",
             "math": r"""## 共同数学：相似度、Softmax 与 Recall
@@ -85,13 +89,20 @@ $$P(i^+|u)=\frac{\exp(s(u,i^+)/\tau)}{\sum_j\exp(s(u,i_j)/\tau)}$$
 
 训练，其中温度 $\tau$ 控制分布尖锐程度。in-batch negative 把同一批次其他正物品当负样本，效率高但可能出现假负样本。
 
-召回阶段常看 $\mathrm{Recall@K}=|TopK\cap Relevant|/|Relevant|$。DSSM 只有一个 $u$；MIND 使用 $K$ 个 $u_k$，候选分数为 $\max_k u_k^\top v_i$。""",
+召回阶段常看 $\mathrm{Recall@K}=|TopK\cap Relevant|/|Relevant|$。DSSM 只有一个 $u$；MIND 使用 $K$ 个 $u_k$，候选分数为 $\max_k u_k^\top v_i$。
+
+SASRec 先令 $x_t=e(i_t)+p_t$，再计算
+
+$$\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}+M\right)V.$$
+
+因果遮罩在未来位置填入 $-\infty$，使预测位置只能读取过去。最后位置向量就是随顺序变化的用户召回向量。""",
             "demo": """import numpy as np, matplotlib.pyplot as plt
 scores=np.array([2.4,1.2,.3,-.2]); temperatures=[1.0,.3]
-fig,axes=plt.subplots(1,2,figsize=(9,3.2))
+fig,axes=plt.subplots(1,3,figsize=(12,3.2))
 for ax,tau in zip(axes,temperatures):
     probability=np.exp(scores/tau); probability/=probability.sum()
     ax.bar(range(len(scores)),probability,color='#7ca832'); ax.set(title=f'softmax temperature={tau}',xlabel='1 positive + 3 negatives',ylabel='probability',ylim=(0,1))
+causal=np.tril(np.ones((5,5))); axes[2].imshow(causal,cmap='YlGn'); axes[2].set(title='SASRec causal visibility',xlabel='history',ylabel='prediction')
 plt.tight_layout(); plt.show()
 single=np.array([.5,.5]); interests=np.array([[1.,0.],[0.,1.]]); candidates=np.array([[1.,0.],[0.,1.],[-1.,0.]])
 print({'single_scores':(candidates@single).tolist(),'multi_interest_scores':(interests@candidates.T).max(0).tolist()})""",
@@ -122,8 +133,11 @@ print('PASS：Softmax 概率、单/多兴趣分数与 Recall 示例正确。')""
 - **DIEN (2019)** 用辅助下一行为监督兴趣抽取，再用 AUGRU 表达兴趣演化。
 
 三者都在曝光样本上学习点击概率。若没有曝光日志，不能把“未点击”随意解释成真正负反馈。""",
-            "math": r"""## 共同数学：概率、交叉熵、注意力与状态
+            "math": r"""## 数据选择：为什么使用 KuaiRand
 
+本章使用 KuaiRand-Pure 的真实短视频曝光日志，而不是 MovieLens 评分。每条记录同时给出候选视频、场景、时间、是否点击和观看时长，因此 `is_click=0` 是一次真实未点击曝光，而不是从目录中人工抽出的负样本。这与 DeepFM、DIN、DIEN 的 CTR/序列排序问题更一致。
+
+## 共同数学：概率、交叉熵、注意力与状态
 排序模型先输出 logit $z$，Sigmoid 得 $p=\sigma(z)$。单样本 LogLoss 为
 
 $$L=-[y\log p+(1-y)\log(1-p)]$$
@@ -157,7 +171,7 @@ print({'AUC_as_pairwise_win_rate':round(float(auc),3),'attention_sum':round(floa
 |---|---|---|---|
 | 3.4.1 MMoE | 所有任务共享专家 | 每任务 gate 与 tower | 专家塌缩、梯度冲突 |
 | 3.4.2 PLE | 逐层共享专家 | 每层保留任务专属专家 | 参数与调参成本 |
-| 3.4 总结 | 相同真实评分子集比较 | 逐任务指标 | 平均值掩盖跷跷板 |
+| 3.4 总结 | 相同 KuaiRand 曝光切片 | 逐任务指标 | 平均值掩盖跷跷板 |
 
 MMoE 适合相关任务的灵活共享；PLE 适合确有负迁移且数据足够支撑更复杂结构的场景。上线仍需明确最终业务效用函数。""",
             "papers": """## 来源论文解读
@@ -178,7 +192,7 @@ gate_logits=np.array([[2.,1.,0.],[.2,.8,1.8]])
 gate=np.exp(gate_logits); gate/=gate.sum(1,keepdims=True)
 fig,ax=plt.subplots(figsize=(6,3.2)); left=np.zeros(2)
 for expert in range(3):
-    ax.barh(['click','conversion'],gate[:,expert],left=left,label=f'expert {expert+1}'); left+=gate[:,expert]
+    ax.barh(['click','long view'],gate[:,expert],left=left,label=f'expert {expert+1}'); left+=gate[:,expert]
 ax.set(xlim=(0,1),title='Task-specific Softmax gates'); ax.legend(ncol=3,loc='lower center'); plt.show()
 grad_click=np.array([1.,.2]); grad_convert=np.array([-.5,1.])
 cosine=grad_click@grad_convert/(np.linalg.norm(grad_click)*np.linalg.norm(grad_convert))
@@ -200,10 +214,10 @@ print('PASS：任务 gate 是合法权重，梯度夹角位于合法范围。')"
 | SASRec | 过去（causal mask） | 正负 next-item | 通用序列召回/排序 |
 | BERT4Rec | 左右上下文 | masked item | 离线表征与补全式预训练 |
 | HSTU | 过去、推荐特化 attention | next-item | 超长行为流与生成式推荐 |
-| 3.5.1 实战 | MovieLens 真实时间序列 | pairwise loss | Torch-RecHub SASRec |
+| 3.5.1 实战 | Amazon Reviews 2023 Video Games | pairwise loss | Torch-RecHub SASRec |
 | 3.5 总结 | SASRec 与热门基线结果 | HR@10 | 效果—成本判断 |
 
-SASRec 是理解 Transformer 推荐的最佳起点：结构足够完整，又保留明确的 next-item 任务。BERT4Rec 改成双向 masked-item 训练；HSTU 则进一步针对工业推荐行为流和系统吞吐重构。""",
+SASRec 是理解 Transformer 推荐的最佳起点：结构足够完整，又保留明确的 next-item 任务。BERT4Rec 改成双向 masked-item 训练；HSTU 则进一步针对工业推荐行为流和系统吞吐重构。本章不再使用 MovieLens：SASRec 使用时间覆盖到 2023 年的 Amazon 商品序列，HSTU 在 4.3 使用真实短视频 feed 序列。""",
             "papers": """## 来源论文解读
 
 - **SASRec (ICDM 2018)** 在每个时刻自适应选择相关历史，用因果自注意力兼顾 Markov 式近期信号和较长依赖。

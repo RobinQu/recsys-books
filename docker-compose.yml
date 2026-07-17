@@ -4,6 +4,8 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     environment:
       JUPYTER_PUBLIC_URL: http://localhost:8889
+      IDE_PUBLIC_URL: http://localhost:8090
+      IDE_OPENER_INTERNAL_URL: http://ide:8081
     ports:
       - "8010:8000"
     volumes:
@@ -21,11 +23,26 @@ services:
       --allow-root
       --IdentityProvider.token=recsys --ServerApp.password=''
       --ServerApp.allow_remote_access=True
+      --ServerApp.tornado_settings='{"headers":{"Content-Security-Policy":"frame-ancestors \u0027self\u0027 http://localhost:8010 http://127.0.0.1:8010"}}'
       --ServerApp.root_dir=/workspace
     ports:
       - "8889:8888"
     volumes:
       - .:/workspace
+
+  ide:
+    image: codercom/code-server:latest
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        /usr/lib/code-server/lib/node /home/coder/project/scripts/code_server_opener.mjs &
+        exec code-server --bind-addr 0.0.0.0:8080 --auth none
+        --disable-workspace-trust --disable-getting-started-override
+        /home/coder/project
+    ports:
+      - "127.0.0.1:8090:8080"
+    volumes:
+      - .:/home/coder/project
 
   test:
     build: .
@@ -37,3 +54,5 @@ services:
     environment:
       RECSYS_PROFILE: smoke
       PYTHONPATH: /workspace
+    volumes:
+      - .:/workspace

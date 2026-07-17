@@ -36,9 +36,20 @@ def test_industrial_tutorial_models_train_and_infer():
         assert result["loss_curve"][-1] < result["loss_curve"][0]
         assert "framework" in result
         assert result["dataset"]["randomly_fabricated_rows"] == 0
-        assert "MovieLens latest-small" in result["dataset"]["dataset"]
+    assert all("Amazon Reviews 2023" in runs[index]["dataset"]["dataset"] for index in [0, 1, 7])
+    assert all("KuaiRand" in runs[index]["dataset"]["dataset"] for index in [2, 3, 4, 5, 6, 8, 9])
     assert 0 <= runs[0]["recall@10"] <= 1
     assert 0 <= runs[2]["auc"] <= 1
     assert 0 <= runs[4]["auc"] <= 1
     assert runs[8]["invalid_constrained"] == 0
     assert 0 <= runs[9]["hr@5"] <= 1
+
+
+def test_bundled_dataset_slices_have_auditable_provenance():
+    import json
+    from pathlib import Path
+    for directory, minimum_rows in [("amazon-reviews-2023-video-games", 30000), ("kuairand-pure", 70000)]:
+        record = json.loads((Path("data") / directory / "provenance.json").read_text())
+        assert record["randomly_fabricated_rows"] == 0
+        assert record.get("rows", record.get("standard_rows", 0)) >= minimum_rows
+        assert len(record["source_sha256"]) == 64

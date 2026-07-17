@@ -10,7 +10,7 @@
       "baseline_value": null,
       "framework": "OpenOneRec contract + PyTorch executable proxy",
       "source_notebook": "4_2_openonerec_practice",
-      "dataset": "MovieLens latest-small",
+      "dataset": "KuaiRand-Pure (Kuaishou, CIKM 2022)",
       "randomly_fabricated_rows": 0
     }
   ]

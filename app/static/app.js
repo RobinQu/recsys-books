@@ -119,7 +119,7 @@ if (search && results) {
     const query = search.value.trim().toLowerCase();
     if (!query) { results.hidden = true; return; }
     const hits = models.filter((model) => Object.values(model).join(' ').toLowerCase().includes(query)).slice(0, 6);
-    results.innerHTML = hits.length ? hits.map((model) => `<a href="#model-explorer" data-hit="${model.id}"><b>${model.name}</b><span>${model.stage} · ${model.idea.slice(0, 42)}…</span></a>`).join('') : '<p>未找到匹配模型</p>';
+    results.innerHTML = hits.length ? hits.map((model) => `<a href="/#model-explorer" data-hit="${model.id}"><b>${model.name}</b><span>${model.stage} · ${model.idea.slice(0, 42)}…</span></a>`).join('') : '<p>未找到匹配模型</p>';
     results.hidden = false;
   });
   results.addEventListener('click', (event) => {

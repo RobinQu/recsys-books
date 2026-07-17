@@ -1,8 +1,9 @@
-"""Versioned, deterministic access to the real MovieLens latest-small dataset.
+"""Versioned, deterministic access to the tutorial's real datasets.
 
-The bundled files come from GroupLens and retain their original README/license.
-All task views below are deterministic transformations of observed ratings and
-timestamps; no labels or interaction sequences are randomly fabricated.
+MovieLens supports the classic chapters, Amazon Reviews 2023 supports modern
+retrieval/sequential models, and KuaiRand supports feed ranking and multitask
+learning.  All task views are deterministic transformations of observed rows;
+no interaction or behavior sequence is randomly fabricated.
 """
 from __future__ import annotations
 
@@ -17,6 +18,10 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data" / "ml-latest-small"
 SOURCE_URL = "https://files.grouplens.org/datasets/movielens/ml-latest-small.zip"
 DATASET_NAME = "MovieLens latest-small (GroupLens, generated 2018-09-26)"
+AMAZON_DIR = ROOT / "data" / "amazon-reviews-2023-video-games"
+AMAZON_NAME = "Amazon Reviews 2023 / Video Games / 5-core"
+KUAI_DIR = ROOT / "data" / "kuairand-pure"
+KUAIRAND_NAME = "KuaiRand-Pure (Kuaishou, CIKM 2022)"
 
 
 @lru_cache(maxsize=8)
@@ -103,6 +108,112 @@ def movielens_provenance(ratings: pd.DataFrame) -> dict:
     }
 
 
+@lru_cache(maxsize=8)
+def _load_amazon_cached(max_users: int, min_user_events: int) -> pd.DataFrame:
+    path = AMAZON_DIR / "interactions.csv"
+    if not path.exists():
+        raise FileNotFoundError(f"缺少真实数据集切片：{path}")
+    frame = pd.read_csv(path)
+    user_order = (
+        frame.groupby("user_id").size().rename("events").reset_index()
+        .sort_values(["events", "user_id"], ascending=[False, True]).head(max_users)["user_id"]
+    )
+    frame = frame[frame.user_id.isin(user_order)].copy()
+    valid = frame.groupby("user_id").size()
+    frame = frame[frame.user_id.isin(valid[valid >= min_user_events].index)].copy()
+    user_map = {raw: idx for idx, raw in enumerate(sorted(frame.user_id.unique()))}
+    item_map = {raw: idx for idx, raw in enumerate(sorted(frame.parent_asin.unique()))}
+    frame["raw_user_id"] = frame.user_id
+    frame["user_id"] = frame.user_id.map(user_map).astype("int64")
+    frame["item_id"] = frame.parent_asin.map(item_map).astype("int64")
+    frame["timestamp_ms"] = frame.timestamp.astype("int64")
+    frame["timestamp"] = (frame.timestamp_ms // 1000).astype("int64")
+    frame["like"] = (frame.rating >= 4.0).astype("float32")
+    frame["very_like"] = (frame.rating >= 5.0).astype("float32")
+    frame["hour"] = pd.to_datetime(frame.timestamp_ms, unit="ms", utc=True).dt.hour.astype("int64")
+    frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
+    return frame
+
+
+def load_amazon_2023(max_users: int = 160, min_user_events: int = 12) -> pd.DataFrame:
+    return _load_amazon_cached(max_users, min_user_events).copy()
+
+
+def amazon_provenance(frame: pd.DataFrame) -> dict:
+    source = pd.read_json(AMAZON_DIR / "provenance.json", typ="series")
+    return {
+        "dataset": AMAZON_NAME,
+        "source": source["source_url"],
+        "source_sha256": source["source_sha256"],
+        "slice_rule": source["selection"],
+        "rows_used": int(len(frame)),
+        "users_used": int(frame.user_id.nunique()),
+        "items_used": int(frame.item_id.nunique()),
+        "time_min_utc": pd.to_datetime(frame.timestamp.min(), unit="s", utc=True).isoformat(),
+        "time_max_utc": pd.to_datetime(frame.timestamp.max(), unit="s", utc=True).isoformat(),
+        "positive_rule": "observed Amazon rating >= 4.0",
+        "randomly_fabricated_rows": 0,
+    }
+
+
+@lru_cache(maxsize=8)
+def _load_kuairand_cached(max_users: int, max_items: int) -> tuple[pd.DataFrame, pd.DataFrame]:
+    interactions = pd.read_csv(KUAI_DIR / "standard_interactions.csv")
+    videos = pd.read_csv(KUAI_DIR / "videos.csv")
+    user_order = (
+        interactions.groupby("user_id").size().rename("events").reset_index()
+        .sort_values(["events", "user_id"], ascending=[False, True]).head(max_users)["user_id"]
+    )
+    frame = interactions[interactions.user_id.isin(user_order)].copy()
+    item_order = (
+        frame.groupby("video_id").size().rename("events").reset_index()
+        .sort_values(["events", "video_id"], ascending=[False, True]).head(max_items)["video_id"]
+    )
+    frame = frame[frame.video_id.isin(item_order)].copy()
+    user_map = {raw: idx for idx, raw in enumerate(sorted(frame.user_id.unique()))}
+    item_map = {raw: idx for idx, raw in enumerate(sorted(frame.video_id.unique()))}
+    frame["raw_user_id"] = frame.user_id
+    frame["user_id"] = frame.user_id.map(user_map).astype("int64")
+    frame["item_id"] = frame.video_id.map(item_map).astype("int64")
+    frame["timestamp"] = (frame.time_ms // 1000).astype("int64")
+    frame["hour"] = (frame.hourmin // 100).clip(0, 23).astype("int64")
+    frame["duration_bucket"] = pd.cut(
+        frame.duration_ms, bins=[-1, 7000, 18000, 60000, np.inf], labels=False
+    ).astype("int64")
+    item_popularity = frame.groupby("item_id").size()
+    user_activity = frame.groupby("user_id").size()
+    frame["item_popularity"] = frame.item_id.map(item_popularity).astype("float32")
+    frame["user_activity"] = frame.user_id.map(user_activity).astype("float32")
+    frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
+    video_view = videos[videos.video_id.isin(item_map)].copy()
+    video_view["item_id"] = video_view.video_id.map(item_map).astype("int64")
+    video_view = video_view.sort_values("item_id").reset_index(drop=True)
+    return frame, video_view
+
+
+def load_kuairand(max_users: int = 128, max_items: int = 2500) -> tuple[pd.DataFrame, pd.DataFrame]:
+    frame, videos = _load_kuairand_cached(max_users, max_items)
+    return frame.copy(), videos.copy()
+
+
+def kuairand_provenance(frame: pd.DataFrame) -> dict:
+    source = pd.read_json(KUAI_DIR / "provenance.json", typ="series")
+    return {
+        "dataset": KUAIRAND_NAME,
+        "source": source["source_url"],
+        "source_sha256": source["source_sha256"],
+        "license_file": str(KUAI_DIR / "LICENSE"),
+        "slice_rule": source["selection"],
+        "rows_used": int(len(frame)),
+        "users_used": int(frame.user_id.nunique()),
+        "items_used": int(frame.item_id.nunique()),
+        "time_min_utc": pd.to_datetime(frame.timestamp.min(), unit="s", utc=True).isoformat(),
+        "time_max_utc": pd.to_datetime(frame.timestamp.max(), unit="s", utc=True).isoformat(),
+        "targets": "observed is_click, long_view, is_like and other feed feedback",
+        "randomly_fabricated_rows": 0,
+    }
+
+
 def leave_last_out(ratings: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     ordered = ratings.sort_values(["user_id", "timestamp", "item_id"]).copy()
     test_index = ordered.groupby("user_id").tail(1).index
@@ -152,3 +263,43 @@ def sequence_classification_rows(ratings: pd.DataFrame, max_len: int = 10, limit
         "label": np.asarray([row[4] for row in rows], dtype=np.float32),
         "timestamp": np.asarray([row[5] for row in rows], dtype=np.int64),
     }
+
+
+def kuairand_sequence_classification_rows(
+    interactions: pd.DataFrame, max_len: int = 20, limit: int = 2600
+) -> dict[str, np.ndarray]:
+    """Build DIN/DIEN examples from observed KuaiRand feed impressions."""
+    rows: list[tuple[int, list[int], list[int], int, float, int]] = []
+    for user_id, frame in interactions.sort_values(["user_id", "timestamp", "item_id"]).groupby("user_id"):
+        clicked: list[int] = []
+        skipped: list[int] = []
+        for event in frame.itertuples():
+            if len(clicked) >= 2:
+                rows.append((
+                    int(user_id) + 1,
+                    pad_left(clicked, max_len),
+                    pad_left(skipped, max_len),
+                    int(event.item_id) + 1,
+                    float(event.is_click),
+                    int(event.timestamp),
+                ))
+            if event.is_click:
+                clicked.append(int(event.item_id) + 1)
+            else:
+                skipped.append(int(event.item_id) + 1)
+    rows.sort(key=lambda row: (row[5], row[0], row[3]))
+    rows = rows[-limit:]
+    return {
+        "user_id": np.asarray([row[0] for row in rows], dtype=np.int64),
+        "history": np.asarray([row[1] for row in rows], dtype=np.int64),
+        "negative_history": np.asarray([row[2] for row in rows], dtype=np.int64),
+        "item_id": np.asarray([row[3] for row in rows], dtype=np.int64),
+        "label": np.asarray([row[4] for row in rows], dtype=np.float32),
+        "timestamp": np.asarray([row[5] for row in rows], dtype=np.int64),
+    }
+
+
+def clicked_sequences(interactions: pd.DataFrame, min_length: int = 8) -> dict[int, list[int]]:
+    clicked = interactions[interactions.is_click == 1].sort_values(["user_id", "timestamp", "item_id"])
+    sequences = clicked.groupby("user_id").item_id.apply(lambda values: [int(v) + 1 for v in values]).to_dict()
+    return {int(user): sequence for user, sequence in sequences.items() if len(sequence) >= min_length}

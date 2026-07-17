@@ -3,14 +3,14 @@
     {
       "algorithm": "SASRec 自注意力序列推荐",
       "primary_metric": "hr@10",
-      "primary_value": 0.020833333333333332,
+      "primary_value": 0.01910828025477707,
       "secondary_metric": "popularity_hr@10",
-      "secondary_value": 0.020833333333333332,
+      "secondary_value": 0.006369426751592357,
       "baseline_metric": null,
       "baseline_value": null,
       "framework": "torch_rechub.models.matching.SASRec",
       "source_notebook": "3_5_1_sasrec",
-      "dataset": "MovieLens latest-small",
+      "dataset": "Amazon Reviews 2023 / Video Games / 5-core",
       "randomly_fabricated_rows": 0
     }
   ]

@@ -10,34 +10,31 @@
   <link rel="stylesheet" href="/static/notebook.css">
 </head>
 <body class="notebook-shell-page">
-  <header class="topbar notebook-topbar">
-    <a class="brand" href="/"><span>R</span> RecSys Atlas</a>
-    <nav class="notebook-breadcrumb" aria-label="面包屑">
-      <a href="/">首页</a><i>›</i>
-      {% if chapter and chapter_opening %}<a href="/notebooks/{{ chapter_opening.slug }}">{{ chapter.number }} {{ chapter.title }}</a><i>›</i>{% endif %}
-      <b>Notebook</b>
-    </nav>
-    <div class="top-actions"><button class="ghost sidebar-toggle" aria-label="打开 Notebook 导航" aria-expanded="false">☰</button><button id="theme-toggle" class="ghost" aria-label="切换明暗主题">◐</button><a class="button" href="{{ jupyter_url }}/lab/tree/notebooks/{{ notebook.slug }}.ipynb?token=recsys" target="_blank" rel="noreferrer">切换到可执行模式 ↗</a></div>
-  </header>
-
-  <aside class="sidebar notebook-sidebar" aria-label="Notebook 导航">
-    <div class="notebook-backlinks">
-      {% if chapter and chapter_opening and notebook.slug != chapter_opening.slug %}<a href="/notebooks/{{ chapter_opening.slug }}">← 返回 {{ chapter.number }} 导读与数学基础</a>{% endif %}
-      <a href="/#{{ chapter_slug if chapter_slug else 'labs' }}">← 返回首页课程地图</a>
-    </div>
-    <nav>
-      {% if chapter_sequence %}{% for item in chapter_sequence %}<a href="/notebooks/{{ item.slug }}" class="{{ 'active' if item.slug == notebook.slug else '' }}"><b>{{ '%02d' | format(loop.index) }}</b><span>{{ item.title }}</span></a>{% endfor %}{% else %}{% for item in notebooks %}<a href="/notebooks/{{ item.slug }}" class="{{ 'active' if item.slug == notebook.slug else '' }}"><b>{{ '%02d' | format(loop.index) }}</b><span>{{ item.title }}</span></a>{% endfor %}{% endif %}
-    </nav>
-  </aside>
+  {% include "_site_header.html" %}
+  {% include "_site_sidebar.html" %}
 
   <main class="notebook-shell-main">
     <section class="notebook-reader-head">
       <div><div class="section-kicker">EXECUTED NOTEBOOK · NBCONVERT PREVIEW</div><h1>{{ notebook.title }}</h1><p>{{ notebook.framework }} · {{ notebook.dataset }} · {{ notebook.runtime }}</p></div>
-      <div class="notebook-mode"><span class="mode-dot"></span><div><b>当前：只读预览</b><small>输出来自已执行 Notebook；编辑或重新运行请进入 JupyterLab。</small></div></div>
+      <div class="notebook-mode"><span class="mode-dot"></span><div><b>一个章节，三种模式</b><small>阅读叙事、执行实验和追踪源码可在下方直接切换。</small><a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">在独立 IDE 中打开 ↗</a></div></div>
     </section>
 
-    <section class="notebook-frame-wrap" aria-label="Notebook 阅读预览">
-      <iframe title="{{ notebook.title }} 阅读预览" src="/notebooks/{{ notebook.slug }}/content" loading="eager" sandbox="allow-scripts allow-same-origin"></iframe>
+    <nav class="mode-tabs" role="tablist" aria-label="章节查看模式">
+      <button class="active" role="tab" aria-selected="true" data-mode="preview">阅读预览</button>
+      <button role="tab" aria-selected="false" data-mode="execute">可交互执行</button>
+      <button id="source" role="tab" aria-selected="false" data-mode="source">实现源码</button>
+    </nav>
+
+    <section class="mode-panel active" data-panel="preview" role="tabpanel">
+      <div class="notebook-frame-wrap"><iframe title="{{ notebook.title }} 阅读预览" src="/notebooks/{{ notebook.slug }}/content" loading="eager" sandbox="allow-scripts allow-same-origin"></iframe></div>
+    </section>
+    <section class="mode-panel" data-panel="execute" role="tabpanel" hidden>
+      <div class="mode-help"><b>JupyterLab 可执行模式</b><span>修改单元格并重新运行；若浏览器限制跨端口嵌入，可使用右侧按钮单独打开。</span><a href="{{ jupyter_url }}/lab/tree/notebooks/{{ notebook.slug }}.ipynb?token=recsys" target="_blank" rel="noreferrer">在新窗口打开 ↗</a></div>
+      <div class="notebook-frame-wrap interactive-frame"><iframe title="{{ notebook.title }} 可交互模式" data-src="{{ jupyter_url }}/lab/tree/notebooks/{{ notebook.slug }}.ipynb?token=recsys" loading="lazy"></iframe></div>
+    </section>
+    <section class="mode-panel" data-panel="source" role="tabpanel" hidden>
+      <div class="mode-help"><b>公式—代码映射</b><span>按数据、张量、forward、loss、推理和 metric 追踪完整函数。</span><a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">在独立 IDE 中编辑 ↗</a></div>
+      <div class="embedded-source">{% for section in source_sections %}<section class="source-section"><div><span>{{ section.path }}</span><h2>{{ section.title }}</h2><p>{{ section.explanation }}</p></div><pre><code>{{ section.code }}</code></pre></section>{% endfor %}</div>
     </section>
 
     <nav class="notebook-pager" aria-label="上一篇和下一篇">
@@ -46,5 +43,15 @@
     </nav>
   </main>
   <script src="/static/app.js" defer></script>
+  <script>
+    document.querySelectorAll('.mode-tabs button').forEach((button) => button.addEventListener('click', () => {
+      const mode = button.dataset.mode;
+      document.querySelectorAll('.mode-tabs button').forEach((item) => { item.classList.toggle('active', item === button); item.setAttribute('aria-selected', item === button ? 'true' : 'false'); });
+      document.querySelectorAll('.mode-panel').forEach((panel) => { const active = panel.dataset.panel === mode; panel.hidden = !active; panel.classList.toggle('active', active); });
+      const iframe = document.querySelector(`[data-panel="${mode}"] iframe[data-src]`);
+      if (iframe && !iframe.getAttribute('src')) iframe.src = iframe.dataset.src;
+    }));
+    if (location.hash === '#source') document.querySelector('[data-mode="source"]').click();
+  </script>
 </body>
 </html>

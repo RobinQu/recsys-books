@@ -20,7 +20,7 @@ def main():
     args = parser.parse_args()
     os.environ["RECSYS_PROFILE"] = args.profile
     slugs = [item["slug"] for item in NOTEBOOKS]
-    summary_slugs = {"3_1_summary", "3_2_summary", "3_3_summary", "3_4_summary", "3_5_summary", "4_1_generative_overview"}
+    summary_slugs = {"3_1_summary", "3_2_summary", "3_3_summary", "3_4_summary", "4_1_generative_overview"}
     execution_order = [slug for slug in slugs if slug not in summary_slugs] + [slug for slug in slugs if slug in summary_slugs]
     paths = [ROOT / "notebooks" / f"{slug}.ipynb" for slug in execution_order]
     if args.only:

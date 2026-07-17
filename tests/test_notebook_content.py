@@ -65,7 +65,7 @@ def test_deep_chapters_are_split_and_use_industrial_framework_classes():
         "3_3_3_dien.ipynb": ["DIEN", "AUGRU", "run_dien", "Train & Inference", "Results Discussion"],
         "3_4_1_mmoe.ipynb": ["MMoE", "gate", "run_mmoe", "Train & Inference", "Results Discussion"],
         "3_4_2_ple.ipynb": ["PLE", "专属专家", "run_ple", "Train & Inference", "Results Discussion"],
-        "3_5_1_sasrec.ipynb": ["SASRec", "因果", "run_sasrec", "Train & Inference", "Results Discussion"],
+        "3_2_3_sasrec.ipynb": ["SASRec", "因果", "run_sasrec", "Train & Inference", "Results Discussion"],
         "4_2_openonerec_practice.ipynb": ["OpenOneRec", "trie", "run_openonerec", "Train & Inference", "Results Discussion"],
         "4_3_dlrm_hstu_practice.ipynb": ["HSTUModel", "因果", "run_hstu", "Train & Inference", "Results Discussion"],
     }
@@ -73,19 +73,46 @@ def test_deep_chapters_are_split_and_use_industrial_framework_classes():
         notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
         source = "\n".join(cell.source for cell in notebook.cells)
         assert all(token in source for token in required)
-        for section in ["## Paper & Context", "## Math by Hand", "## Data", "## Model & Framework", "## Checks", "## Next Steps"]:
+        for section in ["## Paper & Context", "## Model Structure & Formula Walkthrough", "## Math by Hand", "## Data", "## Model & Framework", "## Checks", "## Next Steps"]:
             assert section in source
         assert "matplotlib" in source and "save_records" in source
         assert not any(output.output_type == "error" for cell in notebook.cells if cell.cell_type == "code" for output in cell.get("outputs", []))
 
 
+def test_deep_notebooks_derive_model_specific_structure_and_loss():
+    expected = {
+        "3_2_1_dssm.ipynb": ["[B,N]", "temperature", "ANN"],
+        "3_2_2_mind.ipynb": ["c_{jk}", "squash", "[B,K,d]"],
+        "3_3_1_deepfm.ipynb": ["O(nd)", "二元交叉熵", "共享 embedding"],
+        "3_3_2_din.ipynb": ["e_j-e_t", "[B,L,d]", "ActivationUnit"],
+        "3_3_3_dien.ipynb": ["重置门", "AUGRU", "辅助损失"],
+        "3_4_1_mmoe.ipynb": ["[B,E,d]", "task gate", "\\lambda_k"],
+        "3_4_2_ple.ipynb": ["CGC", "共享专家", "progressive extraction"],
+        "3_2_3_sasrec.ipynb": ["QK^\\top", "因果 mask", "softplus"],
+        "4_2_openonerec_practice.ipynb": ["L_{DPO}", "teacher forcing", "trie"],
+        "4_3_dlrm_hstu_practice.ipynb": ["SiLU", "pointwise aggregated attention", "next-item"],
+    }
+    for filename, tokens in expected.items():
+        notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
+        source = "\n".join(cell.source for cell in notebook.cells)
+        assert all(token in source for token in tokens), filename
+        assert "高中" not in source
+
+
+def test_pipeline_notebook_opens_imports_and_reimplements_core_steps():
+    notebook = nbformat.read(Path("notebooks") / "3_0_data_pipeline.ipynb", as_version=4)
+    source = "\n".join(cell.source for cell in notebook.cells)
+    for token in ["inspect.getsource", "leave_last_out", "逐步重写", "class TinyMF", "loss.backward()", "model.eval()", "RMSE"]:
+        assert token in source
+    assert "randomly_fabricated_rows" in source and "高中" not in source
+
+
 def test_every_large_chapter_has_a_result_aggregation_notebook():
     expected = {
         "3_1_summary.ipynb": 4,
-        "3_2_summary.ipynb": 2,
+        "3_2_summary.ipynb": 3,
         "3_3_summary.ipynb": 3,
         "3_4_summary.ipynb": 2,
-        "3_5_summary.ipynb": 1,
         "4_1_generative_overview.ipynb": 2,
     }
     for filename, count in expected.items():
@@ -98,10 +125,9 @@ def test_every_large_chapter_has_a_result_aggregation_notebook():
 def test_every_large_chapter_has_a_math_opening_with_python_demo():
     expected = {
         "3_1_0_classic_foundations.ipynb": ["本章布局与选型地图", "共同数学", "余弦", "低秩", "Sigmoid"],
-        "3_2_0_retrieval_foundations.ipynb": ["本章布局与选型地图", "Softmax", "Recall", "多兴趣", "temperature"],
+        "3_2_0_retrieval_foundations.ipynb": ["本章布局与选型地图", "Softmax", "Recall", "多兴趣", "temperature", "SASRec", "因果", "QK^\\top"],
         "3_3_0_ranking_foundations.ipynb": ["本章布局与选型地图", "LogLoss", "AUC", "注意力", "GRU"],
         "3_4_0_multitask_foundations.ipynb": ["本章布局与选型地图", "Softmax gate", "梯度", "负迁移", "cosine"],
-        "3_5_0_transformer_foundations.ipynb": ["本章布局与选型地图", "SASRec", "BERT4Rec", "Scaled Dot-Product", "因果"],
         "4_0_generative_foundations.ipynb": ["本章布局与选型地图", "自回归", "因果 mask", "trie", "NDCG"],
     }
     for filename, tokens in expected.items():
@@ -112,12 +138,17 @@ def test_every_large_chapter_has_a_math_opening_with_python_demo():
         assert sum(cell.cell_type == "code" for cell in notebook.cells) >= 3
 
 
-def test_every_notebook_uses_the_bundled_real_dataset():
+def test_every_notebook_uses_a_task_appropriate_bundled_real_dataset():
     notebook_paths = sorted(Path("notebooks").glob("*.ipynb"))
-    assert len(notebook_paths) == 27
+    assert len(notebook_paths) == 26
     for path in notebook_paths:
         notebook = nbformat.read(path, as_version=4)
         source = "\n".join(cell.source for cell in notebook.cells)
-        assert "MovieLens latest-small" in source, path.name
+        if path.name.startswith(("3_0", "3_1")):
+            assert "MovieLens latest-small" in source, path.name
+        elif path.name.startswith("3_2"):
+            assert "Amazon Reviews 2023" in source, path.name
+        else:
+            assert "KuaiRand" in source, path.name
         assert "REAL_DATASET" in source, path.name
         assert 'REAL_DATASET["randomly_fabricated_rows"] == 0' in source, path.name

@@ -1,8 +1,8 @@
-"""CPU-sized industrial-model experiments trained on real MovieLens events.
+"""CPU-sized industrial-model experiments trained on task-appropriate real data.
 
-Every label, history, target and timestamp comes from the bundled GroupLens
-MovieLens latest-small files. Deterministic truncation keeps documentation tests
-fast; random seeds initialize model parameters only and never fabricate rows.
+Amazon Reviews 2023 supplies e-commerce retrieval/sequences; KuaiRand supplies
+real short-video impressions and multi-feedback targets. Deterministic
+truncation keeps tests fast; seeds initialize parameters only.
 """
 from __future__ import annotations
 
@@ -21,7 +21,15 @@ from torch_rechub.models.matching import DSSM, MIND, SASRec
 from torch_rechub.models.multi_task import MMOE, PLE
 from torch_rechub.models.ranking import DIEN, DIN, DeepFM
 
-from .data import load_movielens, movielens_provenance, positive_sequences, sequence_classification_rows
+from .data import (
+    amazon_provenance,
+    clicked_sequences,
+    kuairand_provenance,
+    kuairand_sequence_classification_rows,
+    load_amazon_2023,
+    load_kuairand,
+    positive_sequences,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,13 +78,18 @@ def _train_binary(model, data: dict[str, torch.Tensor], labels: torch.Tensor, ep
     return losses
 
 
-def _real_ratings(max_users: int = 96, max_items: int = 480):
-    ratings, movies = load_movielens(max_users=max_users, max_items=max_items, min_user_events=12)
-    return ratings, movies, movielens_provenance(ratings)
+def _real_amazon(max_users: int = 128):
+    ratings = load_amazon_2023(max_users=max_users, min_user_events=12)
+    return ratings, amazon_provenance(ratings)
+
+
+def _real_kuairand(max_users: int = 96, max_items: int = 2200):
+    interactions, videos = load_kuairand(max_users=max_users, max_items=max_items)
+    return interactions, videos, kuairand_provenance(interactions)
 
 
 def run_dssm(epochs: int = 24) -> dict:
-    seed_everything(); ratings, _, provenance = _real_ratings()
+    seed_everything(); ratings, provenance = _real_amazon()
     events = ratings.sort_values("timestamp").tail(5200).reset_index(drop=True)
     split = int(len(events) * .8)
     train, test = events.iloc[:split], events.iloc[split:]
@@ -112,7 +125,7 @@ def run_dssm(epochs: int = 24) -> dict:
     recall = _recall_single_target(scores[valid_users], np.asarray(targets), 10, seen)
     return {
         "framework": "torch_rechub.models.matching.DSSM",
-        "dataset": provenance | {"train_rows": len(train), "test_rows": len(test), "label": "observed rating >= 4.0"},
+        "dataset": provenance | {"train_rows": len(train), "test_rows": len(test), "label": "observed Amazon rating >= 4.0"},
         "loss_curve": losses,
         "test_auc": _safe_auc(test.like.to_numpy(), probability),
         "recall@10": recall,
@@ -140,7 +153,7 @@ def _mind_rows(ratings, history_length=10, negatives=5):
 
 
 def run_mind(epochs: int = 26) -> dict:
-    seed_everything(); ratings, _, provenance = _real_ratings()
+    seed_everything(); ratings, provenance = _real_amazon()
     rows = _mind_rows(ratings); n_users, n_items = ratings.user_id.nunique(), ratings.item_id.nunique(); history_length = 10
     user_feature = [SparseFeature("user_id", n_users + 1, 12)]
     item_feature = [SparseFeature("item_id", n_items + 1, 12, padding_idx=0)]
@@ -153,7 +166,7 @@ def run_mind(epochs: int = 26) -> dict:
         "item_id": torch.tensor([r[2] for r in rows]),
         "negative_items": torch.tensor([r[3] for r in rows]),
     }
-    optimizer = torch.optim.Adam(model.parameters(), lr=.02); losses = []
+    optimizer = torch.optim.Adam(model.parameters(), lr=.005); losses = []
     for _ in range(epochs):
         logits = model(train_data); loss = torch.nn.functional.cross_entropy(logits, torch.zeros(len(rows), dtype=torch.long))
         optimizer.zero_grad(); loss.backward(); optimizer.step(); losses.append(float(loss.detach()))
@@ -167,7 +180,7 @@ def run_mind(epochs: int = 26) -> dict:
     targets = np.asarray([r[5] - 1 for r in rows])
     return {
         "framework": "torch_rechub.models.matching.MIND",
-        "dataset": provenance | {"sequence_users": len(rows), "history_length": history_length, "negative_source": "observed rating <= 3.0"},
+        "dataset": provenance | {"sequence_users": len(rows), "history_length": history_length, "negative_source": "observed Amazon rating <= 3.0"},
         "loss_curve": losses, "positive_top1": train_top1,
         "recall@10": _recall_single_target(scores, targets, 10, seen),
         "interest_shape": list(user_interests.shape),
@@ -175,36 +188,36 @@ def run_mind(epochs: int = 26) -> dict:
     }
 
 
-def _ranking_fields(ratings):
-    frame = ratings.sort_values("timestamp").tail(5200).copy()
+def _ranking_fields(interactions):
+    frame = interactions.sort_values("timestamp").tail(7000).copy()
     return {
         "user_id": frame.user_id.to_numpy() + 1,
         "item_id": frame.item_id.to_numpy() + 1,
-        "genre_id": frame.genre_id.to_numpy() + 1,
+        "tab": frame.tab.to_numpy() + 1,
         "hour": frame.hour.to_numpy() + 1,
-        "decade_id": frame.decade_id.to_numpy() + 1,
-    }, frame.like.to_numpy(), frame
+        "duration_bucket": frame.duration_bucket.to_numpy() + 1,
+    }, frame.is_click.to_numpy(dtype=np.float32), frame
 
 
 def run_deepfm(epochs: int = 28) -> dict:
-    seed_everything(); ratings, _, provenance = _real_ratings(); fields, labels, frame = _ranking_fields(ratings); split = int(len(labels) * .8)
+    seed_everything(); interactions, _, provenance = _real_kuairand(); fields, labels, frame = _ranking_fields(interactions); split = int(len(labels) * .8)
     features = [
         SparseFeature("user_id", int(max(fields["user_id"])) + 1, 12),
         SparseFeature("item_id", int(max(fields["item_id"])) + 1, 12),
-        SparseFeature("genre_id", int(max(fields["genre_id"])) + 1, 12),
+        SparseFeature("tab", int(max(fields["tab"])) + 1, 12),
         SparseFeature("hour", 25, 12),
-        SparseFeature("decade_id", int(max(fields["decade_id"])) + 1, 12),
+        SparseFeature("duration_bucket", int(max(fields["duration_bucket"])) + 1, 12),
     ]
     model = DeepFM(features, features, {"dims": [48, 24], "activation": "relu", "dropout": 0.0})
     tensors = {name: torch.tensor(value, dtype=torch.long) for name, value in fields.items()}
     losses = _train_binary(model, {k: v[:split] for k, v in tensors.items()}, torch.tensor(labels[:split]), epochs, .015)
     with torch.no_grad(): probability = model({k: v[split:] for k, v in tensors.items()}).numpy()
-    baseline_x = np.c_[frame.genre_id.to_numpy(), frame.hour.to_numpy(), frame.decade_id.to_numpy()]
+    baseline_x = np.c_[frame.tab.to_numpy(), frame.hour.to_numpy(), frame.duration_bucket.to_numpy()]
     baseline = LogisticRegression(max_iter=300).fit(baseline_x[:split], labels[:split])
     baseline_probability = baseline.predict_proba(baseline_x[split:])[:, 1]
     return {
         "framework": "torch_rechub.models.ranking.DeepFM",
-        "dataset": provenance | {"rows": len(labels), "train_rows": split, "label": "observed rating >= 4.0"},
+        "dataset": provenance | {"rows": len(labels), "train_rows": split, "label": "observed KuaiRand is_click"},
         "loss_curve": losses, "auc": _safe_auc(labels[split:], probability),
         "logloss": float(log_loss(labels[split:], np.clip(probability, 1e-6, 1 - 1e-6))),
         "lr_auc": _safe_auc(labels[split:], baseline_probability), "probability_sample": probability[:8].round(3).tolist(),
@@ -212,9 +225,9 @@ def run_deepfm(epochs: int = 28) -> dict:
 
 
 def _run_sequence_ranker(kind: str, epochs: int) -> dict:
-    seed_everything(); ratings, _, provenance = _real_ratings(); rows = sequence_classification_rows(ratings, max_len=10, limit=1800)
+    seed_everything(); interactions, _, provenance = _real_kuairand(); rows = kuairand_sequence_classification_rows(interactions, max_len=20, limit=2600)
     labels = rows.pop("label"); timestamps = rows.pop("timestamp"); split = int(len(labels) * .8)
-    n_users, n_items = ratings.user_id.nunique(), ratings.item_id.nunique()
+    n_users, n_items = interactions.user_id.nunique(), interactions.item_id.nunique()
     user = [SparseFeature("user_id", n_users + 1, 12)]
     item = [SparseFeature("item_id", n_items + 1, 12, padding_idx=0)]
     history = [SequenceFeature("history", n_items + 1, 12, pooling="concat", shared_with="item_id", padding_idx=0)]
@@ -232,7 +245,7 @@ def _run_sequence_ranker(kind: str, epochs: int) -> dict:
     overlap = (history_values == rows["item_id"][:, None]).mean(1)
     return {
         "framework": f"torch_rechub.models.ranking.{kind.upper()}",
-        "dataset": provenance | {"rows": len(labels), "sequence_length": 10, "label": "observed rating >= 4.0", "time_ordered": True},
+        "dataset": provenance | {"rows": len(labels), "sequence_length": 20, "label": "observed KuaiRand is_click", "negative_history": "observed skipped impressions", "time_ordered": True},
         "loss_curve": losses, "auc": _safe_auc(labels[split:], probability),
         "logloss": float(log_loss(labels[split:], np.clip(probability, 1e-6, 1 - 1e-6))),
         "static_overlap_auc": _safe_auc(labels[split:], overlap[split:]), "probability_sample": probability[:8].round(3).tolist(),
@@ -243,19 +256,20 @@ def run_din(epochs: int = 26) -> dict: return _run_sequence_ranker("din", epochs
 def run_dien(epochs: int = 30) -> dict: return _run_sequence_ranker("dien", epochs)
 
 
-def _multitask_view(ratings):
-    frame = ratings.sort_values("timestamp").tail(6000).copy()
-    genres = np.eye(int(ratings.genre_id.max()) + 1, dtype=np.float32)[frame.genre_id.to_numpy()]
+def _multitask_view(interactions):
+    frame = interactions.sort_values("timestamp").tail(8000).copy()
+    tabs = np.eye(int(interactions.tab.max()) + 1, dtype=np.float32)[frame.tab.to_numpy()]
+    duration = np.eye(int(interactions.duration_bucket.max()) + 1, dtype=np.float32)[frame.duration_bucket.to_numpy()]
     continuous = np.c_[
         np.sin(frame.hour.to_numpy() / 24 * 2 * np.pi), np.cos(frame.hour.to_numpy() / 24 * 2 * np.pi),
-        np.log1p(frame.item_popularity.to_numpy()) / np.log1p(ratings.item_popularity.max()),
-        np.log1p(frame.user_activity.to_numpy()) / np.log1p(ratings.user_activity.max()),
+        np.log1p(frame.item_popularity.to_numpy()) / np.log1p(interactions.item_popularity.max()),
+        np.log1p(frame.user_activity.to_numpy()) / np.log1p(interactions.user_activity.max()),
     ].astype(np.float32)
-    return np.c_[genres, continuous].astype(np.float32), np.c_[frame.like, frame.very_like].astype(np.float32)
+    return np.c_[tabs, duration, continuous].astype(np.float32), np.c_[frame.is_click, frame.long_view].astype(np.float32)
 
 
 def _run_multitask(kind: str, epochs: int) -> dict:
-    seed_everything(); ratings, _, provenance = _real_ratings(); x, labels = _multitask_view(ratings); split = int(len(x) * .8)
+    seed_everything(); interactions, _, provenance = _real_kuairand(); x, labels = _multitask_view(interactions); split = int(len(x) * .8)
     features = [DenseFeature(f"x{i}") for i in range(x.shape[1])]
     expert = {"dims": [24, 12], "activation": "relu", "dropout": 0.0}; towers = [{"dims": [12], "activation": "relu", "dropout": 0.0}] * 2
     model = MMOE(features, ["classification", "classification"], 4, expert, towers) if kind == "mmoe" else PLE(features, ["classification", "classification"], 2, 2, 2, expert, towers)
@@ -272,8 +286,9 @@ def _run_multitask(kind: str, epochs: int) -> dict:
         independent_auc.append(_safe_auc(labels[split:, task], baseline.predict_proba(x[split:])[:, 1]))
     return {
         "framework": f"torch_rechub.models.multi_task.{kind.upper()}",
-        "dataset": provenance | {"rows": len(x), "features": x.shape[1], "tasks": ["rating>=4.0", "rating>=4.5"]},
+        "dataset": provenance | {"rows": len(x), "features": x.shape[1], "tasks": ["observed is_click", "observed long_view"]},
         "loss_curve": losses, "click_auc": _safe_auc(labels[split:, 0], probability[:, 0]),
+        "long_view_auc": _safe_auc(labels[split:, 1], probability[:, 1]),
         "conversion_auc": _safe_auc(labels[split:, 1], probability[:, 1]), "independent_lr_auc": independent_auc,
     }
 
@@ -289,14 +304,24 @@ class TinyListGenerator(torch.nn.Module):
         states, _ = self.gru(self.embedding(tokens)); return self.head(states)
 
 
-def _semantic_catalog(ratings):
-    movie_meta = ratings.drop_duplicates("item_id").sort_values("item_id")
-    return {int(row.item_id): (int(row.genre_id) + 1, int(row.decade_id) + 1, int(row.item_id % 31) + 1) for row in movie_meta.itertuples()}
+def _semantic_catalog(videos):
+    def first_tag(value) -> int:
+        raw = str(value).split(",")[0]
+        try: return int(float(raw))
+        except ValueError: return 0
+    return {
+        int(row.item_id): (
+            first_tag(row.tag) % 128 + 1,
+            int(0 if np.isnan(row.music_type) else row.music_type) % 32 + 1,
+            int(row.item_id % 64) + 1,
+        )
+        for row in videos.itertuples()
+    }
 
 
 def run_openonerec(epochs: int = 32) -> dict:
-    seed_everything(); ratings, _, provenance = _real_ratings(); item_to_code = _semantic_catalog(ratings); catalog = set(item_to_code.values())
-    positive = ratings[ratings.rating >= 4.0].sort_values("timestamp").tail(1600)
+    seed_everything(); interactions, videos, provenance = _real_kuairand(); item_to_code = _semantic_catalog(videos); catalog = set(item_to_code.values())
+    positive = interactions[interactions.is_click == 1].sort_values("timestamp").tail(2000)
     sequences = np.asarray([item_to_code[int(item)] for item in positive.item_id], dtype=np.int64)
     vocabulary_size = int(sequences.max()) + 2
     model_input = torch.tensor(np.c_[np.zeros((len(sequences), 1), dtype=np.int64), sequences[:, :-1]])
@@ -313,10 +338,15 @@ def run_openonerec(epochs: int = 32) -> dict:
     while prefix + (invalid_token,) in catalog: invalid_token -= 1
     stress_logits[invalid_token] = float(stress_logits.max() + .5)
     unconstrained = int(stress_logits.argmax()); constrained = int(max(allowed, key=lambda token: stress_logits[token]))
-    chosen_row = ratings[ratings.rating >= 4.5].iloc[0]; rejected_row = ratings[ratings.rating <= 2.0].iloc[0]
+    chosen_row = interactions[(interactions.is_click == 1) & (interactions.long_view == 1)].iloc[0]
+    rejected_row = interactions[interactions.is_click == 0].iloc[0]
     return {
         "framework": "OpenOneRec contract + PyTorch executable proxy",
-        "dataset": provenance | {"semantic_catalog_size": len(catalog), "training_codes": len(sequences), "code_source": "real genre + release decade + movie id"},
+        "dataset": provenance | {
+            "semantic_catalog_size": len(catalog), "training_codes": len(sequences),
+            "code_source": "observed KuaiRand video tag + music type + item id partition",
+            "recif_bench_access": "official OpenOneRec-RecIF repository is gated; full profile requires authenticated acceptance",
+        },
         "loss_curve": losses, "catalog_size": len(catalog), "prefix": prefix, "allowed_tokens": allowed,
         "unconstrained_token": unconstrained, "constrained_token": constrained,
         "invalid_unconstrained": float(prefix + (unconstrained,) not in catalog), "invalid_constrained": float(prefix + (constrained,) not in catalog),
@@ -324,8 +354,7 @@ def run_openonerec(epochs: int = 32) -> dict:
     }
 
 
-def _sequence_windows(ratings, length=12):
-    sequences = positive_sequences(ratings, threshold=3.5, min_length=length + 3)
+def _sequence_windows_from_sequences(sequences, length=12):
     train_input, train_target, eval_input, eval_target = [], [], [], []
     for sequence in sequences.values():
         prior = sequence[:-1]
@@ -337,8 +366,9 @@ def _sequence_windows(ratings, length=12):
 
 
 def run_sasrec(epochs: int = 30) -> dict:
-    seed_everything(); ratings, _, provenance = _real_ratings(); length = 12
-    train_input, train_target, eval_input, eval_target = _sequence_windows(ratings, length)
+    seed_everything(); ratings, provenance = _real_amazon(max_users=160); length = 20
+    sequences = positive_sequences(ratings, threshold=4.0, min_length=length + 3)
+    train_input, train_target, eval_input, eval_target = _sequence_windows_from_sequences(sequences, length)
     low_items = [int(v) + 1 for v in ratings[ratings.rating <= 2.5].item_id]
     negative = np.asarray([[low_items[(row + col) % len(low_items)] for col in range(length)] for row in range(len(train_input))])
     vocab = ratings.item_id.nunique() + 1
@@ -362,16 +392,17 @@ def run_sasrec(epochs: int = 30) -> dict:
     popularity_hr = float(np.mean([target - 1 in popularity_top10 for target in eval_target]))
     return {
         "framework": "torch_rechub.models.matching.SASRec",
-        "dataset": provenance | {"sequence_users": len(eval_target), "sequence_length": length, "negative_source": "observed rating <= 2.5"},
+        "dataset": provenance | {"sequence_users": len(eval_target), "sequence_length": length, "negative_source": "observed Amazon rating <= 2.5"},
         "loss_curve": losses, "hr@10": _recall_single_target(scores, eval_target - 1, 10, seen),
         "popularity_hr@10": popularity_hr, "embedding_dim": 24,
     }
 
 
 def run_hstu(epochs: int = 26) -> dict:
-    seed_everything(); ratings, _, provenance = _real_ratings(); length = 12
-    train_input, train_target, eval_input, eval_target = _sequence_windows(ratings, length)
-    vocab = ratings.item_id.nunique() + 1
+    seed_everything(); interactions, _, provenance = _real_kuairand(max_users=128, max_items=2500); length = 24
+    sequences = clicked_sequences(interactions, min_length=length + 3)
+    train_input, train_target, eval_input, eval_target = _sequence_windows_from_sequences(sequences, length)
+    vocab = interactions.item_id.nunique() + 1
     inputs, targets = torch.tensor(train_input), torch.tensor(train_target)
     model = HSTUModel(vocab, d_model=32, n_heads=2, n_layers=1, dqk=8, dv=8, max_seq_len=length, dropout=0.0, use_time_embedding=False)
     optimizer = torch.optim.Adam(model.parameters(), lr=.008); losses=[]

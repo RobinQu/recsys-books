@@ -1,6 +1,6 @@
 # 互联网推荐算法技术发展：来源与研究说明
 
-更新时间：2026-07-16（Asia/Shanghai）
+更新时间：2026-07-17（Asia/Shanghai）
 
 ## 研究边界
 
@@ -26,6 +26,17 @@
 13. Sun et al. [BERT4Rec](https://arxiv.org/abs/1904.06690), CIKM, 2019.
 14. Li et al. [MIND: Multi-Interest Network with Dynamic Routing for Recommendation at Tmall](https://arxiv.org/abs/1904.08030), CIKM, 2019.
 15. Tang et al. [Progressive Layered Extraction (PLE)](https://doi.org/10.1145/3383313.3412236), RecSys, 2020.
+
+## 数据集选择证据
+
+1. GroupLens. [MovieLens latest-small README](https://files.grouplens.org/datasets/movielens/ml-latest-small-README.html)：用于经典矩阵、评分和特征交互教学，不外推为 feed CTR。
+2. Hou et al. [Amazon Reviews 2023](https://amazon-reviews-2023.github.io/)：571.54M reviews、细粒度时间戳、交互延伸到 2023 年；本教程采用官方 Video Games 5-core。
+3. Li et al. [MIND](https://arxiv.org/abs/1904.08030)：原论文离线数据为 Amazon Books 与 TmallData，支持用 Amazon 电商长序列展示多兴趣召回，而非继续使用电影评分。
+4. Gao et al. [KuaiRand](https://github.com/chongminggao/KuaiRand)：真实短视频 feed、标准/随机干预策略、12 类反馈和时间戳；用于 DeepFM、DIN/DIEN、MMoE/PLE 与 HSTU。
+5. Wu et al. [Microsoft News Dataset](https://learn.microsoft.com/en-us/azure/open-datasets/dataset-microsoft-news)：真实 news impression、点击与候选未点击，可作为 DSSM/新闻排序的 full-profile 替代数据。
+6. OpenOneRec. [RecIF-Bench dataset card](https://huggingface.co/datasets/OpenOneRec/OpenOneRec-RecIF)：多域生成式推荐基准；当前仓库 gated，教程明确区分 KuaiRand smoke adapter 与授权后的 RecIF full profile。
+
+选择原则不是“越新越好”：经典方法优先可解释、可手算；CTR 模型必须优先真实曝光；多目标模型需要原生多反馈；Transformer/HSTU 需要严格时间序列、较长历史和更贴近线上流的数据。
 
 ## 生成式推荐与统一建模
 

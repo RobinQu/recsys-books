@@ -3,14 +3,14 @@
     {
       "algorithm": "DIEN 兴趣演化排序",
       "primary_metric": "auc",
-      "primary_value": 0.5392450384271119,
+      "primary_value": 0.6334802523550255,
       "secondary_metric": "logloss",
-      "secondary_value": 2.5210411702550526,
+      "secondary_value": 0.570897263415952,
       "baseline_metric": "static_overlap_auc",
-      "baseline_value": 0.5,
+      "baseline_value": 0.5019229107250885,
       "framework": "torch_rechub.models.ranking.DIEN",
       "source_notebook": "3_3_3_dien",
-      "dataset": "MovieLens latest-small",
+      "dataset": "KuaiRand-Pure (Kuaishou, CIKM 2022)",
       "randomly_fabricated_rows": 0
     }
   ]

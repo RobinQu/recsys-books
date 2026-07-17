@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
+import nbformat
+from nbconvert import HTMLExporter
+from traitlets.config import Config
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -10,6 +15,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
 from app.content import CHAPTERS, DATASETS, EVOLUTION, FRAMEWORKS, MODELS, NOTEBOOKS, PRACTICES, SOURCES
+from app.source_browser import ide_source_target, source_sections
 
 ROOT = Path(__file__).resolve().parents[1]
 LEGACY_NOTEBOOKS = {
@@ -18,6 +24,10 @@ LEGACY_NOTEBOOKS = {
     "3_2_retrieval_dssm_mind": "3_2_summary",
     "3_3_ranking_deepfm_din_dien": "3_3_summary",
     "3_4_multitask_mmoe_ple": "3_4_summary",
+    "3_0_1_data_and_experiment_pipeline": "3_0_data_pipeline",
+    "3_5_0_transformer_foundations": "3_2_0_retrieval_foundations",
+    "3_5_1_sasrec": "3_2_3_sasrec",
+    "3_5_summary": "3_2_summary",
 }
 app = FastAPI(title="RecSys Atlas", version="1.0.0")
 app.mount("/static", StaticFiles(directory=ROOT / "app" / "static"), name="static")
@@ -25,6 +35,15 @@ templates = Jinja2Templates(directory=ROOT / "app" / "templates")
 
 
 def page_context(request: Request, active: str = "overview") -> dict:
+    course_groups = []
+    for key, chapter in CHAPTERS.items():
+        ordered_slugs = list(dict.fromkeys([chapter["opening"], *chapter["notebooks"], chapter["summary"]]))
+        course_groups.append({
+            "key": key,
+            "number": chapter["number"],
+            "title": chapter["title"],
+            "items": [item for slug in ordered_slugs for item in NOTEBOOKS if item["slug"] == slug],
+        })
     return {
         "request": request,
         "active": active,
@@ -36,7 +55,10 @@ def page_context(request: Request, active: str = "overview") -> dict:
         "notebooks": NOTEBOOKS,
         "chapters": CHAPTERS,
         "sources": SOURCES,
+        "course_groups": course_groups,
+        "current_notebook_slug": None,
         "jupyter_url": os.getenv("JUPYTER_PUBLIC_URL", "http://localhost:8889"),
+        "ide_url": os.getenv("IDE_PUBLIC_URL", "http://localhost:8090"),
     }
 
 
@@ -45,8 +67,11 @@ def index(request: Request):
     return templates.TemplateResponse(request, "index.html", page_context(request))
 
 
-@app.get("/chapters/{slug}", response_class=HTMLResponse)
-def chapter_detail(request: Request, slug: str):
+@app.get("/chapters/{slug}")
+def legacy_chapter_redirect(slug: str):
+    """Compatibility only: categories live on the home page, not on a third page level."""
+    if slug == "transformer":
+        return RedirectResponse("/notebooks/3_2_0_retrieval_foundations", status_code=307)
     chapter = CHAPTERS.get(slug)
     if chapter is None:
         raise HTTPException(404, "Unknown chapter")
@@ -92,12 +117,13 @@ def notebook_preview(request: Request, slug: str):
         chapter_sequence = [n for slug_value in ordered_slugs for n in NOTEBOOKS if n["slug"] == slug_value]
     context.update({
         "notebook": notebook,
+        "current_notebook_slug": slug,
         "chapter_slug": chapter_slug,
         "chapter": CHAPTERS.get(chapter_slug) if chapter_slug else None,
-        "chapter_opening": next((n for n in NOTEBOOKS if chapter_slug and n["slug"] == CHAPTERS[chapter_slug]["opening"]), None),
         "chapter_sequence": chapter_sequence,
         "previous_notebook": NOTEBOOKS[notebook_index - 1] if notebook_index > 0 else None,
         "next_notebook": NOTEBOOKS[notebook_index + 1] if notebook_index + 1 < len(NOTEBOOKS) else None,
+        "source_sections": source_sections(slug),
     })
     return templates.TemplateResponse(request, "notebook_shell.html", context)
 
@@ -109,9 +135,60 @@ def notebook_preview_content(slug: str):
     if slug not in {n["slug"] for n in NOTEBOOKS}:
         raise HTTPException(404, "Unknown notebook")
     path = ROOT / "notebook_previews" / f"{slug}.html"
-    if not path.exists():
-        return HTMLResponse("<h1>预览尚未生成</h1><p>运行 <code>python scripts/build_previews.py</code></p>", 503)
+    notebook_path = ROOT / "notebooks" / f"{slug}.ipynb"
+    if not notebook_path.exists():
+        raise HTTPException(404, "Notebook file is missing")
+    # A generated notebook can be newer than a checked-in preview. Regenerate
+    # that one document on demand so readers never see stale/missing content.
+    if not path.exists() or path.stat().st_mtime < notebook_path.stat().st_mtime:
+        config = Config(); config.HTMLExporter.exclude_input_prompt = True; config.HTMLExporter.exclude_output_prompt = True
+        exporter = HTMLExporter(template_name="lab", config=config)
+        body, _ = exporter.from_notebook_node(nbformat.read(notebook_path, as_version=4))
+        path.parent.mkdir(exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+        return HTMLResponse(body)
     return FileResponse(path, media_type="text/html")
+
+
+def request_ide_open(target: str) -> None:
+    """Ask the private sidecar to activate a whitelisted source file."""
+    base = os.getenv("IDE_OPENER_INTERNAL_URL", "http://ide:8081").rstrip("/")
+    with urlopen(f"{base}/open?{urlencode({'target': target})}", timeout=10) as response:
+        if response.status != 200:
+            raise RuntimeError(f"IDE opener returned HTTP {response.status}")
+
+
+@app.get("/ide/{slug}", response_class=HTMLResponse)
+def open_source_in_ide(request: Request, slug: str):
+    if slug in LEGACY_NOTEBOOKS:
+        slug = LEGACY_NOTEBOOKS[slug]
+    if slug not in {item["slug"] for item in NOTEBOOKS}:
+        raise HTTPException(404, "Unknown notebook")
+    notebook = next(item for item in NOTEBOOKS if item["slug"] == slug)
+    context = page_context(request, "labs")
+    context.update({"notebook": notebook})
+    return templates.TemplateResponse(request, "ide_bridge.html", context)
+
+
+@app.post("/api/ide/{slug}/open")
+def activate_source_in_ide(slug: str):
+    if slug in LEGACY_NOTEBOOKS:
+        slug = LEGACY_NOTEBOOKS[slug]
+    if slug not in {item["slug"] for item in NOTEBOOKS}:
+        raise HTTPException(404, "Unknown notebook")
+    try:
+        request_ide_open(ide_source_target(slug))
+    except Exception as exc:
+        raise HTTPException(503, "浏览器 IDE 尚未就绪，请确认 docker compose 的 ide 服务已启动。") from exc
+    return {"status": "opened", "target": ide_source_target(slug)}
+
+
+@app.get("/source/{slug}", response_class=HTMLResponse)
+def legacy_source_redirect(slug: str):
+    """Source is a tab on the chapter detail page, never a separate information page."""
+    if slug not in {item["slug"] for item in NOTEBOOKS}:
+        raise HTTPException(404, "Unknown notebook")
+    return RedirectResponse(f"/notebooks/{slug}#source", status_code=307)
 
 
 @app.get("/legacy", response_class=HTMLResponse)
