@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import nbformat
@@ -12,8 +13,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
-from app.content import CHAPTERS, DATASETS, EVOLUTION, FRAMEWORKS, MODELS, NOTEBOOKS, PRACTICES, SOURCES
+from app.content import CHAPTERS, DATASETS, EVOLUTION, MODELS, NOTEBOOKS, PRACTICES, SOURCES, notebook_has_paper_guide
+from app.evidence import paper_guide, paper_payload, source_paper_links
+from app.notebook_preview import polish_preview
 from app.source_browser import source_files
+from recsys_lab.resources import RESOURCE_ROOT, ensure_resources
 
 ROOT = Path(__file__).resolve().parents[1]
 LEGACY_NOTEBOOKS = {
@@ -27,9 +31,40 @@ LEGACY_NOTEBOOKS = {
     "3_5_1_sasrec": "3_2_3_sasrec",
     "3_5_summary": "3_2_summary",
 }
-app = FastAPI(title="RecSys Atlas", version="1.0.0")
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    application.state.resources = ensure_resources(
+        download=os.getenv("RECSYS_RESOURCE_AUTO_DOWNLOAD", "0") == "1",
+        strict=os.getenv("RECSYS_RESOURCE_STRICT", "0") == "1",
+        offline=os.getenv("RECSYS_RESOURCE_OFFLINE", "0") == "1",
+    )
+    yield
+
+
+RESOURCE_ROOT.mkdir(parents=True, exist_ok=True)
+app = FastAPI(title="RecSys Atlas", version="1.1.0", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=ROOT / "app" / "static"), name="static")
+app.mount("/resources", StaticFiles(directory=RESOURCE_ROOT, check_dir=False), name="resources")
 templates = Jinja2Templates(directory=ROOT / "app" / "templates")
+
+
+def cuda_status() -> dict:
+    """Report the CUDA capability visible to the Web/Jupyter container."""
+    forced = os.getenv("RECSYS_CUDA_AVAILABLE")
+    if forced is not None:
+        available = forced.casefold() in {"1", "true", "yes", "on"}
+        return {"available": available, "devices": 1 if available else 0, "name": "configured CUDA" if available else None}
+    try:
+        import torch
+
+        available = torch.cuda.is_available()
+        return {
+            "available": available,
+            "devices": torch.cuda.device_count() if available else 0,
+            "name": torch.cuda.get_device_name(0) if available else None,
+        }
+    except (ImportError, RuntimeError):
+        return {"available": False, "devices": 0, "name": None}
 
 
 def page_context(request: Request, active: str = "overview") -> dict:
@@ -47,16 +82,17 @@ def page_context(request: Request, active: str = "overview") -> dict:
         "active": active,
         "evolution": EVOLUTION,
         "models": MODELS,
-        "frameworks": FRAMEWORKS,
         "datasets": DATASETS,
         "practices": PRACTICES,
         "notebooks": NOTEBOOKS,
         "chapters": CHAPTERS,
         "sources": SOURCES,
+        "source_paper_links": source_paper_links(),
         "course_groups": course_groups,
         "current_notebook_slug": None,
         "jupyter_url": os.getenv("JUPYTER_PUBLIC_URL", "http://localhost:8889"),
         "ide_url": os.getenv("IDE_PUBLIC_URL", "http://localhost:8090"),
+        "cuda": cuda_status(),
     }
 
 
@@ -79,6 +115,38 @@ def legacy_chapter_redirect(slug: str):
 @app.get("/healthz")
 def healthz():
     return {"status": "ok", "notebooks": len(NOTEBOOKS), "models": len(MODELS)}
+
+
+@app.get("/api/resources")
+def resource_status(request: Request):
+    return getattr(request.app.state, "resources", ensure_resources(download=False))
+
+
+@app.get("/papers/{paper_id}", response_class=HTMLResponse)
+def paper_reader(
+    request: Request,
+    paper_id: str,
+    page: int = Query(default=1, ge=1),
+    evidence: str | None = None,
+    embedded: bool = False,
+):
+    paper = paper_payload(paper_id)
+    if paper is None:
+        raise HTTPException(404, "Unknown paper")
+    selected = next((item for item in paper["anchors"] if item["id"] == evidence), None)
+    if selected:
+        page = selected["page"]
+    context = page_context(request, "sources")
+    context.update({"paper": paper, "paper_page": page, "selected_evidence": selected, "embedded": embedded})
+    return templates.TemplateResponse(request, "paper_reader.html", context)
+
+
+@app.get("/api/papers/{paper_id}")
+def paper_api(paper_id: str):
+    paper = paper_payload(paper_id)
+    if paper is None:
+        raise HTTPException(404, "Unknown paper")
+    return paper
 
 
 @app.get("/api/models")
@@ -122,6 +190,8 @@ def notebook_preview(request: Request, slug: str):
         "previous_notebook": NOTEBOOKS[notebook_index - 1] if notebook_index > 0 else None,
         "next_notebook": NOTEBOOKS[notebook_index + 1] if notebook_index + 1 < len(NOTEBOOKS) else None,
         "source_groups": source_files(slug),
+        "paper_guide": paper_guide(slug),
+        "show_paper_guide": notebook_has_paper_guide(slug),
     })
     return templates.TemplateResponse(request, "notebook_shell.html", context)
 
@@ -143,6 +213,7 @@ def notebook_preview_content(slug: str):
         exporter = HTMLExporter(template_name="lab", config=config)
         body, _ = exporter.from_notebook_node(nbformat.read(notebook_path, as_version=4))
         path.parent.mkdir(exist_ok=True)
+        body = polish_preview(body)
         path.write_text(body, encoding="utf-8")
         return HTMLResponse(body)
     return FileResponse(path, media_type="text/html")

@@ -17,10 +17,11 @@ from recsys_lab.runtime import (
     safe_auc as _safe_auc,
     seed_everything,
     train_binary as _train_binary,
+    complete_or_recent,
 )
 
 def _ranking_fields(interactions):
-    frame = interactions.sort_values("timestamp").tail(7000).copy()
+    frame = complete_or_recent(interactions, 7000)
     # 6) 返回真实测试切分上的指标和必要诊断信息，供章节总结统一读取。
     return {
         "user_id": frame.user_id.to_numpy() + 1,

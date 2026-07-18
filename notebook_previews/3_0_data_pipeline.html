@@ -7292,39 +7292,27 @@ a.anchor-link {
 }
 </style>
 <!-- Load mathjax -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe"> </script>
-<!-- MathJax configuration -->
-<script type="text/x-mathjax-config">
-    init_mathjax = function() {
-        if (window.MathJax) {
-        // MathJax loaded
-            MathJax.Hub.Config({
-                TeX: {
-                    equationNumbers: {
-                    autoNumber: "AMS",
-                    useLabelIds: true
-                    }
-                },
-                tex2jax: {
-                    inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-                    processEscapes: true,
-                    processEnvironments: true
-                },
-                displayAlign: 'center',
-                messageStyle: 'none',
-                CommonHTML: {
-                    linebreaks: {
-                    automatic: true
-                    }
-                }
-            });
-
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-        }
-    }
-    init_mathjax();
-    </script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  chtml: {
+    scale: 1.18,
+    mtextInheritFont: true,
+    displayAlign: 'center',
+    displayIndent: '0'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
 <!-- End of mathjax configuration --><script type="module">
   document.addEventListener("DOMContentLoaded", async () => {
     const diagrams = document.querySelectorAll(".jp-Mermaid > pre.mermaid");
@@ -7508,10 +7496,28 @@ a.anchor-link {
     white-space: normal;
   }
 </style>
-<!-- End of mermaid configuration --></head>
+<!-- End of mermaid configuration -->
+<style id="recsys-preview-style">
+  /* MathJax v3 display math: paper-style centered, larger, scrollable when wide. */
+  mjx-container[display="true"], div.math {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: .55rem .25rem;
+    text-align: center !important;
+    margin: 1.25em auto !important;
+  }
+  mjx-container {font-size: 115% !important}
+  mjx-container mjx-itable {min-width: auto !important}
+  .jp-MarkdownOutput pre {white-space:pre-wrap;overflow-wrap:anywhere}
+  .jp-Notebook {max-width:1180px;margin:0 auto}
+  .jp-Notebook img {max-width:100%;height:auto;border-radius:8px}
+  .jp-Notebook figure{margin:1.4em 0}
+</style>
+</head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a458852f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=667c71b7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7524,7 +7530,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8503d624">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4a7316bd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7534,7 +7540,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0803dbfa">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=08f65d05">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7543,17 +7549,43 @@ a.anchor-link {
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"smoke"</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
+<span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab.data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">load_movielens</span><span class="p">,</span> <span class="n">movielens_provenance</span><span class="p">,</span> <span class="n">load_amazon_2023</span><span class="p">,</span>
-                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">)</span>
+                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">,</span>
+                             <span class="n">load_amazon_2018</span><span class="p">,</span> <span class="n">amazon_2018_provenance</span><span class="p">,</span>
+                             <span class="n">load_movielens_1m</span><span class="p">,</span> <span class="n">movielens_1m_provenance</span><span class="p">,</span>
+                             <span class="n">load_mind_amazon_books</span><span class="p">,</span> <span class="n">mind_amazon_provenance</span><span class="p">,</span>
+                             <span class="n">load_census_income</span><span class="p">,</span> <span class="n">census_income_provenance</span><span class="p">)</span>
 <span class="n">DATASET_KEY</span> <span class="o">=</span> <span class="s2">"movielens"</span>
 <span class="k">if</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens"</span><span class="p">:</span>
     <span class="n">real_ratings</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_movielens</span><span class="p">()</span>
     <span class="n">real_interactions</span> <span class="o">=</span> <span class="n">real_ratings</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-books"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Books"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"mind-amazon-books"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_mind_amazon_books</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">mind_amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-electronics"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Electronics"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens-1m"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_movielens_1m</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_1m_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"census-income"</span> <span class="ow">and</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span><span class="p">:</span>
+    <span class="n">census_train_x</span><span class="p">,</span> <span class="n">census_train_y</span><span class="p">,</span> <span class="n">census_test_x</span><span class="p">,</span> <span class="n">census_test_y</span> <span class="o">=</span> <span class="n">load_census_income</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span><span class="p">,</span> <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">census_train_x</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">census_train_x</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">census_income_provenance</span><span class="p">()</span>
 <span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-2023"</span><span class="p">:</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
@@ -7562,7 +7594,9 @@ a.anchor-link {
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+       <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
+       <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
 </pre></div>
 </div>
@@ -7575,14 +7609,14 @@ a.anchor-link {
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'profile': 'smoke', 'root': '/workspace', 'real_dataset': {'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/workspace/data/ml-latest-small/README.txt', 'rows_used': 26732, 'users_used': 120, 'items_used': 600, 'time_min_utc': '1996-10-17T11:51:49+00:00', 'time_max_utc': '2018-09-13T21:38:16+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}}
+<pre>{'profile': 'smoke', 'root': '/workspace', 'real_dataset': {'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/workspace/data/ml-latest-small/README.txt', 'profile': 'smoke', 'slice_rule': 'deterministic user/item subset', 'rows_used': 26732, 'users_used': 120, 'items_used': 600, 'time_min_utc': '1996-10-17T11:51:49+00:00', 'time_max_utc': '2018-09-13T21:38:16+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}, 'cuda_available': False, 'cuda_device': None}
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=43665729">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=90835655">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7603,7 +7637,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4ac013a3">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4dd411b8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7663,37 +7697,37 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
     ratings = pd.read_csv(ratings_path)
     movies = pd.read_csv(movies_path)
 
-    # 固定选取行为最多的用户与这些用户中最常出现的电影，保证 CPU 实验可运行。
-    user_order = (
-        ratings.groupby("userId").size().rename("events").reset_index()
-        .sort_values(["events", "userId"], ascending=[False, True])
-        .head(max_users)["userId"]
-    )
-    subset = ratings[ratings.userId.isin(user_order)].copy()
-    item_order = (
-        subset.groupby("movieId").size().rename("events").reset_index()
-        .sort_values(["events", "movieId"], ascending=[False, True])
-        .head(max_items)["movieId"]
-    )
-    subset = subset[subset.movieId.isin(item_order)].copy()
-    valid_users = subset.groupby("userId").size()
-    subset = subset[subset.userId.isin(valid_users[valid_users &gt;= min_user_events].index)].copy()
+    # full 保留官方文件的全部评分；smoke 才使用确定性子集。
+    if _full_profile():
+        subset = ratings.copy()
+    else:
+        user_order = (
+            ratings.groupby("userId").size().rename("events").reset_index()
+            .sort_values(["events", "userId"], ascending=[False, True])
+            .head(max_users)["userId"]
+        )
+        subset = ratings[ratings.userId.isin(user_order)].copy()
+        item_order = (
+            subset.groupby("movieId").size().rename("events").reset_index()
+            .sort_values(["events", "movieId"], ascending=[False, True])
+            .head(max_items)["movieId"]
+        )
+        subset = subset[subset.movieId.isin(item_order)].copy()
+        valid_users = subset.groupby("userId").size()
+        subset = subset[subset.userId.isin(valid_users[valid_users &gt;= min_user_events].index)].copy()
 
     user_ids = {raw: idx for idx, raw in enumerate(sorted(subset.userId.unique()))}
     item_ids = {raw: idx for idx, raw in enumerate(sorted(subset.movieId.unique()))}
     subset["user_id"] = subset.userId.map(user_ids).astype("int64")
     subset["item_id"] = subset.movieId.map(item_ids).astype("int64")
     selected_movies = movies[movies.movieId.isin(item_ids)].copy()
-    subset = subset.merge(selected_movies, on="movieId", how="left", validate="many_to_one")
-
-    subset["primary_genre"] = subset.genres.fillna("(no genres listed)").str.split("|").str[0]
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dd427cec">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e5117743">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7703,7 +7737,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=685129bc">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=5d244b8d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7806,14 +7840,14 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/workspace/data/ml-latest-small/README.txt', 'rows_used': 914, 'users_used': 12, 'items_used': 80, 'time_min_utc': '2000-06-19T17:37:28+00:00', 'time_max_utc': '2018-02-20T10:34:44+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}
+<pre>{'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/workspace/data/ml-latest-small/README.txt', 'profile': 'smoke', 'slice_rule': 'deterministic user/item subset', 'rows_used': 914, 'users_used': 12, 'items_used': 80, 'time_min_utc': '2000-06-19T17:37:28+00:00', 'time_max_utc': '2018-02-20T10:34:44+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8601c01c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e8137bfb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7823,7 +7857,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3eb91fb4">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6edb3b3a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7860,7 +7894,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a7bdccde">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=70d19a7f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7869,7 +7903,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=699594c3">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2a6fcf63">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7901,7 +7935,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6096c89a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c035d6a7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7918,7 +7952,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1e1f1b21">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a075a99b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7965,7 +7999,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0129099c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=accdb2dc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7976,7 +8010,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c7c8b3ae">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0a49a6f6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8010,7 +8044,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9737fa3d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=45068ff9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8029,7 +8063,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3e479660">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5fb37e62">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8038,7 +8072,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1d0611ae">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=64e7e3c9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8067,7 +8101,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -&gt; tup
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a7cbfe10">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b1493834">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

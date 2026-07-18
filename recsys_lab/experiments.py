@@ -55,8 +55,8 @@ def ndcg_at_k(ranked: list[int], relevant: set[int], k: int = 5) -> float:
     return dcg / ideal if ideal else 0.0
 
 
-def run_generative() -> dict:
-    result = run_openonerec(epochs=4)
+def run_generative(cpu_smoke: bool = False) -> dict:
+    result = run_openonerec(epochs=4, cpu_smoke=cpu_smoke)
     return {
         "dataset": "KuaiRand-Pure", "randomly_fabricated_rows": 0,
         "semantic_id_prefix": result["prefix"], "allowed_next_tokens": result["allowed_tokens"],

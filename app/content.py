@@ -26,19 +26,9 @@ MODELS = [
     {"id":"hstu","chapter":"generative","stage":"生成式","name":"DLRM HSTU","idea":"把长期行为流作为统一序列进行 next-item 预训练与下游迁移。","pros":"长序列、统一表征和规模效应。","cons":"训练服务协同复杂，GPU ROI 要求高。","metric":"HR/NDCG + throughput / P99","notebook":"4_3_dlrm_hstu_practice"},
 ]
 
-FRAMEWORKS = [
-    {"axis":"定位","torcheasyrec":"大规模生产训练与服务配置","rechub":"轻量、统一 API 的研究/教学到部署"},
-    {"axis":"易用性","torcheasyrec":"Protobuf/YAML 配置完整，但学习曲线较陡","rechub":"10–30 行可训练，Notebook 友好"},
-    {"axis":"模型覆盖","torcheasyrec":"匹配、排序、多任务、生成式；含 HSTU-Match/ULTRA-HSTU","rechub":"30+；覆盖本应用所有经典深度模型及 HSTU/TIGER"},
-    {"axis":"数据兼容","torcheasyrec":"CSV/Parquet、MaxCompute、Kafka，适合大数据管线","rechub":"DataGenerator/自定义 Dataset；PySpark/Parquet 可扩展"},
-    {"axis":"工程能力","torcheasyrec":"TorchRec 分片、动态 embedding、AMP、TensorRT/AOTI","rechub":"统一 Trainer、追踪、ONNX、ANN/Milvus 插件"},
-    {"axis":"代码质量信号","torcheasyrec":"Apache-2.0、配置 schema、测试与文档；阿里生产导向","rechub":"MIT、592+ commits、测试/benchmark/docs；社区维护活跃"},
-    {"axis":"本项目选择","torcheasyrec":"工业配置档、HSTU 扩展与上线清单","rechub":"默认 CPU 实验后端，保证 Notebook 可读可跑"},
-]
-
 DATASETS = [
     {"name":"MovieLens latest-small","year":"2018 固定版本","scale":"100,836 ratings · 610 users · 9,742 movies","fit":"3.0—3.1 的 CF、MF、FM、GBDT+LR 教学","note":"结构简单，适合手算和经典基线；不再承担深度 CTR/序列实验","url":"https://files.grouplens.org/datasets/movielens/ml-latest-small-README.html"},
-    {"name":"Amazon Reviews 2023 / Video Games","year":"2023","scale":"5-core: 94.8K users · 25.6K items · 814.6K reviews","fit":"DSSM、MIND、SASRec 电商召回与序列","note":"官方毫秒时间戳；仓库内切片保留 500 位最活跃用户的全部真实行为","url":"https://amazon-reviews-2023.github.io/data_processing/5core.html"},
+    {"name":"Amazon Reviews 2023 / Video Games","year":"2023","scale":"5-core rating-only: 284,120 reviews · 13,926 users · 24,276 items","fit":"DSSM、MIND、SASRec 电商召回与序列","note":"full 档读取官方完整文件与毫秒时间戳；smoke 档只保留确定性真实行为切片","url":"https://amazon-reviews-2023.github.io/data_processing/5core.html"},
     {"name":"KuaiRand-Pure","year":"2022","scale":"1.44M standard + 1.19M random-policy interactions","fit":"DeepFM、DIN/DIEN、MMoE/PLE、HSTU","note":"真实短视频曝光与 12 类反馈；包含随机干预，适合排序和多目标","url":"https://github.com/chongminggao/KuaiRand"},
     {"name":"MerRec","year":"2024","scale":"6 months, millions of C2C users/items","fit":"多动作、会话、电商多目标","note":"含 taxonomy、文本和买卖双重角色","url":"https://github.com/mercari/mercari-ml-merrec-pub-us"},
     {"name":"EB-NeRD","year":"2024","scale":"2.3M+ news users","fit":"新闻曝光、排序、多样性","note":"提供 demo/small/full，适合曝光偏差研究","url":"https://recsys.eb.dk/"},
@@ -80,10 +70,10 @@ NOTEBOOKS = [
     {"slug":"3_4_1_mmoe","title":"3.4.1 MMoE 多目标学习","framework":"Torch-RecHub MMOE","dataset":"KuaiRand is_click + long_view","runtime":"约 20 秒 CPU"},
     {"slug":"3_4_2_ple","title":"3.4.2 PLE 渐进式专家抽取","framework":"Torch-RecHub PLE","dataset":"KuaiRand is_click + long_view","runtime":"约 25 秒 CPU"},
     {"slug":"3_4_summary","title":"3.4 总结：MMoE 与 PLE","framework":"结果聚合与选型","dataset":"KuaiRand 实验 JSON","runtime":"约 5 秒 CPU"},
-    {"slug":"4_0_generative_foundations","title":"4.0 导读与数学基础：生成式推荐","framework":"NumPy / Matplotlib","dataset":"KuaiRand-Pure","runtime":"约 10 秒 CPU"},
-    {"slug":"4_1_generative_overview","title":"4.1 总结：生成式召回、排序与融合","framework":"结果聚合与工业选型","dataset":"KuaiRand 实验 JSON","runtime":"约 5 秒 CPU"},
-    {"slug":"4_2_openonerec_practice","title":"4.2 OpenOneRec 实战","framework":"OpenOneRec 契约 + PyTorch 约束生成器","dataset":"KuaiRand taxonomy adapter；RecIF full 需授权","runtime":"smoke 1 分钟；全量需 GPU"},
-    {"slug":"4_3_dlrm_hstu_practice","title":"4.3 DLRM HSTU 实战","framework":"Torch-RecHub HSTU + Meta DLRM-v3 配置","dataset":"KuaiRand-Pure 真实 feed 序列","runtime":"smoke 2 分钟；官方配置需 4×24GB GPU"},
+    {"slug":"4_0_generative_foundations","title":"4.0 导读与数学基础：生成式推荐","framework":"NumPy / Matplotlib","dataset":"KuaiRand-Pure","runtime":"默认 CUDA；CPU 仅基础检查"},
+    {"slug":"4_1_generative_overview","title":"4.1 总结：生成式召回、排序与融合","framework":"结果聚合与工业选型","dataset":"KuaiRand 实验 JSON","runtime":"默认 CUDA；CPU 仅阅读"},
+    {"slug":"4_2_openonerec_practice","title":"4.2 OpenOneRec 实战","framework":"OpenOneRec 契约 + PyTorch 约束生成器","dataset":"KuaiRand taxonomy adapter；RecIF full 需授权","runtime":"CUDA 混合精度；CPU basic smoke"},
+    {"slug":"4_3_dlrm_hstu_practice","title":"4.3 DLRM HSTU 实战","framework":"Torch-RecHub HSTU + Meta DLRM-v3 配置","dataset":"KuaiRand-Pure 真实 feed 序列","runtime":"CUDA 混合精度；官方配置需 4×24GB GPU"},
 ]
 
 CHAPTERS = {
@@ -149,6 +139,23 @@ CHAPTERS = {
         "sources": [("Rajput et al., 2023：TIGER", "https://arxiv.org/abs/2305.05065", "以 RQ-VAE Semantic ID 将全库召回转成受约束自回归生成。"), ("Kuaishou, 2025：OneRec / OpenOneRec", "https://github.com/Kuaishou-OneRec/OpenOneRec", "公开列表生成、奖励建模与 RecIF-Bench 流程，是召排融合的工业化样本。"), ("Zhai et al., 2024：HSTU", "https://arxiv.org/abs/2402.17152", "针对高基数、非平稳行为流重新设计序列转换与系统协同。")],
     },
 }
+
+
+def notebook_has_paper_guide(slug: str) -> bool:
+    """Whether the detail page should render the 论文导读 tab.
+
+    The foundations chapter (3.0) and every chapter opening / 导读 page focus on
+    math and intuition, so they skip the paper-evidence tab. Algorithm detail and
+    summary pages keep it.
+    """
+    foundations = CHAPTERS["foundations"]
+    if slug in {foundations["opening"], *foundations["notebooks"], foundations["summary"]}:
+        return False
+    for key in ("classic", "retrieval", "ranking", "multitask", "generative"):
+        if CHAPTERS[key]["opening"] == slug:
+            return False
+    return True
+
 
 SOURCES = [
     ("Collaborative Filtering","https://dl.acm.org/doi/10.1145/192844.192905","论文"),

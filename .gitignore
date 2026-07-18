@@ -3,4 +3,8 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 *.pyc
-
+.ruff_cache/
+# Downloaded papers, full datasets, viewer bundles and generated resource locks.
+# The tracked manifest lives at config/resources.json.
+resources/
+tmp/

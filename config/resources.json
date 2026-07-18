@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "root": "resources",
+  "papers": [
+    {"id":"dssm","title":"Learning Deep Structured Semantic Models for Web Search","provider":"scholar","scholar_query":"Learning Deep Structured Semantic Models for Web Search using Clickthrough Data","url":"https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/cikm2013_DSSM_fullversion.pdf","path":"papers/dssm.pdf","required":true},
+    {"id":"mind","title":"Multi-Interest Network with Dynamic Routing","provider":"arxiv","arxiv_id":"1904.08030","path":"papers/mind.pdf","required":true},
+    {"id":"sasrec","title":"Self-Attentive Sequential Recommendation","provider":"arxiv","arxiv_id":"1808.09781","path":"papers/sasrec.pdf","required":true},
+    {"id":"deepfm","title":"DeepFM: A Factorization-Machine based Neural Network","provider":"arxiv","arxiv_id":"1703.04247","path":"papers/deepfm.pdf","required":true},
+    {"id":"din","title":"Deep Interest Network for Click-Through Rate Prediction","provider":"arxiv","arxiv_id":"1706.06978","path":"papers/din.pdf","required":true},
+    {"id":"dien","title":"Deep Interest Evolution Network for CTR Prediction","provider":"arxiv","arxiv_id":"1809.03672","path":"papers/dien.pdf","required":true},
+    {"id":"mmoe","title":"Modeling Task Relationships in Multi-task Learning with Multi-gate Mixture-of-Experts","provider":"scholar","scholar_query":"Modeling Task Relationships Multi-gate Mixture-of-Experts KDD 2018","url":"https://raw.githubusercontent.com/wzhe06/Reco-papers/master/Multi-Task/%5BMMoE%5D%20Modeling%20Task%20Relationships%20in%20Multi-task%20Learning%20with%20Multi-gate%20Mixture-of-Experts.pdf","path":"papers/mmoe-kdd.pdf","required":true},
+    {"id":"ple","title":"Progressive Layered Extraction (PLE): A Novel Multi-Task Learning (MTL) Model for Personalized Recommendations","provider":"scholar","scholar_query":"Progressive Layered Extraction PLE RecSys 2020","url":"https://raw.githubusercontent.com/tangxyw/RecSysPapers/main/Multi-Task/%5B2020%5D%5BTencent%5D%5BPLE%5D%20Progressive%20Layered%20Extraction%20%28PLE%29%20-%20A%20Novel%20Multi-Task%20Learning%20%28MTL%29%20Model%20for%20Personalized%20Recommendations.pdf","path":"papers/ple-recsys2020.pdf","required":true},
+    {"id":"tiger","title":"Recommender Systems with Generative Retrieval","provider":"arxiv","arxiv_id":"2305.05065","path":"papers/tiger.pdf","required":true},
+    {"id":"onerec","title":"OneRec: Unifying Retrieve and Rank with Generative Recommender","provider":"arxiv","arxiv_id":"2502.18965","path":"papers/onerec.pdf","required":true},
+    {"id":"hstu","title":"Actions Speak Louder than Words: Trillion-Parameter Sequential Transducers","provider":"arxiv","arxiv_id":"2402.17152","path":"papers/hstu.pdf","required":true},
+    {"id":"bert4rec","title":"BERT4Rec: Sequential Recommendation with Bidirectional Encoder Representations from Transformer","provider":"arxiv","arxiv_id":"1904.06690","path":"papers/bert4rec.pdf","required":true},
+    {"id":"kuairand-paper","title":"KuaiRand: An Unbiased Sequential Recommendation Dataset with Randomly Exposed Videos","provider":"arxiv","arxiv_id":"2208.08696","path":"papers/kuairand.pdf","required":true},
+    {"id":"mf","title":"Matrix Factorization Techniques for Recommender Systems","provider":"scholar","scholar_query":"Matrix Factorization Techniques for Recommender Systems Koren Bell Volinsky","url":"https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf","path":"papers/matrix-factorization.pdf","required":false},
+    {"id":"fm","title":"Factorization Machines","provider":"scholar","scholar_query":"Factorization Machines Steffen Rendle 2010","url":"https://jame-zhang.github.io/assets/algo/Factorization-Machines-Rendle2010.pdf","path":"papers/fm.pdf","required":false}
+  ],
+  "datasets": [
+    {"id":"movielens-1m-full","title":"MovieLens 1M","provider":"url","url":"https://files.grouplens.org/datasets/movielens/ml-1m.zip","path":"datasets/movielens/ml-1m.zip","expected_members":["ml-1m/ratings.dat","ml-1m/movies.dat","ml-1m/users.dat"],"required":false,"profile":"full"},
+    {"id":"movielens-20m-full","title":"MovieLens 20M","provider":"url","url":"https://files.grouplens.org/datasets/movielens/ml-20m.zip","path":"datasets/movielens/ml-20m.zip","expected_members":["ml-20m/ratings.csv","ml-20m/movies.csv"],"required":false,"profile":"full"},
+    {"id":"amazon-books-5core","title":"Amazon Reviews Books 5-core","provider":"url","url":"https://mcauleylab.ucsd.edu/public_datasets/data/amazon_v2/categoryFilesSmall/Books_5.json.gz","path":"datasets/amazon-2018/Books_5.json.gz","required_columns":["reviewerID","asin","overall","unixReviewTime"],"required":false,"profile":"full"},
+    {"id":"amazon-books-2014-ratings","title":"Amazon Books ratings-only (2014 release used by MIND)","provider":"url","url":"https://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Books.csv","path":"datasets/amazon-2014/ratings_Books.csv","first_row_fields":4,"min_size_bytes":100000000,"required":false,"profile":"full"},
+    {"id":"amazon-electronics-5core","title":"Amazon Reviews Electronics 5-core","provider":"url","url":"https://mcauleylab.ucsd.edu/public_datasets/data/amazon_v2/categoryFilesSmall/Electronics_5.json.gz","path":"datasets/amazon-2018/Electronics_5.json.gz","required_columns":["reviewerID","asin","overall","unixReviewTime"],"required":false,"profile":"full"},
+    {"id":"criteo-x1-full","title":"Criteo Display Ads (Criteo_x1, 45.8M rows)","provider":"huggingface","repo_id":"reczoo/Criteo_x1","repo_type":"dataset","revision":"main","path":"datasets/criteo-x1","expected_files":["Criteo_x1.zip"],"file_sha256":{"Criteo_x1.zip":"ad87602d1a0c855a234da10f4510ba058990247380e961083f7d60b8bff62608"},"required":false,"profile":"full"},
+    {"id":"census-income-kdd","title":"Census-Income KDD","provider":"url","url":"https://archive.ics.uci.edu/static/public/117/census+income+kdd.zip","path":"datasets/census-income/census-income-kdd.zip","expected_members":["census.tar.gz"],"required":false,"profile":"full"},
+    {"id":"amazon-video-games-full","title":"Amazon Reviews 2023 Video Games 5-core","provider":"url","url":"https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/benchmark/5core/rating_only/Video_Games.csv.gz","path":"datasets/amazon-reviews-2023/Video_Games.csv.gz","required":false,"profile":"full"},
+    {"id":"kuairand-pure-full","title":"KuaiRand-Pure","provider":"url","url":"https://zenodo.org/records/10439422/files/KuaiRand-Pure.tar.gz?download=1","path":"datasets/kuairand-pure/KuaiRand-Pure.tar.gz","expected_members":["log_standard_4_08_to_4_21_pure.csv","log_standard_4_22_to_5_08_pure.csv","video_features_basic_pure.csv"],"required":false,"profile":"full"},
+    {"id":"openonerec-recif","title":"OpenOneRec RecIF-Bench","provider":"huggingface","repo_id":"OpenOneRec/OpenOneRec-RecIF","repo_type":"dataset","path":"datasets/openonerec-recif","required":false,"gated":true,"profile":"full"},
+    {"id":"yambda","title":"Yambda","provider":"huggingface","repo_id":"yandex/yambda","repo_type":"dataset","path":"datasets/yambda","allow_patterns":["README.md","*50m*"],"required":false,"profile":"full"}
+  ],
+  "vendor": [
+    {"id":"embedpdf","title":"EmbedPDF Snippet","provider":"npm","package":"@embedpdf/snippet","version":"2.14.4","path":"vendor/embedpdf","required":true}
+  ]
+}

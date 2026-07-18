@@ -7292,39 +7292,27 @@ a.anchor-link {
 }
 </style>
 <!-- Load mathjax -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe"> </script>
-<!-- MathJax configuration -->
-<script type="text/x-mathjax-config">
-    init_mathjax = function() {
-        if (window.MathJax) {
-        // MathJax loaded
-            MathJax.Hub.Config({
-                TeX: {
-                    equationNumbers: {
-                    autoNumber: "AMS",
-                    useLabelIds: true
-                    }
-                },
-                tex2jax: {
-                    inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-                    processEscapes: true,
-                    processEnvironments: true
-                },
-                displayAlign: 'center',
-                messageStyle: 'none',
-                CommonHTML: {
-                    linebreaks: {
-                    automatic: true
-                    }
-                }
-            });
-
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-        }
-    }
-    init_mathjax();
-    </script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  chtml: {
+    scale: 1.18,
+    mtextInheritFont: true,
+    displayAlign: 'center',
+    displayIndent: '0'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
 <!-- End of mathjax configuration --><script type="module">
   document.addEventListener("DOMContentLoaded", async () => {
     const diagrams = document.querySelectorAll(".jp-Mermaid > pre.mermaid");
@@ -7508,10 +7496,28 @@ a.anchor-link {
     white-space: normal;
   }
 </style>
-<!-- End of mermaid configuration --></head>
+<!-- End of mermaid configuration -->
+<style id="recsys-preview-style">
+  /* MathJax v3 display math: paper-style centered, larger, scrollable when wide. */
+  mjx-container[display="true"], div.math {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: .55rem .25rem;
+    text-align: center !important;
+    margin: 1.25em auto !important;
+  }
+  mjx-container {font-size: 115% !important}
+  mjx-container mjx-itable {min-width: auto !important}
+  .jp-MarkdownOutput pre {white-space:pre-wrap;overflow-wrap:anywhere}
+  .jp-Notebook {max-width:1180px;margin:0 auto}
+  .jp-Notebook img {max-width:100%;height:auto;border-radius:8px}
+  .jp-Notebook figure{margin:1.4em 0}
+</style>
+</head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e8a279c1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3e03dbbd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7524,7 +7530,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c2d91862">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=08178e84">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7534,7 +7540,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e0550eae">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=542a93f1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7543,17 +7549,43 @@ a.anchor-link {
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"smoke"</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
+<span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab.data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">load_movielens</span><span class="p">,</span> <span class="n">movielens_provenance</span><span class="p">,</span> <span class="n">load_amazon_2023</span><span class="p">,</span>
-                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">)</span>
+                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">,</span>
+                             <span class="n">load_amazon_2018</span><span class="p">,</span> <span class="n">amazon_2018_provenance</span><span class="p">,</span>
+                             <span class="n">load_movielens_1m</span><span class="p">,</span> <span class="n">movielens_1m_provenance</span><span class="p">,</span>
+                             <span class="n">load_mind_amazon_books</span><span class="p">,</span> <span class="n">mind_amazon_provenance</span><span class="p">,</span>
+                             <span class="n">load_census_income</span><span class="p">,</span> <span class="n">census_income_provenance</span><span class="p">)</span>
 <span class="n">DATASET_KEY</span> <span class="o">=</span> <span class="s2">"movielens"</span>
 <span class="k">if</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens"</span><span class="p">:</span>
     <span class="n">real_ratings</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_movielens</span><span class="p">()</span>
     <span class="n">real_interactions</span> <span class="o">=</span> <span class="n">real_ratings</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-books"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Books"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"mind-amazon-books"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_mind_amazon_books</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">mind_amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-electronics"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Electronics"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens-1m"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_movielens_1m</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_1m_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"census-income"</span> <span class="ow">and</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span><span class="p">:</span>
+    <span class="n">census_train_x</span><span class="p">,</span> <span class="n">census_train_y</span><span class="p">,</span> <span class="n">census_test_x</span><span class="p">,</span> <span class="n">census_test_y</span> <span class="o">=</span> <span class="n">load_census_income</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span><span class="p">,</span> <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">census_train_x</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">census_train_x</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">census_income_provenance</span><span class="p">()</span>
 <span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-2023"</span><span class="p">:</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
@@ -7562,7 +7594,9 @@ a.anchor-link {
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+       <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
+       <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
 </pre></div>
 </div>
@@ -7575,14 +7609,14 @@ a.anchor-link {
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'profile': 'smoke', 'root': '/workspace', 'real_dataset': {'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/workspace/data/ml-latest-small/README.txt', 'rows_used': 26732, 'users_used': 120, 'items_used': 600, 'time_min_utc': '1996-10-17T11:51:49+00:00', 'time_max_utc': '2018-09-13T21:38:16+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}}
+<pre>{'profile': 'smoke', 'root': '/workspace', 'real_dataset': {'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/workspace/data/ml-latest-small/README.txt', 'profile': 'smoke', 'slice_rule': 'deterministic user/item subset', 'rows_used': 26732, 'users_used': 120, 'items_used': 600, 'time_min_utc': '1996-10-17T11:51:49+00:00', 'time_max_utc': '2018-09-13T21:38:16+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}, 'cuda_available': False, 'cuda_device': None}
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=648c0f2b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d0fc0ba2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7598,7 +7632,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=db3b8aea">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=90e727b8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7697,7 +7731,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ceb8e3b8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fd8abe5e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7707,7 +7741,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=19dadf33">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d519e08c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7736,7 +7770,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=34526c4f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=04004b33">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7750,7 +7784,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e2d082c4">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3d461ffe">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7792,7 +7826,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=82448a35">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c88d7e5c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7806,7 +7840,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e563d145">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=325c109b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7851,7 +7885,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2fab41f8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5a8f2b8e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7867,7 +7901,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2de1b748">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=56160117">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7910,12 +7944,102 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f733f8f7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d79a50dd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5.-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%EF%BC%9A%E6%B2%BF%E7%9D%80%E4%B8%8B%E5%9D%A1%E6%96%B9%E5%90%91%E4%B8%80%E7%82%B9%E7%82%B9%E6%94%B9%E5%8F%82%E6%95%B0">5. 梯度下降：沿着下坡方向一点点改参数<a class="anchor-link" href="#5.-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%EF%BC%9A%E6%B2%BF%E7%9D%80%E4%B8%8B%E5%9D%A1%E6%96%B9%E5%90%91%E4%B8%80%E7%82%B9%E7%82%B9%E6%94%B9%E5%8F%82%E6%95%B0">¶</a></h2><p>把模型参数想成山坡上的横坐标 $w$，损失 $L(w)$ 是高度。<strong>梯度</strong>就是当前位置的坡度：</p>
+<h2 id="5.-Softmax%E3%80%81%E6%B8%A9%E5%BA%A6%E3%80%81%E5%8A%A0%E6%9D%83%E6%B1%87%E6%80%BB%E4%B8%8E%E9%81%AE%E7%BD%A9">5. Softmax、温度、加权汇总与遮罩<a class="anchor-link" href="#5.-Softmax%E3%80%81%E6%B8%A9%E5%BA%A6%E3%80%81%E5%8A%A0%E6%9D%83%E6%B1%87%E6%80%BB%E4%B8%8E%E9%81%AE%E7%BD%A9">¶</a></h2><p>后续的 DSSM、MIND、DIN、SASRec、MMoE 会反复用到同一组操作：先算若干个分数，再把它们转成权重，最后汇总若干个向量。</p>
+<p>Softmax 把任意实数 $z_1,\ldots,z_n$ 转成和为 1 的正数：</p>
+<p>$$
+\alpha_j=\frac{\exp(z_j/\tau)}{\sum_k\exp(z_k/\tau)},
+\qquad \sum_j\alpha_j=1.
+$$</p>
+<p>$\tau$ 是温度：较小时权重更集中在最高分，较大时更平均。有了权重后，加权汇总就是</p>
+<p>$$
+v=\sum_j\alpha_j e_j.
+$$</p>
+<p>它可以理解为“每个历史向量 $e_j$ 贡献多少”。注意力只是让分数 $z_j$ 由当前 query 与 key 的匹配产生。对矩阵 $Q,K$ 通常写为</p>
+<p>$$
+S=\frac{QK^\top}{\sqrt d},\qquad A=\operatorname{softmax}(S+M),\qquad H=AV.
+$$</p>
+<p>$QK^\top$ 是批量点积；$\sqrt d$ 防止维数增大时分数过大；遮罩 $M$ 把不允许读取的位置设为 $-\infty$，Softmax 后它们的权重就是 0。序列模型用它阻止偷看未来，变长序列用它忽略 padding。</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4a150e05">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">])</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">softmax_with_temperature</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="n">stable</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">temperature</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">temperature</span><span class="p">)</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">stable</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">temperature</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]:</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">softmax_with_temperature</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">@</span> <span class="n">values</span>
+    <span class="nb">print</span><span class="p">({</span><span class="s2">"temperature"</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span> <span class="s2">"weights"</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+           <span class="s2">"weighted vector"</span><span class="p">:</span> <span class="n">summary</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+
+<span class="n">masked_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">])</span>
+<span class="n">masked_weights</span> <span class="o">=</span> <span class="n">softmax_with_temperature</span><span class="p">(</span><span class="n">masked_scores</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">masked_weights</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">masked_weights</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>{'temperature': 0.5, 'weights': [0.002, 0.018, 0.98], 'weighted vector': [0.982, 0.998]}
+{'temperature': 1.0, 'weights': [0.042, 0.114, 0.844], 'weighted vector': [0.886, 0.958]}
+{'temperature': 2.0, 'weights': [0.14, 0.231, 0.629], 'weighted vector': [0.769, 0.86]}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3a7ee5e1">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="5.1-%E9%80%90%E5%85%83%E7%B4%A0%E8%BF%90%E7%AE%97%E4%B8%8E%E5%B8%B8%E8%A7%81%E6%BF%80%E6%B4%BB">5.1 逐元素运算与常见激活<a class="anchor-link" href="#5.1-%E9%80%90%E5%85%83%E7%B4%A0%E8%BF%90%E7%AE%97%E4%B8%8E%E5%B8%B8%E8%A7%81%E6%BF%80%E6%B4%BB">¶</a></h3><p>拿到两个同形状向量 $a,b$，<strong>逐元素乘积</strong>（Hadamard 乘积，记作 $\odot$）就是对应位置分别相乘，不再求和：</p>
+<p>$$
+(a\odot b)_i=a_i b_i.
+$$</p>
+<p>DIN/DIEN/HSTU 用它表达“两个向量在每一维上共同激活多少”，和第 2 节的点积（求和成一个数）相对照。把一个向量跳层加回后面（$H\leftarrow H+X$）叫<strong>残差连接</strong>，它让梯度更容易回传；再做 LayerNorm（按特征维标准化到均值 0、方差 1），深层网络才稳定训练。</p>
+<p>推荐里反复出现的激活函数：</p>
+<ul>
+<li><strong>ReLU</strong>：$\operatorname{ReLU}(z)=\max(0,z)$，负数直接截 0，计算便宜。</li>
+<li><strong>Sigmoid</strong>：$\sigma(z)=1/(1+e^{-z})$，第 4 节已讲，把数压到 0～1 当概率/门。</li>
+<li><strong>Tanh</strong>：$\tanh(z)=(e^z-e^{-z})/(e^z+e^{-z})$，输出在 $-1\sim1$，常与门配合。</li>
+<li><strong>Softplus</strong>：$\operatorname{softplus}(z)=\log(1+e^z)$，是 ReLU 的平滑版本，SASRec 用它写 pairwise logistic 损失。</li>
+<li><strong>SiLU/Swish</strong>：$\operatorname{SiLU}(z)=z\sigma(z)$，自己做自己的门，HSTU/Modern 推荐用它。</li>
+</ul>
+<p>这些函数逐元素作用在张量上，不会改变维度；与 Softmax（跨位置归一化、会混合多个位置）用途完全不同。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=536998b6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="6.-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%EF%BC%9A%E6%B2%BF%E7%9D%80%E4%B8%8B%E5%9D%A1%E6%96%B9%E5%90%91%E4%B8%80%E7%82%B9%E7%82%B9%E6%94%B9%E5%8F%82%E6%95%B0">6. 梯度下降：沿着下坡方向一点点改参数<a class="anchor-link" href="#6.-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%EF%BC%9A%E6%B2%BF%E7%9D%80%E4%B8%8B%E5%9D%A1%E6%96%B9%E5%90%91%E4%B8%80%E7%82%B9%E7%82%B9%E6%94%B9%E5%8F%82%E6%95%B0">¶</a></h2><p>把模型参数想成山坡上的横坐标 $w$，损失 $L(w)$ 是高度。<strong>梯度</strong>就是当前位置的坡度：</p>
 <ul>
 <li>坡度为正，向左走能下降；</li>
 <li>坡度为负，向右走能下降；</li>
@@ -7925,7 +8049,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ce325818">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=703674fc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7971,12 +8095,12 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3b493ebf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aa4be1c0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="6.-%E8%AE%AD%E7%BB%83%E9%9B%86%E3%80%81%E6%B5%8B%E8%AF%95%E9%9B%86%E4%B8%8E%E6%8E%A8%E8%8D%90%E6%8C%87%E6%A0%87">6. 训练集、测试集与推荐指标<a class="anchor-link" href="#6.-%E8%AE%AD%E7%BB%83%E9%9B%86%E3%80%81%E6%B5%8B%E8%AF%95%E9%9B%86%E4%B8%8E%E6%8E%A8%E8%8D%90%E6%8C%87%E6%A0%87">¶</a></h2><p>模型在做过的题上得高分，不代表会做新题。因此必须：</p>
+<h2 id="7.-%E8%AE%AD%E7%BB%83%E9%9B%86%E3%80%81%E6%B5%8B%E8%AF%95%E9%9B%86%E4%B8%8E%E6%8E%A8%E8%8D%90%E6%8C%87%E6%A0%87">7. 训练集、测试集与推荐指标<a class="anchor-link" href="#7.-%E8%AE%AD%E7%BB%83%E9%9B%86%E3%80%81%E6%B5%8B%E8%AF%95%E9%9B%86%E4%B8%8E%E6%8E%A8%E8%8D%90%E6%8C%87%E6%A0%87">¶</a></h2><p>模型在做过的题上得高分，不代表会做新题。因此必须：</p>
 <ol>
 <li><strong>训练集</strong>用来修改参数；</li>
 <li><strong>验证集</strong>用来选择超参数和停止时机；</li>
@@ -7991,7 +8115,7 @@ a.anchor-link {
 <li>$H_u@K=R_u@K\cap G_u$：推荐列表中的命中集合；</li>
 <li>$y_i$：真实标签或评分，$\hat y_i$：模型预测，$N$：样本数。</li>
 </ul>
-<h3 id="6.1-Top-K-%E9%9B%86%E5%90%88%E6%8C%87%E6%A0%87%EF%BC%9A%E6%89%BE%E5%BE%97%E5%87%86%E3%80%81%E6%89%BE%E5%BE%97%E5%85%A8%E3%80%81%E6%98%AF%E5%90%A6%E5%91%BD%E4%B8%AD">6.1 Top-K 集合指标：找得准、找得全、是否命中<a class="anchor-link" href="#6.1-Top-K-%E9%9B%86%E5%90%88%E6%8C%87%E6%A0%87%EF%BC%9A%E6%89%BE%E5%BE%97%E5%87%86%E3%80%81%E6%89%BE%E5%BE%97%E5%85%A8%E3%80%81%E6%98%AF%E5%90%A6%E5%91%BD%E4%B8%AD">¶</a></h3><p>**Precision@K（准确率）**问：“推荐出来的 $K$ 个物品中，有多少是对的？”</p>
+<h3 id="7.1-Top-K-%E9%9B%86%E5%90%88%E6%8C%87%E6%A0%87%EF%BC%9A%E6%89%BE%E5%BE%97%E5%87%86%E3%80%81%E6%89%BE%E5%BE%97%E5%85%A8%E3%80%81%E6%98%AF%E5%90%A6%E5%91%BD%E4%B8%AD">7.1 Top-K 集合指标：找得准、找得全、是否命中<a class="anchor-link" href="#7.1-Top-K-%E9%9B%86%E5%90%88%E6%8C%87%E6%A0%87%EF%BC%9A%E6%89%BE%E5%BE%97%E5%87%86%E3%80%81%E6%89%BE%E5%BE%97%E5%85%A8%E3%80%81%E6%98%AF%E5%90%A6%E5%91%BD%E4%B8%AD">¶</a></h3><p>**Precision@K（准确率）**问：“推荐出来的 $K$ 个物品中，有多少是对的？”</p>
 <p>$$
 \mathrm{Precision@K}(u)=\frac{|H_u@K|}{K}
 $$</p>
@@ -8015,7 +8139,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=3a956409">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4b09e3db">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8057,12 +8181,12 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f8aa66e8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0a5f153d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="6.2-%E9%A1%BA%E5%BA%8F%E6%95%8F%E6%84%9F%E7%9A%84%E5%88%97%E8%A1%A8%E6%8C%87%E6%A0%87%EF%BC%9A%E5%A5%BD%E4%B8%9C%E8%A5%BF%E6%98%AF%E5%90%A6%E6%8E%92%E5%9C%A8%E5%89%8D%E9%9D%A2">6.2 顺序敏感的列表指标：好东西是否排在前面<a class="anchor-link" href="#6.2-%E9%A1%BA%E5%BA%8F%E6%95%8F%E6%84%9F%E7%9A%84%E5%88%97%E8%A1%A8%E6%8C%87%E6%A0%87%EF%BC%9A%E5%A5%BD%E4%B8%9C%E8%A5%BF%E6%98%AF%E5%90%A6%E6%8E%92%E5%9C%A8%E5%89%8D%E9%9D%A2">¶</a></h3><p>Precision/Recall 只看集合，不看命中的位置。推荐页面首屏尤其在意顺序。</p>
+<h3 id="7.2-%E9%A1%BA%E5%BA%8F%E6%95%8F%E6%84%9F%E7%9A%84%E5%88%97%E8%A1%A8%E6%8C%87%E6%A0%87%EF%BC%9A%E5%A5%BD%E4%B8%9C%E8%A5%BF%E6%98%AF%E5%90%A6%E6%8E%92%E5%9C%A8%E5%89%8D%E9%9D%A2">7.2 顺序敏感的列表指标：好东西是否排在前面<a class="anchor-link" href="#7.2-%E9%A1%BA%E5%BA%8F%E6%95%8F%E6%84%9F%E7%9A%84%E5%88%97%E8%A1%A8%E6%8C%87%E6%A0%87%EF%BC%9A%E5%A5%BD%E4%B8%9C%E8%A5%BF%E6%98%AF%E5%90%A6%E6%8E%92%E5%9C%A8%E5%89%8D%E9%9D%A2">¶</a></h3><p>Precision/Recall 只看集合，不看命中的位置。推荐页面首屏尤其在意顺序。</p>
 <p>**MRR（Mean Reciprocal Rank）**只看第一个相关结果的位置。若第一个命中在第 $r_u$ 位，则倒数排名为 $1/r_u$：</p>
 <p>$$
 \mathrm{MRR@K}=\frac{1}{|U|}\sum_{u\in U}
@@ -8089,7 +8213,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c8a6775d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e9db5941">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8131,12 +8255,12 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f3f3713">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ad3af150">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="6.3-%E8%AF%84%E5%88%86%E8%AF%AF%E5%B7%AE%EF%BC%9A%E9%A2%84%E6%B5%8B%E5%80%BC%E7%A6%BB%E7%9C%9F%E5%AE%9E%E5%80%BC%E5%A4%9A%E8%BF%9C">6.3 评分误差：预测值离真实值多远<a class="anchor-link" href="#6.3-%E8%AF%84%E5%88%86%E8%AF%AF%E5%B7%AE%EF%BC%9A%E9%A2%84%E6%B5%8B%E5%80%BC%E7%A6%BB%E7%9C%9F%E5%AE%9E%E5%80%BC%E5%A4%9A%E8%BF%9C">¶</a></h3><p>**MAE（平均绝对误差）**直接平均距离，单位与原评分相同：</p>
+<h3 id="7.3-%E8%AF%84%E5%88%86%E8%AF%AF%E5%B7%AE%EF%BC%9A%E9%A2%84%E6%B5%8B%E5%80%BC%E7%A6%BB%E7%9C%9F%E5%AE%9E%E5%80%BC%E5%A4%9A%E8%BF%9C">7.3 评分误差：预测值离真实值多远<a class="anchor-link" href="#7.3-%E8%AF%84%E5%88%86%E8%AF%AF%E5%B7%AE%EF%BC%9A%E9%A2%84%E6%B5%8B%E5%80%BC%E7%A6%BB%E7%9C%9F%E5%AE%9E%E5%80%BC%E5%A4%9A%E8%BF%9C">¶</a></h3><p>**MAE（平均绝对误差）**直接平均距离，单位与原评分相同：</p>
 <p>$$
 \mathrm{MAE}=\frac{1}{N}\sum_{i=1}^{N}|y_i-\hat y_i|
 $$</p>
@@ -8145,7 +8269,7 @@ $$</p>
 \mathrm{RMSE}=\sqrt{\frac{1}{N}\sum_{i=1}^{N}(y_i-\hat y_i)^2}
 $$</p>
 <p>二者都是越小越好。RMSE/MAE 适合 1～5 星等评分预测，却不保证 Top-K 排序更好。</p>
-<h3 id="6.4-%E6%A6%82%E7%8E%87%E4%B8%8E%E4%BA%8C%E5%88%86%E7%B1%BB%E6%8E%92%E5%BA%8F%EF%BC%9ALogLoss%E3%80%81AUC-%E4%B8%8E-GAUC">6.4 概率与二分类排序：LogLoss、AUC 与 GAUC<a class="anchor-link" href="#6.4-%E6%A6%82%E7%8E%87%E4%B8%8E%E4%BA%8C%E5%88%86%E7%B1%BB%E6%8E%92%E5%BA%8F%EF%BC%9ALogLoss%E3%80%81AUC-%E4%B8%8E-GAUC">¶</a></h3><p>点击率模型对样本 $i$ 输出概率 $p_i\in(0,1)$，真实标签 $y_i\in\{0,1\}$。</p>
+<h3 id="7.4-%E6%A6%82%E7%8E%87%E4%B8%8E%E4%BA%8C%E5%88%86%E7%B1%BB%E6%8E%92%E5%BA%8F%EF%BC%9ALogLoss%E3%80%81AUC-%E4%B8%8E-GAUC">7.4 概率与二分类排序：LogLoss、AUC 与 GAUC<a class="anchor-link" href="#7.4-%E6%A6%82%E7%8E%87%E4%B8%8E%E4%BA%8C%E5%88%86%E7%B1%BB%E6%8E%92%E5%BA%8F%EF%BC%9ALogLoss%E3%80%81AUC-%E4%B8%8E-GAUC">¶</a></h3><p>点击率模型对样本 $i$ 输出概率 $p_i\in(0,1)$，真实标签 $y_i\in\{0,1\}$。</p>
 <p>**LogLoss（二元交叉熵）**衡量概率预测本身是否可信，越小越好：</p>
 <p>$$
 \mathrm{LogLoss}=-\frac{1}{N}\sum_{i=1}^{N}
@@ -8165,7 +8289,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7f261dd9">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6403b2f1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8208,12 +8332,12 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4c617f54">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=053bce3d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="6.5-%E8%A6%86%E7%9B%96%E7%8E%87%E4%B8%8E%E6%8C%87%E6%A0%87%E9%80%89%E6%8B%A9">6.5 覆盖率与指标选择<a class="anchor-link" href="#6.5-%E8%A6%86%E7%9B%96%E7%8E%87%E4%B8%8E%E6%8C%87%E6%A0%87%E9%80%89%E6%8B%A9">¶</a></h3><p>准确率高不代表所有用户都在看到丰富的目录。<strong>Catalog Coverage@K</strong> 衡量全部用户的 Top-K 列表一共触达多少种物品：</p>
+<h3 id="7.5-%E8%A6%86%E7%9B%96%E7%8E%87%E4%B8%8E%E6%8C%87%E6%A0%87%E9%80%89%E6%8B%A9">7.5 覆盖率与指标选择<a class="anchor-link" href="#7.5-%E8%A6%86%E7%9B%96%E7%8E%87%E4%B8%8E%E6%8C%87%E6%A0%87%E9%80%89%E6%8B%A9">¶</a></h3><p>准确率高不代表所有用户都在看到丰富的目录。<strong>Catalog Coverage@K</strong> 衡量全部用户的 Top-K 列表一共触达多少种物品：</p>
 <p>$$
 \mathrm{Coverage@K}=\frac{|\bigcup_{u\in U}R_u@K|}{|I|}
 $$</p>
@@ -8253,7 +8377,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e0a539b4">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=658b8e4b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8287,7 +8411,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0ff2cf3a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d98ba3c9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8296,7 +8420,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=65da8942">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4bb2444e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8331,7 +8455,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1337a825">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=878eda84">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

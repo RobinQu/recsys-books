@@ -1,0 +1,11 @@
+services:
+  web:
+    gpus: all
+    environment:
+      RECSYS_CUDA_AVAILABLE: "1"
+
+  jupyter:
+    gpus: all
+
+  test:
+    gpus: all

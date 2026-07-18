@@ -1,0 +1,13 @@
+{
+  "dssm": {"page": 3, "label": "Figure 1 · DSSM architecture", "crop": [0.05, 0.07, 0.95, 0.35]},
+  "mind": {"page": 3, "label": "Figure 2 · MIND overview", "crop": [0.03, 0.08, 0.96, 0.42]},
+  "sasrec": {"page": 1, "label": "Figure 1 · SASRec training and inference", "crop": [0.51, 0.18, 0.99, 0.42]},
+  "deepfm": {"page": 1, "label": "Figure 1 · DeepFM wide and deep architecture", "crop": [0.47, 0.24, 0.96, 0.56]},
+  "din": {"page": 4, "label": "Figure 2 · DIN network architecture", "crop": [0.03, 0.09, 0.97, 0.34]},
+  "dien": {"page": 4, "label": "Figure 1 · DIEN structure", "crop": [0.03, 0.05, 0.97, 0.36]},
+  "mmoe": {"page": 2, "label": "Figure 1 · Shared-bottom, MoE and MMoE", "crop": [0.03, 0.09, 0.97, 0.36]},
+  "ple": {"page": 5, "label": "Figure 4 · Customized Gate Control", "crop": [0.03, 0.52, 0.52, 0.93]},
+  "tiger": {"page": 3, "label": "Figure 2 · TIGER generative retrieval", "crop": [0.01, 0.01, 0.99, 0.45]},
+  "onerec": {"page": 3, "label": "Figure 2 · OneRec overall framework", "crop": [0.07, 0.09, 0.93, 0.47]},
+  "hstu": {"page": 4, "label": "Figure 3 · DLRM and HSTU components", "crop": [0.08, 0.06, 0.93, 0.47]}
+}

@@ -1,8 +1,8 @@
 {
-  "python.defaultInterpreterPath": "/usr/local/bin/python",
+  "python.defaultInterpreterPath": "/opt/venv/bin/python",
   "python.analysis.extraPaths": [
     "/home/coder/project",
-    "/usr/local/lib/python3.11/site-packages"
+    "/opt/venv/lib/python3.11/site-packages"
   ],
   "basedpyright.analysis.typeCheckingMode": "off",
   "ruff.configuration": "/home/coder/project/pyproject.toml",

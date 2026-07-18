@@ -19,17 +19,43 @@ def code(text: str): return nbf.v4.new_code_cell(text.strip())
 SETUP = """
 from pathlib import Path
 import os, sys, json
+import torch
 ROOT = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
 sys.path.insert(0, str(ROOT))
-os.environ.setdefault("RECSYS_PROFILE", "smoke")
+os.environ.setdefault("RECSYS_PROFILE", "full")
 PROFILE = os.environ["RECSYS_PROFILE"]
+CUDA_AVAILABLE = torch.cuda.is_available()
 from recsys_lab.data import (load_movielens, movielens_provenance, load_amazon_2023,
-                             amazon_provenance, load_kuairand, kuairand_provenance)
+                             amazon_provenance, load_kuairand, kuairand_provenance,
+                             load_amazon_2018, amazon_2018_provenance,
+                             load_movielens_1m, movielens_1m_provenance,
+                             load_mind_amazon_books, mind_amazon_provenance,
+                             load_census_income, census_income_provenance)
 DATASET_KEY = "__DATASET_KEY__"
 if DATASET_KEY == "movielens":
     real_ratings, real_movies = load_movielens()
     real_interactions = real_ratings
     REAL_DATASET = movielens_provenance(real_ratings)
+elif DATASET_KEY == "amazon-books":
+    real_ratings = load_amazon_2018("Books") if PROFILE == "full" else load_amazon_2023()
+    real_interactions, real_movies = real_ratings, None
+    REAL_DATASET = amazon_2018_provenance(real_ratings) if PROFILE == "full" else amazon_provenance(real_ratings)
+elif DATASET_KEY == "mind-amazon-books":
+    real_ratings = load_mind_amazon_books() if PROFILE == "full" else load_amazon_2023()
+    real_interactions, real_movies = real_ratings, None
+    REAL_DATASET = mind_amazon_provenance(real_ratings) if PROFILE == "full" else amazon_provenance(real_ratings)
+elif DATASET_KEY == "amazon-electronics":
+    real_ratings = load_amazon_2018("Electronics") if PROFILE == "full" else load_amazon_2023()
+    real_interactions, real_movies = real_ratings, None
+    REAL_DATASET = amazon_2018_provenance(real_ratings) if PROFILE == "full" else amazon_provenance(real_ratings)
+elif DATASET_KEY == "movielens-1m":
+    real_ratings = load_movielens_1m() if PROFILE == "full" else load_amazon_2023()
+    real_interactions, real_movies = real_ratings, None
+    REAL_DATASET = movielens_1m_provenance(real_ratings) if PROFILE == "full" else amazon_provenance(real_ratings)
+elif DATASET_KEY == "census-income" and PROFILE == "full":
+    census_train_x, census_train_y, census_test_x, census_test_y = load_census_income()
+    real_interactions, real_movies, real_ratings = census_train_x, None, census_train_x
+    REAL_DATASET = census_income_provenance()
 elif DATASET_KEY == "amazon-2023":
     real_ratings = load_amazon_2023()
     real_interactions, real_movies = real_ratings, None
@@ -38,7 +64,9 @@ else:
     real_interactions, real_movies = load_kuairand()
     real_ratings = real_interactions
     REAL_DATASET = kuairand_provenance(real_interactions)
-print({"profile": PROFILE, "root": str(ROOT), "real_dataset": REAL_DATASET})
+print({"profile": PROFILE, "root": str(ROOT), "real_dataset": REAL_DATASET,
+       "cuda_available": CUDA_AVAILABLE,
+       "cuda_device": torch.cuda.get_device_name(0) if CUDA_AVAILABLE else None})
 assert REAL_DATASET["randomly_fabricated_rows"] == 0
 """
 
@@ -46,22 +74,33 @@ assert REAL_DATASET["randomly_fabricated_rows"] == 0
 def dataset_for_title(title: str) -> tuple[str, str]:
     if title.startswith(("3.0", "3.1")):
         return "movielens", "GroupLens MovieLens latest-small：经典评分与邻域任务"
+    if "MIND" in title:
+        return "mind-amazon-books", "Amazon Books 2014：按 MIND 论文执行迭代 10-core，并核验 6,271,511 行"
+    if "DSSM" in title:
+        return "amazon-books", "Amazon Reviews Books 5-core：DSSM 搜索日志不可公开时的完整电商迁移实验"
+    if "SASRec" in title:
+        return "movielens-1m", "MovieLens 1M：按 SASRec 论文协议执行 leave-two-out 与 100 负例评测"
+    if "DIN" in title or "DIEN" in title:
+        return "amazon-electronics", "Amazon Reviews Electronics 5-core：DIN/DIEN 公开复现实验数据"
+    if "MMoE" in title or "PLE" in title:
+        return "census-income", "Census-Income KDD：MMoE/PLE 论文公开多任务实验的完整官方 train/test"
     if title.startswith(("3.2", "3.5")):
-        return "amazon-2023", "Amazon Reviews 2023 Video Games 5-core：电商召回与 Transformer 序列"
+        return "amazon-2023", "Amazon Reviews 2023 Video Games 5-core：召回章节导读与汇总"
     return "kuairand", "KuaiRand-Pure：真实短视频曝光、点击、长播与多反馈序列"
 
 
 def notebook(title: str, goal: str, source: str, cells: list):
     dataset_key, dataset_description = dataset_for_title(title)
+    requires_cuda = title.startswith("4.")
     nb = nbf.v4.new_notebook()
     nb["metadata"] = {
         "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
         "language_info": {"name": "python", "version": "3.11"},
-        "recsys": {"profile": "smoke", "source_of_truth": "HTML and notebook share app/content.py + recsys_lab"},
+        "recsys": {"profile": "full", "requires_cuda": requires_cuda, "source_of_truth": "HTML and notebook share app/content.py + recsys_lab"},
     }
     nb["cells"] = [
         md(f"# {title}\n\n> 阅读版与 Web 应用内容一致；实验数值来自本 Notebook 的已执行输出。\n\n## Goal\n\n{goal}"),
-        md(f"## Setup\n\n本 Notebook 的默认真实数据是 **{dataset_description}**。`smoke` 档读取仓库内可审计的确定性切片，`full` 档扩大到官方完整文件；两档都不制造交互、曝光、标签或行为序列。切片规则、源地址、哈希与许可记录在 `data/README.md` 及对应数据目录。\n\n**主要资料：** {source}"),
+        md(f"## Setup\n\n本 Notebook 的默认真实数据是 **{dataset_description}**。`smoke` 档读取仓库内可审计的确定性切片，`full` 档扩大到官方完整文件；两档都不制造交互、曝光、标签或行为序列。切片规则、源地址、哈希与许可记录在 `data/README.md` 及对应数据目录。{' **生成式章节默认要求 CUDA；无 CUDA 时只允许自动化测试执行 CPU basic smoke，不进行完整精度验证。**' if requires_cuda else ''}\n\n**主要资料：** {source}"),
         code(SETUP.replace("__DATASET_KEY__", dataset_key)),
         *cells,
     ]
@@ -376,7 +415,52 @@ plt.tight_layout(); plt.show()
 print({"sigmoid(0)": .5, "loss if y=1,p=.9": round(float(-np.log(.9)), 3), "loss if y=1,p=.01": round(float(-np.log(.01)), 3)})
 """),
             md(r"""
-## 5. 梯度下降：沿着下坡方向一点点改参数
+## 5. Softmax、温度、加权汇总与遮罩
+
+后续的 DSSM、MIND、DIN、SASRec、MMoE 会反复用到同一组操作：先算若干个分数，再把它们转成权重，最后汇总若干个向量。
+
+Softmax 把任意实数 $z_1,\ldots,z_n$ 转成和为 1 的正数：
+
+$$
+\alpha_j=\frac{\exp(z_j/\tau)}{\sum_k\exp(z_k/\tau)},
+\qquad \sum_j\alpha_j=1.
+$$
+
+$\tau$ 是温度：较小时权重更集中在最高分，较大时更平均。有了权重后，加权汇总就是
+
+$$
+v=\sum_j\alpha_j e_j.
+$$
+
+它可以理解为“每个历史向量 $e_j$ 贡献多少”。注意力只是让分数 $z_j$ 由当前 query 与 key 的匹配产生。对矩阵 $Q,K$ 通常写为
+
+$$
+S=\frac{QK^\top}{\sqrt d},\qquad A=\operatorname{softmax}(S+M),\qquad H=AV.
+$$
+
+$QK^\top$ 是批量点积；$\sqrt d$ 防止维数增大时分数过大；遮罩 $M$ 把不允许读取的位置设为 $-\infty$，Softmax 后它们的权重就是 0。序列模型用它阻止偷看未来，变长序列用它忽略 padding。
+"""),
+            code(r"""
+scores = np.array([1.0, 2.0, 4.0])
+values = np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]])
+
+def softmax_with_temperature(x, temperature=1.0):
+    stable = x / temperature - np.max(x / temperature)
+    weights = np.exp(stable)
+    return weights / weights.sum()
+
+for temperature in [0.5, 1.0, 2.0]:
+    weights = softmax_with_temperature(scores, temperature)
+    summary = weights @ values
+    print({"temperature": temperature, "weights": weights.round(3).tolist(),
+           "weighted vector": summary.round(3).tolist()})
+
+masked_scores = np.array([1.0, 2.0, -np.inf])
+masked_weights = softmax_with_temperature(masked_scores)
+assert np.isclose(masked_weights.sum(), 1.0) and masked_weights[-1] == 0
+"""),
+            md(r"""
+## 6. 梯度下降：沿着下坡方向一点点改参数
 
 把模型参数想成山坡上的横坐标 $w$，损失 $L(w)$ 是高度。**梯度**就是当前位置的坡度：
 
@@ -405,7 +489,7 @@ plt.tight_layout(); plt.show()
 print({"start": path[0], "after 12 steps": round(path[-1], 4), "optimal": 3.0})
 """),
             md(r"""
-## 6. 训练集、测试集与推荐指标
+## 7. 训练集、测试集与推荐指标
 
 模型在做过的题上得高分，不代表会做新题。因此必须：
 
@@ -422,7 +506,7 @@ print({"start": path[0], "after 12 steps": round(path[-1], 4), "optimal": 3.0})
 - $H_u@K=R_u@K\cap G_u$：推荐列表中的命中集合；
 - $y_i$：真实标签或评分，$\hat y_i$：模型预测，$N$：样本数。
 
-### 6.1 Top-K 集合指标：找得准、找得全、是否命中
+### 7.1 Top-K 集合指标：找得准、找得全、是否命中
 
 **Precision@K（准确率）**问：“推荐出来的 $K$ 个物品中，有多少是对的？”
 
@@ -473,7 +557,7 @@ print({
 })
 """),
             md(r"""
-### 6.2 顺序敏感的列表指标：好东西是否排在前面
+### 7.2 顺序敏感的列表指标：好东西是否排在前面
 
 Precision/Recall 只看集合，不看命中的位置。推荐页面首屏尤其在意顺序。
 
@@ -529,7 +613,7 @@ ap_at_5 = np.sum(precision_at_each_rank * binary_relevance) / min(binary_relevan
 print({"MRR@5": round(mrr_at_5, 3), "NDCG@5": round(ndcg_at_5, 3), "AP@5": round(ap_at_5, 3)})
 """),
             md(r"""
-### 6.3 评分误差：预测值离真实值多远
+### 7.3 评分误差：预测值离真实值多远
 
 **MAE（平均绝对误差）**直接平均距离，单位与原评分相同：
 
@@ -545,7 +629,7 @@ $$
 
 二者都是越小越好。RMSE/MAE 适合 1～5 星等评分预测，却不保证 Top-K 排序更好。
 
-### 6.4 概率与二分类排序：LogLoss、AUC 与 GAUC
+### 7.4 概率与二分类排序：LogLoss、AUC 与 GAUC
 
 点击率模型对样本 $i$ 输出概率 $p_i\in(0,1)$，真实标签 $y_i\in\{0,1\}$。
 
@@ -595,7 +679,7 @@ pairwise_auc = np.mean(
 print({"MAE": round(mae, 3), "RMSE": round(rmse, 3), "LogLoss": round(logloss, 3), "AUC": round(float(pairwise_auc), 3)})
 """),
             md(r"""
-### 6.5 覆盖率与指标选择
+### 7.5 覆盖率与指标选择
 
 准确率高不代表所有用户都在看到丰富的目录。**Catalog Coverage@K** 衡量全部用户的 Top-K 列表一共触达多少种物品：
 
@@ -1253,7 +1337,21 @@ display(comparison.round(4))
 print("指标来源：", [p.name for p in result_files])
 """),
             md(r"""
-## 3. 横向评论
+## 3. 与原论文的可比性审计
+
+本章算法来自不同任务，原论文也没有一个统一 benchmark。下表的目的不是制造“复现率”，而是明确当前教学实验与论文实验之间的边界。
+
+| 算法 | 当前教程产物 | 原论文代表性结果/规模 | 审计结论 |
+|---|---|---|---|
+| UserCF / ItemCF | MovieLens latest-small 子集，HR@10=0.125 | GroupLens 与 ItemCF 论文采用更早的数据与 MAE/预测质量等口径 | 实现验证，不是原论文复现；指标定义不同，不能相减。 |
+| BiasMF | RMSE=1.1905 | Koren 等报告 Netflix 系统 RMSE=0.9514、大奖目标 0.8563；Netflix 含约 1 亿评分 | 当前小样本结果明显更弱，但数据、切分、维数与正则均未对齐。 |
+| FM | AUC=0.5964，LogLoss=2.6061 | FM 原论文重点验证稀疏因子化的通用性，包含 Netflix 1 亿样本等回归/排序任务，并未给出本教程 CTR 口径 | AUC 略高于随机，但 LogLoss 显示严重过度自信；只能作为公式实现练习。 |
+| GBDT+LR | AUC=0.6376，LogLoss=0.7414 | Facebook 论文使用工业广告日志与 Normalized Entropy、校准等内部口径 | 当前仅验证“树叶编码 → LR”链路，不能宣称复现工业收益。 |
+
+因此 3.1 的可信结论是代码链路、数学结构和同一教程内的基线差异；不能把这些 smoke 数字当成公开 benchmark。
+"""),
+            md(r"""
+## 4. 横向评论
 
 | 维度 | CF | MF | FM | GBDT+LR |
 |---|---|---|---|---|

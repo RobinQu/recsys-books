@@ -8,7 +8,11 @@ no interaction or behavior sequence is randomly fabricated.
 from __future__ import annotations
 
 from functools import lru_cache
+import io
+import os
 from pathlib import Path
+import tarfile
+import zipfile
 
 import numpy as np
 import pandas as pd
@@ -22,6 +26,11 @@ AMAZON_DIR = ROOT / "data" / "amazon-reviews-2023-video-games"
 AMAZON_NAME = "Amazon Reviews 2023 / Video Games / 5-core"
 KUAI_DIR = ROOT / "data" / "kuairand-pure"
 KUAIRAND_NAME = "KuaiRand-Pure (Kuaishou, CIKM 2022)"
+RESOURCE_DATA = ROOT / "resources" / "datasets"
+
+
+def _full_profile() -> bool:
+    return os.getenv("RECSYS_PROFILE", "smoke").casefold() == "full"
 
 
 @lru_cache(maxsize=8)
@@ -36,21 +45,24 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -> tuple[
     ratings = pd.read_csv(ratings_path)
     movies = pd.read_csv(movies_path)
 
-    # 固定选取行为最多的用户与这些用户中最常出现的电影，保证 CPU 实验可运行。
-    user_order = (
-        ratings.groupby("userId").size().rename("events").reset_index()
-        .sort_values(["events", "userId"], ascending=[False, True])
-        .head(max_users)["userId"]
-    )
-    subset = ratings[ratings.userId.isin(user_order)].copy()
-    item_order = (
-        subset.groupby("movieId").size().rename("events").reset_index()
-        .sort_values(["events", "movieId"], ascending=[False, True])
-        .head(max_items)["movieId"]
-    )
-    subset = subset[subset.movieId.isin(item_order)].copy()
-    valid_users = subset.groupby("userId").size()
-    subset = subset[subset.userId.isin(valid_users[valid_users >= min_user_events].index)].copy()
+    # full 保留官方文件的全部评分；smoke 才使用确定性子集。
+    if _full_profile():
+        subset = ratings.copy()
+    else:
+        user_order = (
+            ratings.groupby("userId").size().rename("events").reset_index()
+            .sort_values(["events", "userId"], ascending=[False, True])
+            .head(max_users)["userId"]
+        )
+        subset = ratings[ratings.userId.isin(user_order)].copy()
+        item_order = (
+            subset.groupby("movieId").size().rename("events").reset_index()
+            .sort_values(["events", "movieId"], ascending=[False, True])
+            .head(max_items)["movieId"]
+        )
+        subset = subset[subset.movieId.isin(item_order)].copy()
+        valid_users = subset.groupby("userId").size()
+        subset = subset[subset.userId.isin(valid_users[valid_users >= min_user_events].index)].copy()
 
     user_ids = {raw: idx for idx, raw in enumerate(sorted(subset.userId.unique()))}
     item_ids = {raw: idx for idx, raw in enumerate(sorted(subset.movieId.unique()))}
@@ -79,6 +91,7 @@ def _load_cached(max_users: int, max_items: int, min_user_events: int) -> tuple[
     subset["item_popularity"] = subset.item_id.map(item_popularity).astype("float32")
     subset["user_activity"] = subset.user_id.map(user_activity).astype("float32")
     subset = subset.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
+    subset.attrs["resource_profile"] = "full" if _full_profile() else "smoke"
 
     selected_movies = (
         selected_movies.assign(item_id=selected_movies.movieId.map(item_ids).astype("int64"))
@@ -94,10 +107,13 @@ def load_movielens(max_users: int = 120, max_items: int = 600, min_user_events: 
 
 
 def movielens_provenance(ratings: pd.DataFrame) -> dict:
+    full = ratings.attrs.get("resource_profile") == "full"
     return {
         "dataset": DATASET_NAME,
         "source": SOURCE_URL,
         "license_file": str(DATA_DIR / "README.txt"),
+        "profile": "full" if full else "smoke",
+        "slice_rule": "complete MovieLens latest-small ratings file" if full else "deterministic user/item subset",
         "rows_used": int(len(ratings)),
         "users_used": int(ratings.user_id.nunique()),
         "items_used": int(ratings.item_id.nunique()),
@@ -110,15 +126,18 @@ def movielens_provenance(ratings: pd.DataFrame) -> dict:
 
 @lru_cache(maxsize=8)
 def _load_amazon_cached(max_users: int, min_user_events: int) -> pd.DataFrame:
-    path = AMAZON_DIR / "interactions.csv"
+    full_path = RESOURCE_DATA / "amazon-reviews-2023" / "Video_Games.csv.gz"
+    path = full_path if _full_profile() else AMAZON_DIR / "interactions.csv"
     if not path.exists():
-        raise FileNotFoundError(f"缺少真实数据集切片：{path}")
+        command = "python scripts/init_resources.py --include-optional --kind datasets --id amazon-video-games-full"
+        raise FileNotFoundError(f"缺少真实数据集：{path}。full 档请运行 `{command}`")
     frame = pd.read_csv(path)
-    user_order = (
-        frame.groupby("user_id").size().rename("events").reset_index()
-        .sort_values(["events", "user_id"], ascending=[False, True]).head(max_users)["user_id"]
-    )
-    frame = frame[frame.user_id.isin(user_order)].copy()
+    if not _full_profile():
+        user_order = (
+            frame.groupby("user_id").size().rename("events").reset_index()
+            .sort_values(["events", "user_id"], ascending=[False, True]).head(max_users)["user_id"]
+        )
+        frame = frame[frame.user_id.isin(user_order)].copy()
     valid = frame.groupby("user_id").size()
     frame = frame[frame.user_id.isin(valid[valid >= min_user_events].index)].copy()
     user_map = {raw: idx for idx, raw in enumerate(sorted(frame.user_id.unique()))}
@@ -132,6 +151,8 @@ def _load_amazon_cached(max_users: int, min_user_events: int) -> pd.DataFrame:
     frame["very_like"] = (frame.rating >= 5.0).astype("float32")
     frame["hour"] = pd.to_datetime(frame.timestamp_ms, unit="ms", utc=True).dt.hour.astype("int64")
     frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
+    frame.attrs["resource_profile"] = "full" if _full_profile() else "smoke"
+    frame.attrs["resource_path"] = str(path)
     return frame
 
 
@@ -141,11 +162,14 @@ def load_amazon_2023(max_users: int = 160, min_user_events: int = 12) -> pd.Data
 
 def amazon_provenance(frame: pd.DataFrame) -> dict:
     source = pd.read_json(AMAZON_DIR / "provenance.json", typ="series")
+    full = frame.attrs.get("resource_profile") == "full"
     return {
         "dataset": AMAZON_NAME,
         "source": source["source_url"],
         "source_sha256": source["source_sha256"],
-        "slice_rule": source["selection"],
+        "slice_rule": "complete official 5-core rating file; no user truncation" if full else source["selection"],
+        "profile": "full" if full else "smoke",
+        "local_resource": frame.attrs.get("resource_path"),
         "rows_used": int(len(frame)),
         "users_used": int(frame.user_id.nunique()),
         "items_used": int(frame.item_id.nunique()),
@@ -156,20 +180,222 @@ def amazon_provenance(frame: pd.DataFrame) -> dict:
     }
 
 
+@lru_cache(maxsize=4)
+def _load_amazon_2018_cached(category: str, min_user_events: int) -> pd.DataFrame:
+    """Load every row of an official Amazon 5-core category for formal runs."""
+    path = RESOURCE_DATA / "amazon-2018" / f"{category}_5.json.gz"
+    if not path.exists():
+        resource_id = f"amazon-{category.casefold()}-5core"
+        raise FileNotFoundError(
+            f"缺少 {category} 完整数据：{path}。请运行 `python scripts/init_resources.py --include-optional --kind datasets --id {resource_id}`"
+        )
+    raw = pd.read_json(path, lines=True, compression="gzip")
+    frame = raw.rename(columns={"reviewerID": "raw_user_id", "asin": "raw_item_id", "overall": "rating", "unixReviewTime": "timestamp"})
+    valid = frame.groupby("raw_user_id").size()
+    frame = frame[frame.raw_user_id.isin(valid[valid >= min_user_events].index)].copy()
+    user_map = {raw_id: index for index, raw_id in enumerate(sorted(frame.raw_user_id.unique()))}
+    item_map = {raw_id: index for index, raw_id in enumerate(sorted(frame.raw_item_id.unique()))}
+    frame["user_id"] = frame.raw_user_id.map(user_map).astype("int64")
+    frame["item_id"] = frame.raw_item_id.map(item_map).astype("int64")
+    frame["like"] = (frame.rating >= 4.0).astype("float32")
+    frame["very_like"] = (frame.rating >= 5.0).astype("float32")
+    frame["hour"] = pd.to_datetime(frame.timestamp, unit="s", utc=True).dt.hour.astype("int64")
+    frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
+    frame.attrs.update(resource_profile="full", resource_path=str(path), dataset_name=f"Amazon Reviews {category} 5-core (2018)")
+    return frame
+
+
+def load_amazon_2018(category: str, min_user_events: int = 5) -> pd.DataFrame:
+    return _load_amazon_2018_cached(category, min_user_events).copy()
+
+
+def amazon_2018_provenance(frame: pd.DataFrame) -> dict:
+    return {
+        "dataset": frame.attrs["dataset_name"], "source": "https://nijianmo.github.io/amazon/index.html",
+        "profile": "full", "slice_rule": "complete official category 5-core file; no user/item truncation",
+        "local_resource": frame.attrs["resource_path"], "rows_used": int(len(frame)),
+        "users_used": int(frame.user_id.nunique()), "items_used": int(frame.item_id.nunique()),
+        "randomly_fabricated_rows": 0,
+    }
+
+
+MIND_AMAZON_STATS = {"rows": 6_271_511, "users": 351_356, "items": 393_801}
+
+
+@lru_cache(maxsize=1)
+def _load_mind_amazon_books_cached() -> pd.DataFrame:
+    """Rebuild the Amazon Books 10-core view described in the MIND paper."""
+    path = RESOURCE_DATA / "amazon-2014" / "ratings_Books.csv"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"缺少 MIND 论文版 Amazon Books：{path}。请运行 "
+            "`python scripts/init_resources.py --include-optional --kind datasets --id amazon-books-2014-ratings`"
+        )
+    frame = pd.read_csv(
+        path, names=["raw_user_id", "raw_item_id", "rating", "timestamp"],
+        dtype={"raw_user_id": "string", "raw_item_id": "string", "rating": "float32", "timestamp": "int64"},
+    )
+    # k-core is a joint constraint. Removing rare items can make users rare
+    # (and vice versa), therefore both filters repeat until convergence.
+    while True:
+        before = len(frame)
+        user_count = frame.groupby("raw_user_id", observed=True).raw_item_id.transform("size")
+        frame = frame[user_count >= 10]
+        item_count = frame.groupby("raw_item_id", observed=True).raw_user_id.transform("size")
+        frame = frame[item_count >= 10]
+        if len(frame) == before:
+            break
+    actual = {"rows": len(frame), "users": frame.raw_user_id.nunique(), "items": frame.raw_item_id.nunique()}
+    if actual != MIND_AMAZON_STATS:
+        raise ValueError(f"MIND Amazon preprocessing drift: expected {MIND_AMAZON_STATS}, got {actual}")
+    frame["user_id"] = pd.factorize(frame.raw_user_id, sort=True)[0].astype("int64")
+    frame["item_id"] = pd.factorize(frame.raw_item_id, sort=True)[0].astype("int64")
+    frame["like"] = np.ones(len(frame), dtype="float32")
+    frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
+    frame.attrs.update(resource_profile="full", resource_path=str(path), dataset_name="Amazon Books 2014 / MIND iterative 10-core")
+    return frame
+
+
+def load_mind_amazon_books() -> pd.DataFrame:
+    return _load_mind_amazon_books_cached().copy()
+
+
+def mind_amazon_provenance(frame: pd.DataFrame) -> dict:
+    return {
+        "dataset": frame.attrs["dataset_name"],
+        "source": "https://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Books.csv",
+        "profile": "full", "slice_rule": "complete 2014 ratings file; iterative user/item 10-core to convergence",
+        "paper_expected_stats": MIND_AMAZON_STATS, "local_resource": frame.attrs["resource_path"],
+        "rows_used": int(len(frame)), "users_used": int(frame.user_id.nunique()),
+        "items_used": int(frame.item_id.nunique()), "randomly_fabricated_rows": 0,
+    }
+
+
+@lru_cache(maxsize=1)
+def _load_movielens_1m_cached() -> pd.DataFrame:
+    path = RESOURCE_DATA / "movielens" / "ml-1m.zip"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"缺少 MovieLens 1M：{path}。请运行 `python scripts/init_resources.py --include-optional --kind datasets --id movielens-1m-full`"
+        )
+    with zipfile.ZipFile(path) as bundle, bundle.open("ml-1m/ratings.dat") as handle:
+        frame = pd.read_csv(handle, sep="::", engine="python", names=["raw_user_id", "raw_item_id", "rating", "timestamp"])
+    raw_rows = len(frame)
+    # SASRec follows the standard sequential-recommendation 5-core protocol.
+    # This is algorithm-defined preprocessing, not an arbitrary tutorial crop.
+    while True:
+        before = len(frame)
+        frame = frame[frame.groupby("raw_user_id").raw_item_id.transform("size") >= 5]
+        frame = frame[frame.groupby("raw_item_id").raw_user_id.transform("size") >= 5]
+        if len(frame) == before:
+            break
+    if (len(frame), frame.raw_user_id.nunique(), frame.raw_item_id.nunique()) != (999_611, 6_040, 3_416):
+        raise ValueError("MovieLens 1M SASRec 5-core statistics do not match paper Table II")
+    user_map = {raw_id: index for index, raw_id in enumerate(sorted(frame.raw_user_id.unique()))}
+    item_map = {raw_id: index for index, raw_id in enumerate(sorted(frame.raw_item_id.unique()))}
+    frame["user_id"] = frame.raw_user_id.map(user_map).astype("int64")
+    frame["item_id"] = frame.raw_item_id.map(item_map).astype("int64")
+    frame["like"] = (frame.rating >= 4.0).astype("float32")
+    frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
+    frame.attrs.update(resource_profile="full", resource_path=str(path), raw_rows=raw_rows)
+    return frame
+
+
+def load_movielens_1m() -> pd.DataFrame:
+    return _load_movielens_1m_cached().copy()
+
+
+def movielens_1m_provenance(frame: pd.DataFrame) -> dict:
+    return {
+        "dataset": "MovieLens 1M", "source": "https://files.grouplens.org/datasets/movielens/ml-1m.zip",
+        "profile": "full", "slice_rule": "read all 1,000,209 official ratings, then apply paper-defined iterative user/item 5-core",
+        "local_resource": frame.attrs["resource_path"], "rows_used": int(len(frame)),
+        "raw_rows_read": int(frame.attrs["raw_rows"]),
+        "users_used": int(frame.user_id.nunique()), "items_used": int(frame.item_id.nunique()),
+        "randomly_fabricated_rows": 0,
+    }
+
+
+@lru_cache(maxsize=1)
+def _load_census_income_cached() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Load all official Census-Income train/test rows for MMoE/PLE."""
+    path = RESOURCE_DATA / "census-income" / "census-income-kdd.zip"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"缺少 Census-Income KDD：{path}。请运行 "
+            "`python scripts/init_resources.py --include-optional --kind datasets --id census-income-kdd`"
+        )
+    with zipfile.ZipFile(path) as outer:
+        archive = io.BytesIO(outer.read("census.tar.gz"))
+    with tarfile.open(fileobj=archive, mode="r:gz") as bundle:
+        train = pd.read_csv(bundle.extractfile("census-income.data"), header=None, skipinitialspace=True)
+        test = pd.read_csv(bundle.extractfile("census-income.test"), header=None, skipinitialspace=True)
+    if (len(train), len(test), train.shape[1]) != (199_523, 99_762, 42):
+        raise ValueError("Census-Income official split statistics do not match the MMoE paper")
+    combined = pd.concat([train, test], ignore_index=True)
+    # Education (4) and marital status (7) are targets in the paper and must
+    # not leak into the shared input. Column 24 is the instance weight.
+    input_columns = [column for column in range(41) if column not in {4, 7, 24}]
+    encoded = np.empty((len(combined), len(input_columns)), dtype=np.float32)
+    for output_column, source_column in enumerate(input_columns):
+        numeric = pd.to_numeric(combined[source_column], errors="coerce")
+        if numeric.notna().all():
+            scale = float(numeric.std()) or 1.0
+            encoded[:, output_column] = ((numeric - numeric.mean()) / scale).astype("float32")
+        else:
+            codes, uniques = pd.factorize(combined[source_column].astype("string"), sort=True)
+            encoded[:, output_column] = codes.astype("float32") / max(1, len(uniques) - 1)
+    income = combined[41].astype("string").str.contains(r"50000\+", regex=True).to_numpy(dtype=np.float32)
+    never_married = combined[7].astype("string").str.strip().eq("Never married").to_numpy(dtype=np.float32)
+    labels = np.c_[income, never_married].astype(np.float32)
+    boundary = len(train)
+    return encoded[:boundary], labels[:boundary], encoded[boundary:], labels[boundary:]
+
+
+def load_census_income() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    return tuple(value.copy() for value in _load_census_income_cached())
+
+
+def census_income_provenance() -> dict:
+    return {
+        "dataset": "Census-Income KDD", "source": "https://archive.ics.uci.edu/dataset/117/census+income+kdd",
+        "profile": "full", "train_rows": 199_523, "test_rows": 99_762,
+        "slice_rule": "official train file and complete official test file; no row truncation",
+        "tasks": ["income > 50K", "never married"], "randomly_fabricated_rows": 0,
+    }
+
+
 @lru_cache(maxsize=8)
 def _load_kuairand_cached(max_users: int, max_items: int) -> tuple[pd.DataFrame, pd.DataFrame]:
-    interactions = pd.read_csv(KUAI_DIR / "standard_interactions.csv")
-    videos = pd.read_csv(KUAI_DIR / "videos.csv")
-    user_order = (
-        interactions.groupby("user_id").size().rename("events").reset_index()
-        .sort_values(["events", "user_id"], ascending=[False, True]).head(max_users)["user_id"]
-    )
-    frame = interactions[interactions.user_id.isin(user_order)].copy()
-    item_order = (
-        frame.groupby("video_id").size().rename("events").reset_index()
-        .sort_values(["events", "video_id"], ascending=[False, True]).head(max_items)["video_id"]
-    )
-    frame = frame[frame.video_id.isin(item_order)].copy()
+    archive = RESOURCE_DATA / "kuairand-pure" / "KuaiRand-Pure.tar.gz"
+    if _full_profile():
+        if not archive.exists():
+            command = "python scripts/init_resources.py --include-optional --kind datasets --id kuairand-pure-full"
+            raise FileNotFoundError(f"缺少 KuaiRand-Pure 完整资源：{archive}。请运行 `{command}`")
+        with tarfile.open(archive, "r:gz") as bundle:
+            members = {Path(member.name).name: member for member in bundle.getmembers() if member.isfile()}
+            log_names = [name for name in members if name.startswith("log_standard_") and name.endswith("_pure.csv")]
+            if not log_names or "video_features_basic_pure.csv" not in members:
+                raise ValueError("KuaiRand-Pure archive layout does not match the official release")
+            interactions = pd.concat(
+                [pd.read_csv(bundle.extractfile(members[name])) for name in sorted(log_names)],
+                ignore_index=True,
+            )
+            videos = pd.read_csv(bundle.extractfile(members["video_features_basic_pure.csv"]))
+        frame = interactions.copy()
+    else:
+        interactions = pd.read_csv(KUAI_DIR / "standard_interactions.csv")
+        videos = pd.read_csv(KUAI_DIR / "videos.csv")
+        user_order = (
+            interactions.groupby("user_id").size().rename("events").reset_index()
+            .sort_values(["events", "user_id"], ascending=[False, True]).head(max_users)["user_id"]
+        )
+        frame = interactions[interactions.user_id.isin(user_order)].copy()
+        item_order = (
+            frame.groupby("video_id").size().rename("events").reset_index()
+            .sort_values(["events", "video_id"], ascending=[False, True]).head(max_items)["video_id"]
+        )
+        frame = frame[frame.video_id.isin(item_order)].copy()
     user_map = {raw: idx for idx, raw in enumerate(sorted(frame.user_id.unique()))}
     item_map = {raw: idx for idx, raw in enumerate(sorted(frame.video_id.unique()))}
     frame["raw_user_id"] = frame.user_id
@@ -185,6 +411,8 @@ def _load_kuairand_cached(max_users: int, max_items: int) -> tuple[pd.DataFrame,
     frame["item_popularity"] = frame.item_id.map(item_popularity).astype("float32")
     frame["user_activity"] = frame.user_id.map(user_activity).astype("float32")
     frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
+    frame.attrs["resource_profile"] = "full" if _full_profile() else "smoke"
+    frame.attrs["resource_path"] = str(archive if _full_profile() else KUAI_DIR / "standard_interactions.csv")
     video_view = videos[videos.video_id.isin(item_map)].copy()
     video_view["item_id"] = video_view.video_id.map(item_map).astype("int64")
     video_view = video_view.sort_values("item_id").reset_index(drop=True)
@@ -198,12 +426,15 @@ def load_kuairand(max_users: int = 128, max_items: int = 2500) -> tuple[pd.DataF
 
 def kuairand_provenance(frame: pd.DataFrame) -> dict:
     source = pd.read_json(KUAI_DIR / "provenance.json", typ="series")
+    full = frame.attrs.get("resource_profile") == "full"
     return {
         "dataset": KUAIRAND_NAME,
         "source": source["source_url"],
         "source_sha256": source["source_sha256"],
         "license_file": str(KUAI_DIR / "LICENSE"),
-        "slice_rule": source["selection"],
+        "slice_rule": "all official standard-policy rows; no user/item truncation" if full else source["selection"],
+        "profile": "full" if full else "smoke",
+        "local_resource": frame.attrs.get("resource_path"),
         "rows_used": int(len(frame)),
         "users_used": int(frame.user_id.nunique()),
         "items_used": int(frame.item_id.nunique()),
@@ -254,7 +485,8 @@ def sequence_classification_rows(ratings: pd.DataFrame, max_len: int = 10, limit
             elif event.rating <= 3.0:
                 negative_history.append(int(event.item_id) + 1)
     rows.sort(key=lambda row: (row[5], row[0], row[3]))
-    rows = rows[-limit:]
+    if not _full_profile() and limit:
+        rows = rows[-limit:]
     return {
         "user_id": np.asarray([row[0] for row in rows], dtype=np.int64),
         "history": np.asarray([row[1] for row in rows], dtype=np.int64),
@@ -288,7 +520,8 @@ def kuairand_sequence_classification_rows(
             else:
                 skipped.append(int(event.item_id) + 1)
     rows.sort(key=lambda row: (row[5], row[0], row[3]))
-    rows = rows[-limit:]
+    if not _full_profile() and limit:
+        rows = rows[-limit:]
     return {
         "user_id": np.asarray([row[0] for row in rows], dtype=np.int64),
         "history": np.asarray([row[1] for row in rows], dtype=np.int64),

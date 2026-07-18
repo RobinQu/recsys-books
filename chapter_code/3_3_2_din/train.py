@@ -8,7 +8,7 @@ import torch
 from sklearn.metrics import log_loss
 from torch_rechub.basic.features import SequenceFeature, SparseFeature
 from torch_rechub.models.ranking import DIEN, DIN
-from recsys_lab.data import clicked_sequences, positive_sequences, kuairand_sequence_classification_rows
+from recsys_lab.data import clicked_sequences, positive_sequences, kuairand_sequence_classification_rows, sequence_classification_rows
 from recsys_lab.runtime import (
     real_amazon as _real_amazon,
     real_kuairand as _real_kuairand,
@@ -16,11 +16,19 @@ from recsys_lab.runtime import (
     safe_auc as _safe_auc,
     seed_everything,
     train_binary as _train_binary,
+    full_profile,
+    real_amazon_electronics,
 )
 
 def _run_sequence_ranker(kind: str, epochs: int) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
-    seed_everything(); interactions, _, provenance = _real_kuairand(); rows = kuairand_sequence_classification_rows(interactions, max_len=20, limit=2600)
+    seed_everything()
+    if full_profile():
+        interactions, provenance = real_amazon_electronics()
+        rows = sequence_classification_rows(interactions, max_len=20, limit=0)
+    else:
+        interactions, _, provenance = _real_kuairand()
+        rows = kuairand_sequence_classification_rows(interactions, max_len=20, limit=2600)
     labels = rows.pop("label"); timestamps = rows.pop("timestamp"); split = int(len(labels) * .8)
     n_users, n_items = interactions.user_id.nunique(), interactions.item_id.nunique()
     user = [SparseFeature("user_id", n_users + 1, 12)]

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ paper.title }} · RecSys Atlas</title>
+  <link rel="stylesheet" href="/static/app.css"><link rel="stylesheet" href="/static/navigation.css"><link rel="stylesheet" href="/static/paper-reader.css">
+</head>
+<body class="paper-page {{ 'paper-embedded' if embedded else '' }}">
+  {% if not embedded %}{% include "_site_header.html" %}{% include "_site_sidebar.html" %}{% endif %}
+  <main class="paper-main">
+    {% if not embedded %}
+    <header class="paper-head"><div><div class="section-kicker">LOCAL PAPER · VERIFIED RESOURCE</div><h1>{{ paper.title }}</h1><p>{{ paper.provider }} · {{ paper.path }} · 当前定位第 {{ paper_page }} 页</p></div><a class="ghost button-like" href="{{ paper.local_url }}#page={{ paper_page }}{% if selected_evidence %}&search={{ selected_evidence.search | urlencode }}{% endif %}" target="_blank">原生阅读器 ↗</a></header>
+    {% if selected_evidence %}<aside class="active-citation"><b>{{ selected_evidence.label }}</b><q>{{ selected_evidence.quote }}</q><p>{{ selected_evidence.note }}</p></aside>{% endif %}
+    {% endif %}
+    {% if paper.ready %}<div id="pdf-viewer" class="pdf-viewer" data-url="{{ paper.local_url }}" data-document="{{ paper.id }}" data-page="{{ paper_page }}" data-search="{{ selected_evidence.search if selected_evidence else '' }}"></div>
+    <noscript><iframe class="native-pdf" src="{{ paper.local_url }}#page={{ paper_page }}"></iframe></noscript>
+    {% else %}<div class="resource-missing"><h2>论文资源尚未初始化</h2><p>在项目根目录运行 <code>python scripts/init_resources.py --strict --kind papers --id {{ paper.id }}</code> 后刷新。</p></div>{% endif %}
+  </main>
+  <script type="module">
+    const target = document.querySelector('#pdf-viewer');
+    if (target) {
+      const fallback = () => { target.innerHTML = `<iframe class="native-pdf" title="论文 PDF" src="${target.dataset.url}#page=${target.dataset.page}&search=${encodeURIComponent(target.dataset.search)}"></iframe>`; };
+      try {
+        let module;
+        try { module = await import('/resources/vendor/embedpdf/embedpdf.js'); }
+        catch (_) { module = await import('https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js'); }
+        const EmbedPDF = module.default || module.EmbedPDF;
+        const ZoomMode = module.ZoomMode;
+        if (!ZoomMode) throw new Error('EmbedPDF ZoomMode export is unavailable');
+        // FitWidth makes the page fill the available column width so text is as
+        // large as the layout allows; refit() re-applies it on every resize.
+        const viewer = EmbedPDF.init({type:'container', target,
+          documentManager:{initialDocuments:[{url:target.dataset.url,documentId:target.dataset.document}]},
+          scroll:{defaultStrategy:'vertical',defaultPageGap:18},
+          zoom:{defaultZoomLevel:ZoomMode.FitWidth}});
+        const registry = await viewer.registry;
+        const scroll = registry.getPlugin('scroll').provides();
+        const scopedScroll = scroll.forDocument ? scroll.forDocument(target.dataset.document) : scroll;
+        const zoom = registry.getPlugin('zoom')?.provides();
+        const scopedZoom = zoom?.forDocument ? zoom.forDocument(target.dataset.document) : zoom;
+        const refit = () => {
+          if (typeof scopedZoom?.setZoomLevel === 'function') scopedZoom.setZoomLevel(ZoomMode.FitWidth);
+          else if (typeof scopedZoom?.zoomTo === 'function') scopedZoom.zoomTo(ZoomMode.FitWidth);
+        };
+        const revealEvidence = () => {
+          scopedScroll.scrollToPage({pageNumber:Number(target.dataset.page),behavior:'instant'});
+          refit();
+        };
+        scroll.onLayoutReady((event) => {
+          if (!event?.documentId || event.documentId === target.dataset.document) revealEvidence();
+        });
+        // The first layout can complete while the async registry is being resolved.
+        // Delayed idempotent calls cover that race without changing the reader state later.
+        window.setTimeout(revealEvidence, 150);
+        window.setTimeout(revealEvidence, 700);
+        // Keep the PDF page width aligned with the container after window resize,
+        // sidebar toggles, responsive breakpoints and tab show/hide.
+        let resizeTimer;
+        const onResize = () => { window.clearTimeout(resizeTimer); resizeTimer = window.setTimeout(refit, 180); };
+        window.addEventListener('resize', onResize);
+        if (typeof ResizeObserver !== 'undefined') new ResizeObserver(onResize).observe(target);
+        const search = registry.getPlugin('search')?.provides();
+        const scoped = search?.forDocument ? search.forDocument(target.dataset.document) : search;
+        if (target.dataset.search && scoped) {
+          for (const method of ['startSearch','search','setSearchQuery']) {
+            if (typeof scoped[method] === 'function') { scoped[method](target.dataset.search); break; }
+          }
+        }
+      } catch (error) { console.warn('EmbedPDF unavailable, using native PDF viewer', error); fallback(); }
+    }
+  </script>
+  {% if not embedded %}<script src="/static/app.js?v=20260717-3" defer></script>{% endif %}
+</body></html>

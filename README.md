@@ -1,44 +1,110 @@
 # RecSys Atlas
 
-交互式推荐算法技术图谱，包含 26 个可执行 Notebook、nbconvert 预览、JupyterLab、code-server 源码 IDE、框架/数据集调研和 Docker Compose 自动化测试。算法页面以 Tab 直接切换阅读预览、可交互执行和实现源码；SASRec 已归入 3.2 召回章节。
+RecSys Atlas 是一套从协同过滤到生成式推荐的中文交互式教程。它把召回与排序的技术演进、论文原文证据、26 个可执行 Notebook、章节源码、真实数据实验和工业实践放进同一个 Python Web 应用；论文、数据集与 Notebook 总目录集中收录在首页附录。
 
-## 启动
+第三章按“数学导读 → 独立算法 → 指标总结”组织，覆盖 CF、MF、FM、GBDT+LR，DSSM、MIND、SASRec，DeepFM、DIN、DIEN，以及 MMoE、PLE。第四章解释生成式召回、生成式排序和召排融合，并提供 OpenOneRec 与 DLRM HSTU 实战。每个详情页固定提供“论文导读、实验预览、可交互执行、代码实现”四种模式；论文导读以等宽双栏并排展示正文和本地 PDF，正文中的多处下划线标注可直接跳到模型结构、实验设计或结论所在页面。
+
+## 1. 初始化论文与数据资源
+
+资源清单位于 `config/resources.json`，实际文件写入已被 Git 忽略的 `resources/`。在项目根目录执行：
+
+```bash
+# 下载并校验教程必需的论文 PDF 和 EmbedPDF 阅读器
+python scripts/init_resources.py --strict
+
+# 只验证，不访问网络
+python scripts/init_resources.py --verify --strict
+
+# 深度章节的完整 Amazon Reviews 2023 数据
+python scripts/init_resources.py --include-optional --kind datasets --id amazon-video-games-full
+
+# 排序、多目标与 HSTU 使用的完整 KuaiRand-Pure
+python scripts/init_resources.py --include-optional --kind datasets --id kuairand-pure-full
+```
+
+Hugging Face gated 数据需先在网页接受许可并设置 `HF_TOKEN`。Google Scholar 只用于发现论文元数据；下载实际来自 arXiv、Hugging Face、作者/机构公开地址或清单中明确的直链。初始化器可重复执行，已就绪文件不会重复下载；应用启动会验证资源状态，Docker build 会先复用本地资源再补齐必需项。
+
+## 2. 启动阅读与实验环境
 
 ```bash
 docker compose up --build web jupyter ide
 ```
 
-- Web 应用：<http://localhost:8010>
+生成式推荐默认要求 NVIDIA CUDA。GPU 主机使用 Compose 覆盖文件把设备传入 Web、Jupyter 和测试容器：
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml up --build web jupyter ide
+```
+
+没有 CUDA 的主机仍可启动普通服务，但生成式章节的“可交互执行”会被禁用；CPU 自动化测试只验证数据契约、张量形状、前向路径和约束解码，不执行完整精度验收。
+
+- 教程 Web：<http://localhost:8010>
 - JupyterLab：<http://localhost:8889/lab?token=recsys>
-- 浏览器 IDE：<http://localhost:8090>（免登录，仅绑定 `127.0.0.1`；不要改为公网监听）
+- 浏览器 IDE：<http://localhost:8090>
 
-每个算法页的“独立 IDE / 在 IDE 中编辑”入口会直接打开该章节的独立源码目录。首次打开和已经存在 IDE 会话时均可使用。
+Jupyter 服务默认设置 `RECSYS_PROFILE=full`。如果完整数据尚未初始化，相应 Notebook 会给出准确的初始化命令。Web 应用不会在普通启动时静默下载大型数据。
 
-IDE 内置 Python 扩展与 BasedPyright，并安装和 Web/Jupyter 完全一致的 Python 3.11、PyTorch、Torch-RecHub、sklearn、XGBoost 等依赖。解释器固定为 `/usr/local/bin/python`；将光标放到 `DSSM` 等符号上，使用 `F12` 或 `Cmd/Ctrl + 单击` 可跳到定义。进入章节时默认打开该目录的 `train.py`，Secondary Sidebar 默认隐藏。教程页面会优先跟随浏览器/系统的明暗偏好，也可用顶栏按钮手动切换并记住选择；IDE 会跟随系统配色，也可使用其主题选择器覆盖。
+code-server 免登录但仅绑定 `127.0.0.1`，不要直接暴露到公网。每个算法页的 IDE 链接会打开 `chapter_code/<slug>/train.py`；Python 解释器、PyTorch、Torch-RecHub、sklearn、XGBoost、BasedPyright 和 Ruff 均已配置，支持跳转定义、诊断和源码追踪。
 
-## 章节源码
+## 3. 数据与实验口径
 
-每个 Notebook 都有对应的 `chapter_code/<slug>/` Python 目录，包含模型结构、算法专属的数据整理、训练、推理和章节 smoke test。`recsys_lab/` 只保留跨章节复用的数据加载、通用训练循环、指标和兼容路由，不再隐藏 MIND 序列构造、DIN/DIEN 训练、MMoE/PLE 多任务张量或 Semantic ID 等章节算法实现。页面“实现源码”Tab 还会展示这些公共基础文件、仓库效果测试，以及实际使用的 Torch-RecHub 模型和 Trainer 源文件。
+- `smoke`：使用仓库内确定性的真实数据切片，面向 CPU、CI 和代码链路验证；不随机制造行为、曝光或标签。
+- `full`：经典章节仍可使用易读的小数据；DSSM/MIND/SASRec 使用完整 Amazon Reviews 2023，DeepFM/DIN/DIEN/MMoE/PLE/HSTU 使用完整 KuaiRand-Pure，生成式章节按官方许可接入 RecIF/Yambda 等资源。
+- 生成式 CUDA 验收：默认训练路径使用 CUDA、混合精度和 TF32；完整精度测试仅在 `torch.cuda.is_available()` 为真时执行。
 
-Jupyter 镜像已安装 `ipywidgets`、`widgetsnbextension` 与 `jupyterlab_widgets`，因此 `tqdm.auto` 可以正常选择 Notebook 进度条，不会再出现 `IProgress not found`。源码预览保留缩进并自动换行，长注释和长表达式无需横向滚动才能读完。
+Notebook 的结果会写入 `results/chapter_*/*.json`，章节总结读取同一批产物。论文报告值、项目实测值和生产预期在叙事中严格分开；smoke 指标不是公开榜单成绩。
 
-## 测试
+## 4. 开发教程
+
+依赖与 Python 版本由 [uv](https://docs.astral.sh/uv/) 管理：`pyproject.toml` 声明依赖与 `requires-python`，`uv.lock` 锁定全部平台解析结果，`.python-version` 固定解释器版本。本地开发只需：
+
+```bash
+uv sync          # 按 uv.lock 创建/更新 .venv（含 pytest、ruff）
+uv run pytest -q # 或 uv run python scripts/build_previews.py
+```
+
+Docker 镜像使用同一套锁文件：`uv sync --locked` 把环境安装到 `/opt/venv`（位于 `/workspace` 之外，bind mount 不会遮蔽），Web、Jupyter、测试与浏览器 IDE 共享完全一致的解释器与依赖。
+
+算法专属的结构、数据整理、训练、推理和测试放在 `chapter_code/<slug>/`；`recsys_lab/` 只保留跨章节公共能力。Notebook 由 `scripts/generate_notebooks.py`、`scripts/tutorial_deep_specs.py` 等源文件生成，因此应先修改生成源，再运行：
+
+```bash
+python scripts/generate_chapter_code.py
+python scripts/generate_notebooks.py
+python scripts/generate_model_diagrams.py
+python scripts/build_previews.py
+```
+
+论文到正文的锚点在 `config/paper_evidence.json` 中维护。每个锚点包含正文关键字、论文 ID、页码、可搜索短语、短引文和边界解释，并在导读正文中派生多个可点击的下划线语义入口。模型结构优先使用 `config/paper_figures.json` 登记的论文原图裁切并保留 Figure/页码出处；论文没有合适结构图时才生成原创 SVG。
+
+详细内容约束、资源策略和页面结构见 `AGENTS.md` 与 `TUTORIAL_REQUIREMENTS.md`。
+
+## 5. 测试与质量门禁
 
 ```bash
 docker compose run --rm test
 ```
 
-测试会依次生成 Notebook、运行单元/API/效果阈值测试、执行全部 26 个 Notebook，并重新生成预览。smoke 数据固定且无需网络下载。3.1—4.3 的算法实验会分别写出 `results/chapter_*/*.json`，各章总结再读取这些产物形成横向指标表。
-
-算法 Python 源码同时受两道质量门禁保护：内存编译检查负责捕获语法错误，Ruff 负责捕获非法结构与未定义名称。IDE 使用同一份 `pyproject.toml`，因此编辑器 Problems 面板和 Docker 测试保持一致。可单独执行：
+该命令会生成代码与 Notebook，运行 API/资源/算法效果测试，以 smoke 档执行全部 Notebook，并重新构建 nbconvert 预览。可单独运行：
 
 ```bash
-docker compose run --rm test python -m ruff check chapter_code recsys_lab
+docker compose run --rm test python -m ruff check chapter_code recsys_lab app scripts
+docker compose run --rm test python scripts/init_resources.py --verify --strict
 ```
 
-## 数据运行档
+论文效果对照使用独立的 full profile；它会下载并严格校验所需完整资源、验证完整测试集行数，并执行已登记的正式 Notebook。该任务可能下载数 GB 数据并运行较长时间：
 
-- `RECSYS_PROFILE=smoke`：按任务读取仓库内 MovieLens、Amazon Reviews 2023 Video Games 或 KuaiRand-Pure 的确定性真实数据切片，适合 CPU 与 CI；不制造交互、曝光、标签或序列。
-- `RECSYS_PROFILE=full`：接入以上数据的官方完整版本；OpenOneRec 的 RecIF-Bench 当前需要在 Hugging Face 接受许可并认证，Meta DLRM-v3 还需按官方文档准备 GPU/权重。
+```bash
+docker compose --profile full run --rm test-full
+```
 
-Notebook 是教程而不是基准榜单；smoke 输出只证明代码路径、损失与指标有效，不能代表公开数据或生产效果。
+`smoke` 结果不得与论文表格相减；Notebook 只有在 full 数据名称与复现协议匹配时才显示数值 gap，否则明确标记 `NOT COMPARABLE`。
+
+推送 `main` 后，GitHub Actions 会构建 Web 和 IDE 镜像并推送到 GitHub Container Registry。仓库需要允许 Actions 写入 Packages；工作流使用内置 `GITHUB_TOKEN`，无需提交凭据。
+
+## 6. 贡献检查表
+
+1. 一个算法一个 Notebook，公式中的新符号先解释再使用。
+2. 给出论文实验设计、真实训练/推理/测试、baseline 和失败边界。
+3. 深度算法默认使用适合其任务的完整新数据，不把 MovieLens 用于所有章节。
+4. 新论文先登记资源清单与证据锚点，再链接正文。
+5. 运行 Compose 测试并检查明暗主题、窄屏布局、PDF 跳页和 Jupyter/IDE 入口。

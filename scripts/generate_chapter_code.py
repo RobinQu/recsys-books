@@ -72,21 +72,24 @@ MODEL_GUIDES = {
 }
 
 CLASSIC_MODELS = {
-    "3_1_1_collaborative_filtering": '''class ItemCF:
+    "3_1_1_collaborative_filtering": '''import numpy as np
+
+class ItemCF:
     """Item-based collaborative filtering using cosine similarity."""
     def fit(self, interactions):
-        import numpy as np
+        values = np.asarray(interactions, dtype=np.float64)
         # 每一列是一件物品；列向量记录哪些用户与它交互过。
-        norms = np.linalg.norm(interactions, axis=0, keepdims=True) + 1e-8
+        norms = np.linalg.norm(values, axis=0, keepdims=True)
         # 矩阵乘法一次得到所有物品对的共同用户数，再除以长度得到余弦相似度。
-        self.similarity = (interactions.T @ interactions) / (norms.T @ norms)
+        denominator = np.maximum(norms.T @ norms, 1e-12)
+        self.similarity = np.nan_to_num((values.T @ values) / denominator)
         # 不允许物品把自己当作邻居，否则自身相似度 1 会淹没其他候选。
         np.fill_diagonal(self.similarity, 0.0)
         return self
 
     def score(self, interactions):
         # 用户历史 × 物品相似度表，得到该用户对所有候选物品的分数。
-        return interactions @ self.similarity
+        return np.asarray(interactions, dtype=np.float64) @ self.similarity
 ''',
     "3_1_2_matrix_factorization": '''import torch
 
@@ -293,6 +296,16 @@ def test_training_pipeline_returns_observed_results():
     assert result.get("randomly_fabricated_rows", 0) == 0
 ''',
     }
+    if slug in {"4_2_openonerec_practice", "4_3_dlrm_hstu_practice"}:
+        files["test_model.py"] = '''"""CUDA-first chapter test with an explicit CPU-only basic fallback."""
+import torch
+from train import train_and_evaluate
+
+def test_training_pipeline_returns_observed_results():
+    result = train_and_evaluate(epochs=1, cpu_smoke=not torch.cuda.is_available())
+    assert isinstance(result, dict) and result
+    assert result.get("randomly_fabricated_rows", result.get("dataset", {}).get("randomly_fabricated_rows", 0)) == 0
+'''
     for name, source in files.items():
         path = directory / name
         # Chapter Python files are maintained as the readable source of truth.
@@ -310,14 +323,14 @@ def test_training_pipeline_returns_observed_results():
     vscode.mkdir(exist_ok=True)
     settings = {
         # Resolve the repository and framework sources copied into the IDE image.
-        "basedpyright.analysis.extraPaths": ["../..", "/usr/local/lib/python3.11/site-packages"],
+        "basedpyright.analysis.extraPaths": ["../..", "/opt/venv/lib/python3.11/site-packages"],
         "basedpyright.analysis.useLibraryCodeForTypes": True,
         "basedpyright.analysis.diagnosticMode": "openFilesOnly",
         # RecHub currently ships incomplete type metadata. Keep navigation and
         # imports, while Ruff/compile gates own correctness diagnostics.
         "basedpyright.analysis.typeCheckingMode": "off",
-        "python.defaultInterpreterPath": "/usr/local/bin/python",
-        "python.analysis.extraPaths": ["../..", "/usr/local/lib/python3.11/site-packages"],
+        "python.defaultInterpreterPath": "/opt/venv/bin/python",
+        "python.analysis.extraPaths": ["../..", "/opt/venv/lib/python3.11/site-packages"],
         "python.terminal.activateEnvironment": False,
         # Ruff and BasedPyright share one interpreter and one repository-level rule set.
         "ruff.configuration": "/home/coder/project/pyproject.toml",
@@ -335,7 +348,7 @@ def test_training_pipeline_returns_observed_results():
     (vscode / "settings.json").write_text(json.dumps(settings, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     pyright = {
         "include": ["."],
-        "extraPaths": ["../..", "/usr/local/lib/python3.11/site-packages"],
+        "extraPaths": ["../..", "/opt/venv/lib/python3.11/site-packages"],
         "useLibraryCodeForTypes": True,
         "typeCheckingMode": "off",
     }

@@ -7292,39 +7292,27 @@ a.anchor-link {
 }
 </style>
 <!-- Load mathjax -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe"> </script>
-<!-- MathJax configuration -->
-<script type="text/x-mathjax-config">
-    init_mathjax = function() {
-        if (window.MathJax) {
-        // MathJax loaded
-            MathJax.Hub.Config({
-                TeX: {
-                    equationNumbers: {
-                    autoNumber: "AMS",
-                    useLabelIds: true
-                    }
-                },
-                tex2jax: {
-                    inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-                    processEscapes: true,
-                    processEnvironments: true
-                },
-                displayAlign: 'center',
-                messageStyle: 'none',
-                CommonHTML: {
-                    linebreaks: {
-                    automatic: true
-                    }
-                }
-            });
-
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-        }
-    }
-    init_mathjax();
-    </script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  chtml: {
+    scale: 1.18,
+    mtextInheritFont: true,
+    displayAlign: 'center',
+    displayIndent: '0'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
 <!-- End of mathjax configuration --><script type="module">
   document.addEventListener("DOMContentLoaded", async () => {
     const diagrams = document.querySelectorAll(".jp-Mermaid > pre.mermaid");
@@ -7508,10 +7496,28 @@ a.anchor-link {
     white-space: normal;
   }
 </style>
-<!-- End of mermaid configuration --></head>
+<!-- End of mermaid configuration -->
+<style id="recsys-preview-style">
+  /* MathJax v3 display math: paper-style centered, larger, scrollable when wide. */
+  mjx-container[display="true"], div.math {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: .55rem .25rem;
+    text-align: center !important;
+    margin: 1.25em auto !important;
+  }
+  mjx-container {font-size: 115% !important}
+  mjx-container mjx-itable {min-width: auto !important}
+  .jp-MarkdownOutput pre {white-space:pre-wrap;overflow-wrap:anywhere}
+  .jp-Notebook {max-width:1180px;margin:0 auto}
+  .jp-Notebook img {max-width:100%;height:auto;border-radius:8px}
+  .jp-Notebook figure{margin:1.4em 0}
+</style>
+</head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=869a2fb1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10221e33">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7524,17 +7530,17 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=685e334f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=987fcace">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h2><p>本 Notebook 的默认真实数据是 <strong>KuaiRand-Pure：真实短视频曝光、点击、长播与多反馈序列</strong>。<code>smoke</code> 档读取仓库内可审计的确定性切片，<code>full</code> 档扩大到官方完整文件；两档都不制造交互、曝光、标签或行为序列。切片规则、源地址、哈希与许可记录在 <code>data/README.md</code> 及对应数据目录。</p>
+<h2 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h2><p>本 Notebook 的默认真实数据是 <strong>Amazon Reviews Electronics 5-core：DIN/DIEN 公开复现实验数据</strong>。<code>smoke</code> 档读取仓库内可审计的确定性切片，<code>full</code> 档扩大到官方完整文件；两档都不制造交互、曝光、标签或行为序列。切片规则、源地址、哈希与许可记录在 <code>data/README.md</code> 及对应数据目录。</p>
 <p><strong>主要资料：</strong> <a href="https://arxiv.org/abs/1809.03672">Zhou et al., 2019, DIEN</a></p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8b339707">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c71b04ed">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7543,17 +7549,43 @@ a.anchor-link {
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"smoke"</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
+<span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab.data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">load_movielens</span><span class="p">,</span> <span class="n">movielens_provenance</span><span class="p">,</span> <span class="n">load_amazon_2023</span><span class="p">,</span>
-                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">)</span>
-<span class="n">DATASET_KEY</span> <span class="o">=</span> <span class="s2">"kuairand"</span>
+                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">,</span>
+                             <span class="n">load_amazon_2018</span><span class="p">,</span> <span class="n">amazon_2018_provenance</span><span class="p">,</span>
+                             <span class="n">load_movielens_1m</span><span class="p">,</span> <span class="n">movielens_1m_provenance</span><span class="p">,</span>
+                             <span class="n">load_mind_amazon_books</span><span class="p">,</span> <span class="n">mind_amazon_provenance</span><span class="p">,</span>
+                             <span class="n">load_census_income</span><span class="p">,</span> <span class="n">census_income_provenance</span><span class="p">)</span>
+<span class="n">DATASET_KEY</span> <span class="o">=</span> <span class="s2">"amazon-electronics"</span>
 <span class="k">if</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens"</span><span class="p">:</span>
     <span class="n">real_ratings</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_movielens</span><span class="p">()</span>
     <span class="n">real_interactions</span> <span class="o">=</span> <span class="n">real_ratings</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-books"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Books"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"mind-amazon-books"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_mind_amazon_books</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">mind_amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-electronics"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Electronics"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens-1m"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_movielens_1m</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_1m_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"census-income"</span> <span class="ow">and</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span><span class="p">:</span>
+    <span class="n">census_train_x</span><span class="p">,</span> <span class="n">census_train_y</span><span class="p">,</span> <span class="n">census_test_x</span><span class="p">,</span> <span class="n">census_test_y</span> <span class="o">=</span> <span class="n">load_census_income</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span><span class="p">,</span> <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">census_train_x</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">census_train_x</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">census_income_provenance</span><span class="p">()</span>
 <span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-2023"</span><span class="p">:</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
@@ -7562,7 +7594,9 @@ a.anchor-link {
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+       <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
+       <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
 </pre></div>
 </div>
@@ -7575,14 +7609,14 @@ a.anchor-link {
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'profile': 'smoke', 'root': '/workspace', 'real_dataset': {'dataset': 'KuaiRand-Pure (Kuaishou, CIKM 2022)', 'source': 'https://zenodo.org/records/10439422/files/KuaiRand-Pure.tar.gz', 'source_sha256': 'c814bf6f3624c0cfae83c57de3df26b2ed206e5c57bab4c4dcbfabbabe20cbf0', 'license_file': '/workspace/data/kuairand-pure/LICENSE', 'slice_rule': 'top 256 users by standard-feed interaction count; ties by user_id; all standard and random-policy rows for those users retained', 'rows_used': 39098, 'users_used': 128, 'items_used': 2500, 'time_min_utc': '2022-04-09T04:17:39+00:00', 'time_max_utc': '2022-05-08T15:50:58+00:00', 'targets': 'observed is_click, long_view, is_like and other feed feedback', 'randomly_fabricated_rows': 0}}
+<pre>{'profile': 'smoke', 'root': '/workspace', 'real_dataset': {'dataset': 'Amazon Reviews 2023 / Video Games / 5-core', 'source': 'https://mcauleylab.ucsd.edu/public_datasets/data/amazon_2023/benchmark/5core/rating_only/Video_Games.csv.gz', 'source_sha256': 'a2bde5f3b945960d161538c200dd87845e6ee471b46da96410dde61613c6901c', 'slice_rule': 'top 500 users by observed interaction count; ties by user_id; all their rows retained', 'profile': 'smoke', 'local_resource': '/workspace/data/amazon-reviews-2023-video-games/interactions.csv', 'rows_used': 18699, 'users_used': 160, 'items_used': 7942, 'time_min_utc': '1999-11-18T22:46:49+00:00', 'time_max_utc': '2023-05-31T16:03:41+00:00', 'positive_rule': 'observed Amazon rating &gt;= 4.0', 'randomly_fabricated_rows': 0}, 'cuda_available': False, 'cuda_device': None}
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c237f240">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f94090c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7601,44 +7635,76 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=44080039">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=623fd36d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Paper-&amp;-Context">Paper &amp; Context<a class="anchor-link" href="#Paper-&amp;-Context">¶</a></h2><p>DIEN 用 GRU 抽取逐时刻兴趣状态，以辅助下一行为损失提供额外监督，再用目标感知 AUGRU 控制状态演化。它比 DIN 更重，收益依赖严格时间顺序和高质量负序列。</p>
 <p><strong>来源：</strong> <a href="https://arxiv.org/abs/1809.03672">Zhou et al., 2019, DIEN</a></p>
+<h3 id="%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">原文实验设计与关键结论<a class="anchor-link" href="#%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">¶</a></h3><p>Table 2 在 Amazon Electronics/Books 上报告多次运行 AUC；Table 5 的阿里在线 A/B 测试报告相对 BaseModel 的 CTR +20.7%、eCPM +17.1%。该数字只描述论文系统，教程结果另行报告。</p>
 <p>请区分三层证据：论文中的离线实验、本 Notebook 验证的代码链路、生产系统尚需验证的在线收益。三者不能互相替代。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=501304ad">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21c24140">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Model-Structure-&amp;-Formula-Walkthrough">Model Structure &amp; Formula Walkthrough<a class="anchor-link" href="#Model-Structure-&amp;-Formula-Walkthrough">¶</a></h2><h3 id="%E7%BB%93%E6%9E%84%EF%BC%9AGRU-%E6%8A%BD%E5%8F%96%E5%85%B4%E8%B6%A3%EF%BC%8CAUGRU-%E6%8C%89%E5%80%99%E9%80%89%E6%BC%94%E5%8C%96">结构：GRU 抽取兴趣，AUGRU 按候选演化<a class="anchor-link" href="#%E7%BB%93%E6%9E%84%EF%BC%9AGRU-%E6%8A%BD%E5%8F%96%E5%85%B4%E8%B6%A3%EF%BC%8CAUGRU-%E6%8C%89%E5%80%99%E9%80%89%E6%BC%94%E5%8C%96">¶</a></h3><p>GRU 用两个 0～1 的门控制记忆。重置门决定计算新内容时保留多少过去，更新门决定最终写入多少：</p>
+<h2 id="Reproduction-Contract">Reproduction Contract<a class="anchor-link" href="#Reproduction-Contract">¶</a></h2><p><strong>正式数据：</strong> Amazon Reviews Electronics 5-core<br/>
+<strong>资源 ID：</strong> <code>amazon-electronics-5core</code><br/>
+<strong>切分：</strong> paper-compatible chronological negative sampling<br/>
+<strong>指标：</strong> AUC, LogLoss<br/>
+<strong>与论文比较边界：</strong> online CTR/eCPM values are not reproducible from public data</p>
+<p><code>full</code> 是论文对照唯一有效的效果模式：它不截断用户、物品或测试行。<code>smoke</code> 只做张量、损失和推理链路回归，不进入论文数值比较。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c19ef8fc">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Model-Structure-&amp;-Formula-Walkthrough">Model Structure &amp; Formula Walkthrough<a class="anchor-link" href="#Model-Structure-&amp;-Formula-Walkthrough">¶</a></h2><p><img alt="Figure 1 · DIEN structure" src="/static/paper-figures/dien.webp"/></p>
+<blockquote>
+<p><strong>论文原图节选</strong> · Figure 1 · DIEN structure · PDF p.4。下图直接截取自原文，用于对照下方公式与代码。</p>
+</blockquote>
+<h3 id="%E5%85%B3%E9%94%AE%E6%A8%A1%E5%9D%97">关键模块<a class="anchor-link" href="#%E5%85%B3%E9%94%AE%E6%A8%A1%E5%9D%97">¶</a></h3><ul>
+<li><strong>GRU 兴趣抽取层</strong>：用 GRU 按时间更新隐状态 $h_t$，并加入辅助损失让 $h_t$ 能预测下一次真实行为，使每个时间步都有监督。</li>
+<li><strong>AUGRU 兴趣演化层</strong>：用候选注意力 $a_t$ 缩放 GRU 的更新门：与候选无关的历史几乎不改变状态，相关历史才被写入。</li>
+<li><strong>主任务 CTR</strong>：最后状态与用户/上下文特征拼接经 MLP 预测点击，总损失 = 主 BCE + $\alpha\cdot$ 辅助 BCE。</li>
+</ul>
+<h3 id="%E7%BB%93%E6%9E%84%EF%BC%9AGRU-%E6%8A%BD%E5%8F%96%E5%85%B4%E8%B6%A3%EF%BC%8CAUGRU-%E6%8C%89%E5%80%99%E9%80%89%E6%BC%94%E5%8C%96">结构：GRU 抽取兴趣，AUGRU 按候选演化<a class="anchor-link" href="#%E7%BB%93%E6%9E%84%EF%BC%9AGRU-%E6%8A%BD%E5%8F%96%E5%85%B4%E8%B6%A3%EF%BC%8CAUGRU-%E6%8C%89%E5%80%99%E9%80%89%E6%BC%94%E5%8C%96">¶</a></h3><p>GRU 用两个 0～1 的门控制记忆。重置门决定计算新内容时保留多少过去，更新门决定最终写入多少：</p>
 <p>$$r_t=\sigma(W_re_t+U_rh_{t-1}),\quad z_t=\sigma(W_ze_t+U_zh_{t-1}),$$
 $$\tilde h_t=\tanh(W_he_t+U_h(r_t\odot h_{t-1})),\quad h_t=(1-z_t)\odot h_{t-1}+z_t\odot\tilde h_t.$$</p>
 <p>辅助损失让 $h_t$ 区分下一次真实行为 $e_{t+1}^+$ 与负行为 $e_{t+1}^-$，为每个时间步提供监督。AUGRU 再用候选注意力 $a_t$ 缩放更新门 $\tilde z_t=a_tz_t$：与候选无关的历史几乎不改状态。最后状态进入 MLP 和 BCE。顺序不同会产生不同 $h_t$，这是它相对 DIN 加入的新能力。</p>
-<h3 id="%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81">公式到代码<a class="anchor-link" href="#%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81">¶</a></h3><p><code>run_dien</code> 显式构造正历史、负历史和 mask；Torch-RecHub DIEN 同时返回主任务预测与辅助损失，训练代码展示两者如何相加。</p>
+<h3 id="%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81%EF%BC%9A%E4%B8%80%E6%AC%A1%E5%89%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88">公式到代码：一次前向传播发生了什么<a class="anchor-link" href="#%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81%EF%BC%9A%E4%B8%80%E6%AC%A1%E5%89%8D%E5%90%91%E4%BC%A0%E6%92%AD%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88">¶</a></h3><ol>
+<li><strong>兴趣抽取（GRU）</strong>：行为 embedding 按时间顺序送入 GRU，每步用重置门/更新门决定保留多少过去，得到隐状态序列 $h_1,\ldots,h_T$。</li>
+<li><strong>辅助损失</strong>：每个 $h_t$ 都要能区分“下一步真实行为”与随机负行为（一个小型二分类），让中间状态携带兴趣信息，而不只依赖最终 CTR 信号。</li>
+<li><strong>兴趣演化（AUGRU）</strong>：候选广告与每个 $h_t$ 算注意力分 $a_t$；AUGRU 把 GRU 的更新门乘以 $a_t$——与候选相关的历史大步写入，无关历史几乎不改状态。</li>
+<li><strong>CTR 预测</strong>：演化后的最终状态与候选、用户、上下文拼接，过 MLP + sigmoid；总损失 = 主任务 BCE + $\alpha\times$ 辅助 BCE。</li>
+</ol>
+<p><code>run_dien</code> 用 Torch-RecHub 的 <code>DIEN</code> 实现第 1–4 步；正/负历史序列构造与 mask 在本章节代码中。</p>
 <p>阅读源码时按“张量形状 → 前向计算 → score → loss → metric”五步追踪，不需要一次读完整个工程文件。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=535d61e4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fedc5f8b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Math-by-Hand">Math by Hand<a class="anchor-link" href="#Math-by-Hand">¶</a></h2><p>GRU 是带记忆的递推函数 $h_t=\mathrm{GRU}(e_t,h_{t-1})$。辅助损失要求 $h_t$ 更像下一次真实行为、远离负样本。AUGRU 用候选相关权重控制每步写入多少。因此两个相同集合的不同排列会得到不同末状态。</p>
+<h2 id="Math-by-Hand">Math by Hand<a class="anchor-link" href="#Math-by-Hand">¶</a></h2><p><strong>先修：</strong> §4 Sigmoid/Tanh、§5 加权汇总、§5.1 逐元素乘积。 <strong>本节新增：</strong> GRU 门控（重置/更新门控制写入多少历史）、AUGRU（候选注意力缩放更新门）、为中间隐状态加辅助损失。</p>
+<p>GRU 是带记忆的递推 $h_t=\operatorname{GRU}(e_t,h_{t-1})$：重置门决定看多少过去算候选内容，更新门决定写入多少。辅助损失要求 $h_t$ 更像下一次真实行为、远离负样本。AUGRU 用候选相关权重控制每步写入多少，因此同样集合的不同排列会得到不同末状态。</p>
 <p>下面用 NumPy/Matplotlib 验证直觉。二维图只是教学投影，工业 embedding 虽有更多维，计算规则相同。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=50cea3ac">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=38f11e7f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7672,7 +7738,7 @@ $$\tilde h_t=\tanh(W_he_t+U_h(r_t\odot h_{t-1})),\quad h_t=(1-z_t)\odot h_{t-1}+
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d7fed67a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4e938c26">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7683,7 +7749,7 @@ $$\tilde h_t=\tanh(W_he_t+U_h(r_t\odot h_{t-1})),\quad h_t=(1-z_t)\odot h_{t-1}+
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=02b442e0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d3186496">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7693,7 +7759,7 @@ $$\tilde h_t=\tanh(W_he_t+U_h(r_t\odot h_{t-1})),\quad h_t=(1-z_t)\odot h_{t-1}+
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f3b32d90">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=da7c6f36">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7734,16 +7800,16 @@ def run_dien(epochs: int = 30) -&gt; dict: return _run_sequence_ranker("dien", e
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=eeadb4b7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=68bdbe40">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Train-&amp;-Inference">Train &amp; Inference<a class="anchor-link" href="#Train-&amp;-Inference">¶</a></h2><p>下一格实际执行完整 smoke：固定 seed、构造数据、实例化模型、训练、切换到推理路径并计算测试指标。</p>
+<h2 id="Train-&amp;-Inference">Train &amp; Inference<a class="anchor-link" href="#Train-&amp;-Inference">¶</a></h2><p>下一格固定 seed、构造数据、实例化模型、训练并进入推理路径。生成式章节在 CUDA 上执行完整评测；CPU 环境只验证缩小后的基本张量与约束链路。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=930a14ec">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=544a4ea2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7751,7 +7817,8 @@ def run_dien(epochs: int = 30) -&gt; dict: return _run_sequence_ranker("dien", e
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">run_dien</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">({</span><span class="s1">'framework'</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s1">'framework'</span><span class="p">],</span> <span class="s1">'dataset'</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dataset'</span><span class="p">,</span> <span class="p">{})})</span>
+<span class="nb">print</span><span class="p">({</span><span class="s1">'framework'</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s1">'framework'</span><span class="p">],</span> <span class="s1">'dataset'</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dataset'</span><span class="p">,</span> <span class="p">{}),</span>
+       <span class="s1">'device'</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'device'</span><span class="p">),</span> <span class="s1">'validation_mode'</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'validation_mode'</span><span class="p">)})</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'inference contract:'</span><span class="p">,</span> <span class="s1">'严格按时间编码历史，候选控制 AUGRU 更新，最终状态进入 MLP；同时测 P99、吞吐和校准。'</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'loss_curve'</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'loss:'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'loss_curve'</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="mi">4</span><span class="p">),</span> <span class="s1">'→'</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'loss_curve'</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="mi">4</span><span class="p">))</span>
@@ -7766,7 +7833,7 @@ def run_dien(epochs: int = 30) -&gt; dict: return _run_sequence_ranker("dien", e
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'framework': 'torch_rechub.models.ranking.DIEN', 'dataset': {'dataset': 'KuaiRand-Pure (Kuaishou, CIKM 2022)', 'source': 'https://zenodo.org/records/10439422/files/KuaiRand-Pure.tar.gz', 'source_sha256': 'c814bf6f3624c0cfae83c57de3df26b2ed206e5c57bab4c4dcbfabbabe20cbf0', 'license_file': '/workspace/data/kuairand-pure/LICENSE', 'slice_rule': 'top 256 users by standard-feed interaction count; ties by user_id; all standard and random-policy rows for those users retained', 'rows_used': 29602, 'users_used': 96, 'items_used': 2200, 'time_min_utc': '2022-04-09T04:29:16+00:00', 'time_max_utc': '2022-05-08T15:50:58+00:00', 'targets': 'observed is_click, long_view, is_like and other feed feedback', 'randomly_fabricated_rows': 0, 'rows': 2600, 'sequence_length': 20, 'label': 'observed KuaiRand is_click', 'negative_history': 'observed skipped impressions', 'time_ordered': True}}
+<pre>{'framework': 'torch_rechub.models.ranking.DIEN', 'dataset': {'dataset': 'KuaiRand-Pure (Kuaishou, CIKM 2022)', 'source': 'https://zenodo.org/records/10439422/files/KuaiRand-Pure.tar.gz', 'source_sha256': 'c814bf6f3624c0cfae83c57de3df26b2ed206e5c57bab4c4dcbfabbabe20cbf0', 'license_file': '/workspace/data/kuairand-pure/LICENSE', 'slice_rule': 'top 256 users by standard-feed interaction count; ties by user_id; all standard and random-policy rows for those users retained', 'profile': 'smoke', 'local_resource': '/workspace/data/kuairand-pure/standard_interactions.csv', 'rows_used': 29602, 'users_used': 96, 'items_used': 2200, 'time_min_utc': '2022-04-09T04:29:16+00:00', 'time_max_utc': '2022-05-08T15:50:58+00:00', 'targets': 'observed is_click, long_view, is_like and other feed feedback', 'randomly_fabricated_rows': 0, 'rows': 2600, 'sequence_length': 20, 'label': 'observed KuaiRand is_click', 'negative_history': 'observed skipped impressions', 'time_ordered': True}, 'device': None, 'validation_mode': None}
 inference contract: 严格按时间编码历史，候选控制 AUGRU 更新，最终状态进入 MLP；同时测 P99、吞吐和校准。
 loss: 0.892 → 0.3578
 </pre>
@@ -7774,7 +7841,7 @@ loss: 0.892 → 0.3578
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c038cc81">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=46730e79">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7845,8 +7912,53 @@ loss: 0.892 → 0.3578
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=55fb06e2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ddfba9e4">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># 论文数字只能在数据、切分、候选和指标全部同口径时相减。</span>
+<span class="n">paper_protocol</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s1">'{"dataset": "Amazon Reviews Electronics 5-core", "resource": "amazon-electronics-5core", "split": "paper-compatible chronological negative sampling", "metrics": ["AUC", "LogLoss"], "paper_comparison": "online CTR/eCPM values are not reproducible from public data"}'</span><span class="p">)</span>
+<span class="n">paper_targets</span> <span class="o">=</span> <span class="n">paper_protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'paper_targets'</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">metric_key</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'HitRate@10'</span><span class="p">:</span><span class="s1">'paper_protocol_hr@10'</span><span class="p">,</span> <span class="s1">'NDCG@10'</span><span class="p">:</span><span class="s1">'paper_protocol_ndcg@10'</span><span class="p">,</span>
+              <span class="s1">'AUC'</span><span class="p">:</span><span class="s1">'auc'</span><span class="p">,</span> <span class="s1">'LogLoss'</span><span class="p">:</span><span class="s1">'logloss'</span><span class="p">}</span>
+<span class="n">dataset_name</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dataset'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dataset'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+<span class="n">dataset_aligned</span> <span class="o">=</span> <span class="n">paper_protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'dataset'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span> <span class="ow">in</span> <span class="n">dataset_name</span><span class="o">.</span><span class="n">casefold</span><span class="p">()</span>
+<span class="n">comparison_eligible</span> <span class="o">=</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s1">'full'</span> <span class="ow">and</span> <span class="n">dataset_aligned</span>
+<span class="n">rows</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">paper_metric</span><span class="p">,</span><span class="n">target</span> <span class="ow">in</span> <span class="n">paper_targets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">result_key</span><span class="o">=</span><span class="n">metric_key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">paper_metric</span><span class="p">)</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">result_key</span><span class="p">)</span> <span class="k">if</span> <span class="n">result_key</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">'metric'</span><span class="p">:</span><span class="n">paper_metric</span><span class="p">,</span><span class="s1">'tutorial'</span><span class="p">:</span><span class="n">value</span><span class="p">,</span><span class="s1">'paper'</span><span class="p">:</span><span class="n">target</span><span class="p">,</span>
+                 <span class="s1">'absolute_gap'</span><span class="p">:</span><span class="kc">None</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">comparison_eligible</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">target</span><span class="p">),</span>
+                 <span class="s1">'comparable'</span><span class="p">:</span><span class="n">comparison_eligible</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">})</span>
+<span class="k">if</span> <span class="n">rows</span><span class="p">:</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">comparison_eligible</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'NOT COMPARABLE：当前运行的数据/协议与论文不完全一致，不计算复现差值。'</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'论文没有可公开、可同口径复现的绝对目标；本节只报告结构与公开协议验证。'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>论文没有可公开、可同口径复现的绝对目标；本节只报告结构与公开协议验证。
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6be9dc74">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7855,7 +7967,7 @@ loss: 0.892 → 0.3578
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=da6c6111">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=97040675">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7900,7 +8012,7 @@ loss: 0.892 → 0.3578
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=afe1cce6">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4341b79d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7914,6 +8026,7 @@ loss: 0.892 → 0.3578
     <span class="s1">'baseline_metric'</span><span class="p">:</span> <span class="s1">'static_overlap_auc'</span><span class="p">,</span>
     <span class="s1">'baseline_value'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'static_overlap_auc'</span><span class="p">])</span> <span class="k">if</span> <span class="kc">True</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
     <span class="s1">'framework'</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s1">'framework'</span><span class="p">],</span> <span class="s1">'source_notebook'</span><span class="p">:</span> <span class="s1">'3_3_3_dien'</span><span class="p">,</span>
+    <span class="s1">'validation_mode'</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'validation_mode'</span><span class="p">,</span> <span class="s1">'standard'</span><span class="p">),</span>
     <span class="s1">'dataset'</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s1">'dataset'</span><span class="p">][</span><span class="s1">'dataset'</span><span class="p">],</span>
     <span class="s1">'randomly_fabricated_rows'</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'dataset'</span><span class="p">][</span><span class="s1">'randomly_fabricated_rows'</span><span class="p">])</span>
 <span class="p">}</span>
@@ -7936,7 +8049,7 @@ loss: 0.892 → 0.3578
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4902dd1d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0535c26c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7945,7 +8058,7 @@ loss: 0.892 → 0.3578
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0a256e06">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=87bd7a91">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7974,7 +8087,7 @@ loss: 0.892 → 0.3578
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=24aca6da">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2992f622">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

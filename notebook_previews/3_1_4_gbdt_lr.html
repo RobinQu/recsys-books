@@ -7292,39 +7292,27 @@ a.anchor-link {
 }
 </style>
 <!-- Load mathjax -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe"> </script>
-<!-- MathJax configuration -->
-<script type="text/x-mathjax-config">
-    init_mathjax = function() {
-        if (window.MathJax) {
-        // MathJax loaded
-            MathJax.Hub.Config({
-                TeX: {
-                    equationNumbers: {
-                    autoNumber: "AMS",
-                    useLabelIds: true
-                    }
-                },
-                tex2jax: {
-                    inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-                    processEscapes: true,
-                    processEnvironments: true
-                },
-                displayAlign: 'center',
-                messageStyle: 'none',
-                CommonHTML: {
-                    linebreaks: {
-                    automatic: true
-                    }
-                }
-            });
-
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-        }
-    }
-    init_mathjax();
-    </script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  chtml: {
+    scale: 1.18,
+    mtextInheritFont: true,
+    displayAlign: 'center',
+    displayIndent: '0'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
 <!-- End of mathjax configuration --><script type="module">
   document.addEventListener("DOMContentLoaded", async () => {
     const diagrams = document.querySelectorAll(".jp-Mermaid > pre.mermaid");
@@ -7508,10 +7496,28 @@ a.anchor-link {
     white-space: normal;
   }
 </style>
-<!-- End of mermaid configuration --></head>
+<!-- End of mermaid configuration -->
+<style id="recsys-preview-style">
+  /* MathJax v3 display math: paper-style centered, larger, scrollable when wide. */
+  mjx-container[display="true"], div.math {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: .55rem .25rem;
+    text-align: center !important;
+    margin: 1.25em auto !important;
+  }
+  mjx-container {font-size: 115% !important}
+  mjx-container mjx-itable {min-width: auto !important}
+  .jp-MarkdownOutput pre {white-space:pre-wrap;overflow-wrap:anywhere}
+  .jp-Notebook {max-width:1180px;margin:0 auto}
+  .jp-Notebook img {max-width:100%;height:auto;border-radius:8px}
+  .jp-Notebook figure{margin:1.4em 0}
+</style>
+</head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=647b0f10">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2c74c670">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7524,7 +7530,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4a86113f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7397e3bf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7534,7 +7540,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=53af8eb3">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=396e7a25">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7543,17 +7549,43 @@ a.anchor-link {
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"smoke"</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
+<span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab.data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">load_movielens</span><span class="p">,</span> <span class="n">movielens_provenance</span><span class="p">,</span> <span class="n">load_amazon_2023</span><span class="p">,</span>
-                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">)</span>
+                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">,</span>
+                             <span class="n">load_amazon_2018</span><span class="p">,</span> <span class="n">amazon_2018_provenance</span><span class="p">,</span>
+                             <span class="n">load_movielens_1m</span><span class="p">,</span> <span class="n">movielens_1m_provenance</span><span class="p">,</span>
+                             <span class="n">load_mind_amazon_books</span><span class="p">,</span> <span class="n">mind_amazon_provenance</span><span class="p">,</span>
+                             <span class="n">load_census_income</span><span class="p">,</span> <span class="n">census_income_provenance</span><span class="p">)</span>
 <span class="n">DATASET_KEY</span> <span class="o">=</span> <span class="s2">"movielens"</span>
 <span class="k">if</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens"</span><span class="p">:</span>
     <span class="n">real_ratings</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_movielens</span><span class="p">()</span>
     <span class="n">real_interactions</span> <span class="o">=</span> <span class="n">real_ratings</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-books"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Books"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"mind-amazon-books"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_mind_amazon_books</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">mind_amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-electronics"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Electronics"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens-1m"</span><span class="p">:</span>
+    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_movielens_1m</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_1m_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"census-income"</span> <span class="ow">and</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span><span class="p">:</span>
+    <span class="n">census_train_x</span><span class="p">,</span> <span class="n">census_train_y</span><span class="p">,</span> <span class="n">census_test_x</span><span class="p">,</span> <span class="n">census_test_y</span> <span class="o">=</span> <span class="n">load_census_income</span><span class="p">()</span>
+    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span><span class="p">,</span> <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">census_train_x</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">census_train_x</span>
+    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">census_income_provenance</span><span class="p">()</span>
 <span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-2023"</span><span class="p">:</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
@@ -7562,7 +7594,9 @@ a.anchor-link {
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+       <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
+       <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
 </pre></div>
 </div>
@@ -7575,14 +7609,14 @@ a.anchor-link {
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'profile': 'smoke', 'root': '/workspace', 'real_dataset': {'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/workspace/data/ml-latest-small/README.txt', 'rows_used': 26732, 'users_used': 120, 'items_used': 600, 'time_min_utc': '1996-10-17T11:51:49+00:00', 'time_max_utc': '2018-09-13T21:38:16+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}}
+<pre>{'profile': 'smoke', 'root': '/workspace', 'real_dataset': {'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/workspace/data/ml-latest-small/README.txt', 'profile': 'smoke', 'slice_rule': 'deterministic user/item subset', 'rows_used': 26732, 'users_used': 120, 'items_used': 600, 'time_min_utc': '1996-10-17T11:51:49+00:00', 'time_max_utc': '2018-09-13T21:38:16+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}, 'cuda_available': False, 'cuda_device': None}
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d91df317">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0a27f64d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7592,7 +7626,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d9c40b35">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4abfcb0b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7743,7 +7777,7 @@ a.anchor-link {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bf8efc85">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f246c5a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7764,7 +7798,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=05c3c39e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ecfed9d6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7773,7 +7807,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a0cdd203">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f6a0416d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7816,7 +7850,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=35473d30">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4510eb90">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7835,7 +7869,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=196828d0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ebef4906">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7844,7 +7878,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=10c5829e">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ec530203">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7885,7 +7919,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e87f1b47">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1ca85aeb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7894,7 +7928,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=67c9c756">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=421fa413">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7930,7 +7964,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9575ad80">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fe566fc2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7939,7 +7973,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=20b3b825">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1c256c23">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8066,7 +8100,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d444e4bc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8b88d701">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8079,7 +8113,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=71945f33">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=57174db9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8088,7 +8122,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=26ed108c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f96da7c7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8117,7 +8151,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=7a5f302d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=86cbeb68">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8146,7 +8180,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3e3136a9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=872e181c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

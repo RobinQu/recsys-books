@@ -41,8 +41,12 @@ def run_din(epochs: int = 26) -> dict: return load_runner("run_din")(epochs)
 def run_dien(epochs: int = 30) -> dict: return load_runner("run_dien")(epochs)
 def run_mmoe(epochs: int = 28) -> dict: return load_runner("run_mmoe")(epochs)
 def run_ple(epochs: int = 28) -> dict: return load_runner("run_ple")(epochs)
-def run_openonerec(epochs: int = 32) -> dict: return load_runner("run_openonerec")(epochs)
-def run_hstu(epochs: int = 26) -> dict: return load_runner("run_hstu")(epochs)
+def run_openonerec(epochs: int = 32, cpu_smoke: bool = False) -> dict:
+    return load_runner("run_openonerec")(epochs, cpu_smoke=cpu_smoke)
+
+
+def run_hstu(epochs: int = 26, cpu_smoke: bool = False) -> dict:
+    return load_runner("run_hstu")(epochs, cpu_smoke=cpu_smoke)
 
 
 __all__ = [*CHAPTER_RUNNERS, "load_runner", "save_records"]

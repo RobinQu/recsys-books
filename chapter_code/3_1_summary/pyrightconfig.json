@@ -4,7 +4,7 @@
   ],
   "extraPaths": [
     "../..",
-    "/usr/local/lib/python3.11/site-packages"
+    "/opt/venv/lib/python3.11/site-packages"
   ],
   "useLibraryCodeForTypes": true,
   "typeCheckingMode": "off"

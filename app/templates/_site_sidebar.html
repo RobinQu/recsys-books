@@ -6,8 +6,8 @@
     {% for group in course_groups %}<details open><summary><b>{{ group.number }}</b><span>{{ group.title }}</span></summary>
       <div class="sidebar-subnav">{% for item in group['items'] %}<a href="/notebooks/{{ item.slug }}" class="{{ 'active' if item.slug == current_notebook_slug else '' }}" {% if item.slug == current_notebook_slug %}aria-current="page"{% endif %}>{{ item.title }}</a>{% endfor %}</div>
     </details>{% endfor %}
-    <a href="/#frameworks" data-section="frameworks"><b>F</b><span>框架选型</span></a>
-    <a href="/#datasets" data-section="datasets"><b>D</b><span>数据集</span></a>
-    <a href="/#sources" data-section="sources"><b>5</b><span>证据清单</span></a>
+    <details open class="appendix-nav"><summary><b>A</b><span>附录</span></summary>
+      <div class="sidebar-subnav"><a href="/#sources" data-section="sources">A.1 论文清单</a><a href="/#datasets" data-section="datasets">A.2 数据集清单</a><a href="/#labs" data-section="labs">A.3 Notebook 清单</a></div>
+    </details>
   </nav>
 </aside>

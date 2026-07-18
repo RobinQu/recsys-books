@@ -57,7 +57,24 @@ const pageLink = sidebarLinks.find((link) => {
   const url = new URL(link.href, window.location.href);
   return url.origin === window.location.origin && url.pathname === window.location.pathname && !url.hash;
 });
-if (pageLink) setCurrentLink(pageLink);
+if (pageLink) {
+  setCurrentLink(pageLink);
+  // Layout, fonts and restored scroll state can all settle after the first
+  // animation frame. Re-run the same idempotent positioning at each boundary.
+  const revealCurrentPage = () => {
+    const sidebarRect = sidebar.getBoundingClientRect();
+    const linkRect = pageLink.getBoundingClientRect();
+    const visibleTop = sidebarRect.top + 18;
+    const visibleBottom = sidebarRect.bottom - 18;
+    if (linkRect.top < visibleTop || linkRect.bottom > visibleBottom) {
+      const centered = sidebar.scrollTop + linkRect.top - sidebarRect.top - (sidebarRect.height - linkRect.height) / 2;
+      sidebar.scrollTo({ top: Math.max(0, centered), behavior: 'instant' });
+    }
+  };
+  requestAnimationFrame(() => requestAnimationFrame(revealCurrentPage));
+  window.addEventListener('load', revealCurrentPage, { once: true });
+  document.fonts?.ready.then(revealCurrentPage);
+}
 
 const sectionLinks = sidebarLinks.filter((link) => {
   const url = new URL(link.href, window.location.href);

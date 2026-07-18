@@ -7,7 +7,7 @@
   <title>{{ notebook.title }} · RecSys Atlas</title>
   <link rel="stylesheet" href="/static/app.css">
   <link rel="stylesheet" href="/static/navigation.css">
-  <link rel="stylesheet" href="/static/notebook.css">
+  <link rel="stylesheet" href="/static/notebook.css?v=20260717-3">
 </head>
 <body class="notebook-shell-page">
   {% include "_site_header.html" %}
@@ -16,21 +16,61 @@
   <main class="notebook-shell-main">
     <section class="notebook-reader-head">
       <div><div class="section-kicker">EXECUTED NOTEBOOK · NBCONVERT PREVIEW</div><h1>{{ notebook.title }}</h1><p>{{ notebook.framework }} · {{ notebook.dataset }} · {{ notebook.runtime }}</p></div>
-      <div class="notebook-mode"><span class="mode-dot"></span><div><b>一个章节，三种模式</b><small>阅读叙事、执行实验和追踪源码可在下方直接切换。</small><a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">在独立 IDE 中打开 ↗</a></div></div>
+      <div class="notebook-mode"><span class="mode-dot"></span><div><b>一个章节，四种模式</b><small>论文证据、实验叙事、交互执行和实现源码可在下方直接切换。</small>{% if chapter_slug == 'generative' %}<small class="cuda-status">{{ 'CUDA 已就绪 · ' ~ cuda.name if cuda.available else '未检测到 CUDA · 交互执行已禁用' }}</small>{% endif %}<a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">在独立 IDE 中打开 ↗</a></div></div>
     </section>
 
+    {% set default_mode = 'paper' if show_paper_guide else 'preview' %}
     <nav class="mode-tabs" role="tablist" aria-label="章节查看模式">
-      <button class="active" role="tab" aria-selected="true" data-mode="preview">阅读预览</button>
-      <button role="tab" aria-selected="false" data-mode="execute">可交互执行</button>
+      {% if show_paper_guide %}<button class="{{ 'active' if default_mode == 'paper' else '' }}" role="tab" aria-selected="{{ 'true' if default_mode == 'paper' else 'false' }}" data-mode="paper">论文导读</button>{% endif %}
+      <button class="{{ 'active' if default_mode == 'preview' else '' }}" role="tab" aria-selected="{{ 'true' if default_mode == 'preview' else 'false' }}" data-mode="preview">实验预览</button>
+      <button role="tab" aria-selected="false" data-mode="execute" {% if chapter_slug == 'generative' and not cuda.available %}disabled aria-disabled="true" title="生成式推荐完整实验需要 CUDA"{% endif %}>可交互执行</button>
       <button id="source" role="tab" aria-selected="false" data-mode="source">代码实现</button>
     </nav>
 
-    <section class="mode-panel active" data-panel="preview" role="tabpanel">
-      <div class="notebook-frame-wrap"><iframe title="{{ notebook.title }} 阅读预览" src="/notebooks/{{ notebook.slug }}/content" loading="eager" sandbox="allow-scripts allow-same-origin"></iframe></div>
+    {% if show_paper_guide %}
+    <section class="mode-panel {{ 'active' if default_mode == 'paper' else '' }}" data-panel="paper" role="tabpanel" {{ '' if default_mode == 'paper' else 'hidden' }}>
+      <div class="paper-guide-split" data-paper-guide data-evidence-reader>
+        <article class="paper-guide-prose">
+          <header class="paper-guide-heading"><span>PAPER EVIDENCE GUIDE</span><h2>论文证据导读</h2><p>{{ paper_guide.intro }}</p></header>
+          {% if paper_guide.structure_figure %}<figure class="guide-diagram paper-original-figure"><button class="figure-evidence-button" type="button" data-paper-id="{{ paper_guide.structure_figure.paper_id }}" data-evidence-id="{{ paper_guide.architecture_item.id }}" data-page="{{ paper_guide.architecture_item.page }}" data-label="{{ paper_guide.architecture_item.label }}"><img src="{{ paper_guide.structure_figure.url }}" alt="{{ paper_guide.structure_figure.label }} 论文原图节选"></button><figcaption>论文原图节选 · {{ paper_guide.structure_figure.label }} · PDF p.{{ paper_guide.structure_figure.page }}。点击图片在右侧核对原页。</figcaption></figure>
+          {% elif paper_guide.diagram_id %}<figure class="guide-diagram"><img src="/static/diagrams/{{ paper_guide.diagram_id }}.svg" alt="{{ paper_guide.diagram_id }} 模型结构教学示意图"><figcaption>该论文没有可直接截取的完整模型图；此图依据论文描述重组。点击下文标注核对原页。</figcaption></figure>{% endif %}
+          {% if paper_guide.layers %}<section class="model-layer-guide"><h3>关键层级</h3>{% for layer in paper_guide.layers %}<button class="model-layer-card paper-annotation-card" type="button" data-paper-id="{{ layer.paper_id }}" data-evidence-id="{{ layer.evidence_id }}" data-page="{{ layer.page }}" data-label="{{ layer.label }}"><b>{{ loop.index }}. {{ layer.name }}</b><span>{{ layer.explanation }}</span></button>{% endfor %}</section>{% endif %}
+          <section class="reading-route"><h3>阅读路线</h3><p>本页关联 {% for title in paper_guide.papers %}<em>{{ title }}</em>{{ '、' if not loop.last else '' }}{% endfor %}。建议先读模型结构，再核对实验设置，最后判断论文结论能否迁移到本教程的数据与指标口径。</p></section>
+          {% for item in paper_guide["items"] %}
+          <section class="evidence-reading" id="guide-{{ item.id }}">
+            <span class="evidence-index">E{{ '%02d'|format(loop.index) }} · p.{{ item.page }}</span>
+            <h3>{{ item.keyword }}</h3>
+            <p>先抓住
+              <button class="paper-annotation" type="button" data-paper-id="{{ item.paper_id }}" data-evidence-id="{{ item.id }}" data-page="{{ item.page }}" data-label="{{ item.label }}">{{ item.annotation_terms[0] }}</button>。
+              论文把它放在
+              <button class="paper-annotation" type="button" data-paper-id="{{ item.paper_id }}" data-evidence-id="{{ item.id }}" data-page="{{ item.page }}" data-label="{{ item.label }}">{{ item.annotation_terms[1] }}</button>
+              中展开；在 PDF 内可用
+              <button class="paper-annotation" type="button" data-paper-id="{{ item.paper_id }}" data-evidence-id="{{ item.id }}" data-page="{{ item.page }}" data-label="{{ item.label }}">{{ item.annotation_terms[2] }}</button>
+              快速定位。</p>
+            <blockquote>{{ item.quote }}</blockquote>
+            <p>{{ item.note }} <button class="paper-annotation evidence-return" type="button" data-paper-id="{{ item.paper_id }}" data-evidence-id="{{ item.id }}" data-page="{{ item.page }}" data-label="{{ item.label }}">回到原文核对</button></p>
+          </section>
+          {% endfor %}
+        </article>
+        <aside class="paper-guide-viewer">
+          <header><div><b data-paper-current>{{ paper_guide["items"][0].label }}</b><span data-paper-page>PDF p.{{ paper_guide["items"][0].page }} · 点击左侧下划线切换证据</span></div><a data-paper-popout href="/papers/{{ paper_guide["items"][0].paper_id }}?page={{ paper_guide["items"][0].page }}&evidence={{ paper_guide["items"][0].id }}" target="_blank" rel="noreferrer">单独打开 ↗</a></header>
+          <iframe id="paper-guide-frame" data-paper-frame title="论文原文证据" src="/papers/{{ paper_guide["items"][0].paper_id }}?page={{ paper_guide["items"][0].page }}&evidence={{ paper_guide["items"][0].id }}&embedded=1"></iframe>
+        </aside>
+      </div>
+    </section>
+    {% endif %}
+    <section class="mode-panel {{ 'active' if default_mode == 'preview' else '' }}" data-panel="preview" role="tabpanel" {{ '' if default_mode == 'preview' else 'hidden' }}>
+      <div class="experiment-preview-pane">
+        <div class="embedded-notebook-preview"><iframe id="notebook-preview-frame" title="{{ notebook.title }} 实验预览" src="/notebooks/{{ notebook.slug }}/content" loading="eager" sandbox="allow-scripts allow-same-origin"></iframe></div>
+      </div>
     </section>
     <section class="mode-panel" data-panel="execute" role="tabpanel" hidden>
+      {% if chapter_slug == 'generative' and not cuda.available %}
+      <div class="cuda-unavailable"><div><h2>此实验需要 CUDA</h2><p>生成式推荐 Notebook 默认执行 GPU 训练和完整精度评测。当前服务没有检测到 CUDA，因此交互入口被禁用；CPU 环境只在自动化测试中运行张量形状、约束解码和单步前向等基本功能检查。</p></div></div>
+      {% else %}
       <div class="mode-help"><b>JupyterLab 可执行模式</b><span>修改单元格并重新运行；若浏览器限制跨端口嵌入，可使用右侧按钮单独打开。</span><a href="{{ jupyter_url }}/lab/tree/notebooks/{{ notebook.slug }}.ipynb?token=recsys" target="_blank" rel="noreferrer">在新窗口打开 ↗</a></div>
       <div class="notebook-frame-wrap interactive-frame"><iframe title="{{ notebook.title }} 可交互模式" data-src="{{ jupyter_url }}/lab/tree/notebooks/{{ notebook.slug }}.ipynb?token=recsys" loading="lazy"></iframe></div>
+      {% endif %}
     </section>
     <section class="mode-panel" data-panel="source" role="tabpanel" hidden>
       <div class="mode-help"><b>本章节代码浏览器</b><span>公共数据代码、章节内模型/训练/推理/测试，以及所用框架源码均可直接切换查看。</span><a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">在 IDE 中打开章节目录 ↗</a></div>
@@ -47,9 +87,10 @@
       {% if next_notebook %}<a href="/notebooks/{{ next_notebook.slug }}" class="next"><span>下一篇</span><b>{{ next_notebook.title }} →</b></a>{% endif %}
     </nav>
   </main>
-  <script src="/static/app.js" defer></script>
+  <script src="/static/app.js?v=20260717-3" defer></script>
   <script>
     document.querySelectorAll('.mode-tabs button').forEach((button) => button.addEventListener('click', () => {
+      if (button.disabled) return;
       const mode = button.dataset.mode;
       document.querySelectorAll('.mode-tabs button').forEach((item) => { item.classList.toggle('active', item === button); item.setAttribute('aria-selected', item === button ? 'true' : 'false'); });
       document.querySelectorAll('.mode-panel').forEach((panel) => { const active = panel.dataset.panel === mode; panel.hidden = !active; panel.classList.toggle('active', active); });
@@ -64,6 +105,21 @@
         document.querySelectorAll('.source-code-panel').forEach((panel) => { const active = panel.id === button.dataset.sourceTarget; panel.hidden = !active; panel.classList.toggle('active', active); });
       });
     });
+    function openEvidence(button) {
+      const reader = button.closest('[data-evidence-reader]');
+      const paperFrame = reader?.querySelector('[data-paper-frame]');
+      if (!paperFrame) return;
+      const paperCurrent = reader.querySelector('[data-paper-current]');
+      const paperPage = reader.querySelector('[data-paper-page]');
+      const paperPopout = reader.querySelector('[data-paper-popout]');
+      const target = `/papers/${button.dataset.paperId}?page=${button.dataset.page}&evidence=${encodeURIComponent(button.dataset.evidenceId)}`;
+      paperFrame.src = `${target}&embedded=1`;
+      if (paperPopout) paperPopout.href = target;
+      if (paperCurrent) paperCurrent.textContent = button.dataset.label;
+      if (paperPage) paperPage.textContent = `PDF p.${button.dataset.page} · 点击左侧下划线切换证据`;
+      reader.querySelectorAll('[data-evidence-id]').forEach((item) => item.classList.toggle('active', item === button));
+    }
+    document.querySelectorAll('[data-evidence-id]').forEach((button) => button.addEventListener('click', () => openEvidence(button)));
   </script>
 </body>
 </html>

@@ -10,6 +10,7 @@
       "baseline_value": 0.5019229107250885,
       "framework": "torch_rechub.models.ranking.DIEN",
       "source_notebook": "3_3_3_dien",
+      "validation_mode": "standard",
       "dataset": "KuaiRand-Pure (Kuaishou, CIKM 2022)",
       "randomly_fabricated_rows": 0
     }

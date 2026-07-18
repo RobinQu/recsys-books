@@ -1,15 +1,15 @@
 {
   "basedpyright.analysis.extraPaths": [
     "../..",
-    "/usr/local/lib/python3.11/site-packages"
+    "/opt/venv/lib/python3.11/site-packages"
   ],
   "basedpyright.analysis.useLibraryCodeForTypes": true,
   "basedpyright.analysis.diagnosticMode": "openFilesOnly",
   "basedpyright.analysis.typeCheckingMode": "off",
-  "python.defaultInterpreterPath": "/usr/local/bin/python",
+  "python.defaultInterpreterPath": "/opt/venv/bin/python",
   "python.analysis.extraPaths": [
     "../..",
-    "/usr/local/lib/python3.11/site-packages"
+    "/opt/venv/lib/python3.11/site-packages"
   ],
   "python.terminal.activateEnvironment": false,
   "ruff.configuration": "/home/coder/project/pyproject.toml",

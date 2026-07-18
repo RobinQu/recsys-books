@@ -5,6 +5,8 @@ services:
     environment:
       JUPYTER_PUBLIC_URL: http://localhost:8889
       IDE_PUBLIC_URL: http://localhost:8090
+      RECSYS_RESOURCE_AUTO_DOWNLOAD: "0"
+      RECSYS_CUDA_AVAILABLE: ${RECSYS_CUDA_AVAILABLE:-0}
     ports:
       - "8010:8000"
     volumes:
@@ -26,6 +28,8 @@ services:
       --ServerApp.root_dir=/workspace
     ports:
       - "8889:8888"
+    environment:
+      RECSYS_PROFILE: full
     volumes:
       - .:/workspace
 
@@ -53,6 +57,30 @@ services:
       python scripts/build_previews.py"
     environment:
       RECSYS_PROFILE: smoke
+      PYTHONPATH: /workspace
+    volumes:
+      - .:/workspace
+
+  test-full:
+    profiles: ["full"]
+    build: .
+    command: >-
+      sh -c "python scripts/init_resources.py --include-optional --strict --kind datasets
+      --id movielens-1m-full --id amazon-books-5core --id amazon-books-2014-ratings
+      --id amazon-electronics-5core --id census-income-kdd
+      --id amazon-video-games-full --id kuairand-pure-full &&
+      RECSYS_PROFILE=full pytest -q -m full_data &&
+      python scripts/generate_notebooks.py &&
+      python scripts/execute_notebooks.py --profile full --only 3_2_1_dssm &&
+      python scripts/execute_notebooks.py --profile full --only 3_2_2_mind &&
+      python scripts/execute_notebooks.py --profile full --only 3_2_3_sasrec &&
+      python scripts/execute_notebooks.py --profile full --only 3_3_2_din &&
+      python scripts/execute_notebooks.py --profile full --only 3_3_3_dien &&
+      python scripts/execute_notebooks.py --profile full --only 3_4_1_mmoe &&
+      python scripts/execute_notebooks.py --profile full --only 3_4_2_ple &&
+      python scripts/build_previews.py"
+    environment:
+      RECSYS_PROFILE: full
       PYTHONPATH: /workspace
     volumes:
       - .:/workspace

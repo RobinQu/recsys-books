@@ -9,18 +9,21 @@ from torch_rechub.basic.features import SparseFeature
 from torch_rechub.models.matching import DSSM
 from recsys_lab.data import clicked_sequences, positive_sequences, kuairand_sequence_classification_rows
 from recsys_lab.runtime import (
-    real_amazon as _real_amazon,
+    real_amazon_books as _real_amazon,
     real_kuairand as _real_kuairand,
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
     train_binary as _train_binary,
+    complete_or_recent,
+    full_profile,
+    sampled_embedding_rank_metrics,
 )
 
 def run_dssm(epochs: int = 24) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
     seed_everything(); ratings, provenance = _real_amazon()
-    events = ratings.sort_values("timestamp").tail(5200).reset_index(drop=True)
+    events = complete_or_recent(ratings, 5200).reset_index(drop=True)
     split = int(len(events) * .8)
     train, test = events.iloc[:split], events.iloc[split:]
     n_users, n_items = ratings.user_id.nunique(), ratings.item_id.nunique()
@@ -46,16 +49,24 @@ def run_dssm(epochs: int = 24) -> dict:
         model.mode = "item"
         item_embedding = model({"item_id": torch.arange(1, n_items + 1)}).numpy()
         model.mode = None
-    user_embedding = np.nan_to_num(user_embedding); item_embedding = np.nan_to_num(item_embedding)
+    user_embedding = np.nan_to_num(user_embedding, nan=0.0, posinf=0.0, neginf=0.0)
+    item_embedding = np.nan_to_num(item_embedding, nan=0.0, posinf=0.0, neginf=0.0)
     user_embedding /= np.linalg.norm(user_embedding, axis=1, keepdims=True) + 1e-8
     item_embedding /= np.linalg.norm(item_embedding, axis=1, keepdims=True) + 1e-8
-    scores = user_embedding @ item_embedding.T
     targets, seen, valid_users = [], [], []
     for user, frame in ratings.sort_values("timestamp").groupby("user_id"):
         positives = frame[frame.rating >= 4.0].item_id.tolist()
         if len(positives) >= 2:
             valid_users.append(int(user)); targets.append(int(positives[-1])); seen.append(set(map(int, positives[:-1])))
-    recall = _recall_single_target(scores[valid_users], np.asarray(targets), 10, seen)
+    target_array = np.asarray(targets)
+    sampled = sampled_embedding_rank_metrics(user_embedding[valid_users], item_embedding, target_array, 10, 100, seen)
+    if full_profile():
+        recall = float(sampled["hr@10"])
+        score_sample = user_embedding[:3] @ item_embedding[:8].T
+    else:
+        scores = np.clip(user_embedding, -1.0, 1.0) @ np.clip(item_embedding, -1.0, 1.0).T
+        recall = _recall_single_target(scores[valid_users], target_array, 10, seen)
+        score_sample = scores[:3, :8]
     # 6) 返回真实测试切分上的指标和必要诊断信息，供章节总结统一读取。
     return {
         "framework": "torch_rechub.models.matching.DSSM",
@@ -63,8 +74,10 @@ def run_dssm(epochs: int = 24) -> dict:
         "loss_curve": losses,
         "test_auc": _safe_auc(test.like.to_numpy(), probability),
         "recall@10": recall,
+        "paper_protocol_hr@10": sampled["hr@10"], "paper_protocol_ndcg@10": sampled["ndcg@10"],
+        "evaluation_users": sampled["evaluation_users"], "sampled_negatives": sampled["sampled_negatives"],
         "embedding_shape": [list(user_embedding.shape), list(item_embedding.shape)],
-        "score_sample": scores[:3, :8].round(3).tolist(),
+        "score_sample": score_sample.round(3).tolist(),
     }
 
 def train_and_evaluate(epochs: int = 4) -> dict:

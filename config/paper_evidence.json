@@ -1,0 +1,53 @@
+{
+  "3_1_2_matrix_factorization": [
+    {"id":"mf-model","paper_id":"mf","keyword":"低秩隐向量","label":"原文：Matrix Factorization Models","page":2,"search":"Matrix Factorization Models","quote":"Matrix factorization models map both users and items to a joint latent factor space.","note":"用户向量与物品向量进入同一个低维空间，内积近似评分；偏置项负责吸收用户打分尺度和物品整体热度。"},
+    {"id":"mf-evaluation","paper_id":"mf","keyword":"Netflix Prize 实验","label":"原文：Netflix Prize 数据与 RMSE","page":1,"search":"Netflix Prize","quote":"Matrix factorization techniques became the dominant methodology within collaborative filtering recommenders.","note":"论文围绕显式评分与 RMSE 展开；教程额外报告 Top-K 指标时，会明确这是任务转换后的项目实验。"}
+  ],
+  "3_1_3_factorization_machine": [
+    {"id":"fm-equation","paper_id":"fm","keyword":"二阶特征交叉","label":"原文 Equation 1：FM 模型方程","page":2,"search":"Factorization Machine Model","quote":"The model equation for a factorization machine of degree d = 2 is defined as follows.","note":"每一对特征不再单独学习参数，而以两个隐向量的内积表示交叉强度，因此稀疏样本之间可以共享统计信息。"},
+    {"id":"fm-linear-complexity","paper_id":"fm","keyword":"线性时间计算","label":"原文 Equation 3：O(kn) 重写","page":3,"search":"linear time","quote":"The model equation can be computed in linear time O(kn).","note":"平方和减去和平方的代数重写，避免显式枚举所有特征对；这是 FM 能用于高维稀疏特征的关键。"}
+  ],
+  "3_2_1_dssm": [
+    {"id":"dssm-architecture","paper_id":"dssm","keyword":"双塔结构","label":"原文 Figure 1：DSSM 结构","page":3,"search":"Figure 1","quote":"The DNN architecture used in our experiments is illustrated in Figure 1.","note":"对照用户/查询侧与文档/物品侧独立编码，以及顶层余弦相似度。"},
+    {"id":"dssm-results","paper_id":"dssm","keyword":"NDCG 实验","label":"原文 Table 2：排序质量","page":6,"search":"Table 2","quote":"The DNN model significantly outperforms all the other models.","note":"论文在真实搜索点击数据上比较 TF-IDF、BM25、WTM 与 DSSM；教学实验改用 Recall@K，是任务口径差异而非复现同一个数字。"}
+  ],
+  "3_2_2_mind": [
+    {"id":"mind-architecture","paper_id":"mind","keyword":"动态路由","label":"原文 Figure 2：多兴趣网络","page":3,"search":"Figure 2","quote":"The multi-interest extractor layer utilizes dynamic routing to adaptively aggregate user's behaviors into interest representation vectors.","note":"图中 label-aware attention 仅在训练时选择与目标 item 最相关的兴趣；线上由多个兴趣分别检索。"},
+    {"id":"mind-results","paper_id":"mind","keyword":"多兴趣收益","label":"原文 Table 2：Amazon Books / 工业数据","page":7,"search":"Table 2","quote":"MIND achieves the best performance on most metrics.","note":"重点观察兴趣数与 HitRate 的关系，而不是只抄一个最优点。"}
+  ],
+  "3_2_3_sasrec": [
+    {"id":"sasrec-architecture","paper_id":"sasrec","keyword":"因果自注意力","label":"原文 Figure 1：序列推荐结构","page":1,"search":"Figure 1","quote":"SASRec adaptively assigns weights to previous items at each time step.","note":"遮罩保证位置 t 只能读取过去，训练目标是下一物品。"},
+    {"id":"sasrec-results","paper_id":"sasrec","keyword":"稀疏与稠密数据","label":"原文 Table III：四个公开数据集","page":7,"search":"TABLE III","quote":"SASRec outperforms both Markov Chains and RNNs on sparse and dense datasets.","note":"论文使用 Amazon Beauty/Games、Steam 与 MovieLens；本教程 full profile 使用较新的 Amazon Reviews 2023。"}
+  ],
+  "3_3_1_deepfm": [
+    {"id":"deepfm-architecture","paper_id":"deepfm","keyword":"共享 Embedding","label":"原文 Figure 1：Wide&Deep 对照","page":1,"search":"Wide & Deep","quote":"DeepFM models low-order feature interactions like FM and models high-order feature interactions like DNN.","note":"教学 SVG 重绘 FM 分支、DNN 分支和共享 embedding，避免把论文图误当作项目自产图。"},
+    {"id":"deepfm-results","paper_id":"deepfm","keyword":"Criteo 实验","label":"原文 Table 2：AUC / LogLoss","page":5,"search":"Table 2","quote":"DeepFM achieves the best performance on both datasets.","note":"原论文包含 Criteo 与公司数据；教程在 KuaiRand 完整曝光上重新训练，不直接移植公司数据结论。"}
+  ],
+  "3_3_2_din": [
+    {"id":"din-architecture","paper_id":"din","keyword":"候选感知注意力","label":"原文 Figure 2：DIN 与 BaseModel","page":4,"search":"Figure 2","quote":"The representation vector of user interests varies over different ads.","note":"注意力不是历史重要性的固定权重，而是 history-item 与当前 candidate 的匹配函数。"},
+    {"id":"din-production","paper_id":"din","keyword":"工业训练","label":"原文：Mini-batch Aware Regularization","page":6,"search":"Mini-batch Aware","quote":"We propose a mini-batch aware regularization method which only calculates the l2-norm of non-zero features.","note":"这是稀疏 embedding 工业训练的关键细节，和模型结构同样重要。"}
+  ],
+  "3_3_3_dien": [
+    {"id":"dien-architecture","paper_id":"dien","keyword":"兴趣演化","label":"原文 Figure 1：DIEN 结构","page":4,"search":"Figure 1","quote":"DIEN is composed of an interest extractor layer and interest evolving layer.","note":"辅助损失让 GRU 隐状态预测下一次行为，AUGRU 再让候选相关性控制状态更新。"},
+    {"id":"dien-online","paper_id":"dien","keyword":"线上 CTR +20.7%","label":"原文 Table 5：在线 A/B 测试","page":7,"search":"20.7%","quote":"DIEN achieves 20.7% improvement on CTR and 17.1% improvement on eCPM.","note":"这是论文特定阿里广告系统的相对增益，不能外推为通用离线效果。"}
+  ],
+  "3_4_1_mmoe": [
+    {"id":"mmoe-architecture","paper_id":"mmoe","keyword":"任务独立 Gate","label":"原文 Figure 1：Shared-bottom / MoE / MMoE","page":2,"search":"Figure 1","quote":"MMoE explicitly learns to model task relationships from data.","note":"每个任务使用独立 gate 混合同一组专家；任务之间共享专家参数而不共享混合权重。"},
+    {"id":"mmoe-results","paper_id":"mmoe","keyword":"任务相关性实验","label":"原文 Table 1：Census-income","page":8,"search":"Table 1","quote":"MMoE is able to achieve better performance than the baseline models across different task relationships.","note":"论文同时用合成任务控制相关性，并以 400 次运行分布展示鲁棒性。"}
+  ],
+  "3_4_2_ple": [
+    {"id":"ple-architecture","paper_id":"ple","keyword":"CGC 分层抽取","label":"原文 Figure 4：Customized Gate Control","page":5,"search":"Figure 4","quote":"PLE separates shared components and task-specific components explicitly.","note":"任务 gate 只能读取本任务专家与共享专家；共享 gate 为下一层产生公共表示。"},
+    {"id":"ple-online","paper_id":"ple","keyword":"Tencent 工业实验","label":"原文 Table 3：四周在线 A/B 测试","page":8,"search":"Table 3","quote":"PLE has been successfully deployed in a large-scale video recommendation system in Tencent.","note":"相对单任务模型，表中 PLE 的人均总播放量与总观看时长分别为 +4.17% 和 +3.57%；摘要相对 SOTA MTL 的口径是 +2.23% 与 +1.84%，不可混写。"}
+  ],
+  "4_1_generative_overview": [
+    {"id":"tiger-architecture","paper_id":"tiger","keyword":"Semantic ID 生成召回","label":"TIGER Figure 2：RQ-VAE + 生成检索","page":3,"search":"Figure 2","quote":"We represent each item with a Semantic ID and formulate recommendation as a generative retrieval problem.","note":"语义 ID 共享前缀带来泛化，但解码必须受合法目录约束。"},
+    {"id":"onerec-unification","paper_id":"onerec","keyword":"召排融合","label":"OneRec Figure 2：统一生成框架","page":3,"search":"Figure 2","quote":"OneRec unifies retrieval and ranking into a single generative recommender.","note":"两阶段训练先学习 session 生成，再以 IPA/DPO 做偏好对齐。"}
+  ],
+  "4_2_openonerec_practice": [
+    {"id":"onerec-results","paper_id":"onerec","keyword":"列表级评测","label":"原文 Table 1：离线结果","page":6,"search":"Table 1","quote":"Offline performance of our proposed OneRec with pointwise, listwise and preference alignment methods.","note":"实验需同时报告列表质量、重复率、非法 ID 率和解码成本。"}
+  ],
+  "4_3_dlrm_hstu_practice": [
+    {"id":"hstu-architecture","paper_id":"hstu","keyword":"HSTU Block","label":"原文 Figure 3：HSTU 架构","page":4,"search":"Figure 3","quote":"HSTU is designed for high-cardinality, non-stationary streaming recommendation data.","note":"核心不是把 Transformer 改名，而是注意力归一化、相对偏置和系统协同的共同设计。"},
+    {"id":"hstu-results","paper_id":"hstu","keyword":"规模与吞吐实验","label":"原文 Table 4 / Figure 4：公开数据与效率","page":7,"search":"Table 4","quote":"HSTU consistently outperforms baselines on public datasets.","note":"论文还报告长序列训练/推理吞吐；教程分别记录轻量可执行结果与 full profile 工业前置条件。"}
+  ]
+}

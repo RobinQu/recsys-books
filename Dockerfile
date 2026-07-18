@@ -1,20 +1,28 @@
-FROM python:3.11-slim
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    UV_LINK_MODE=copy \
+    PATH="/opt/venv/bin:$PATH"
 WORKDIR /workspace
 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential libgomp1 curl \
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential libgomp1 curl fonts-noto-cjk poppler-utils \
     && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt .
-RUN pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0 \
-    && grep -v '^torch==' requirements.txt > /tmp/requirements-no-torch.txt \
-    && pip install -r /tmp/requirements-no-torch.txt
-# Quality tooling is isolated so changing lint rules does not invalidate the
-# considerably larger PyTorch/Jupyter dependency layer.
-RUN pip install ruff==0.11.13
+
+# Locked dependency layer: only rebuilds when pyproject.toml or uv.lock changes.
+# The environment lives outside /workspace so the compose bind mount cannot shadow it.
+COPY pyproject.toml uv.lock ./
+RUN uv sync --locked
 
 COPY . .
-RUN python scripts/generate_chapter_code.py && python scripts/generate_notebooks.py && python scripts/build_previews.py
+ARG RECSYS_RESOURCE_INIT=download
+RUN if [ "$RECSYS_RESOURCE_INIT" = "download" ]; then python scripts/init_resources.py --strict; else python scripts/init_resources.py --verify; fi \
+    && python scripts/generate_model_diagrams.py \
+    && python scripts/generate_paper_figures.py \
+    && python scripts/generate_chapter_code.py \
+    && python scripts/generate_notebooks.py \
+    && python scripts/build_previews.py
 
 EXPOSE 8000 8888
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

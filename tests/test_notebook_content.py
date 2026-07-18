@@ -6,7 +6,7 @@ import nbformat
 def test_math_foundations_is_visual_and_high_school_accessible():
     notebook = nbformat.read(Path("notebooks") / "3_0_math_foundations.ipynb", as_version=4)
     source = "\n".join(cell.source for cell in notebook.cells)
-    for token in ["行为表", "点积", "余弦", "矩阵乘法", "Sigmoid", "LogLoss", "梯度下降", "Recall@K", "matplotlib"]:
+    for token in ["行为表", "点积", "余弦", "矩阵乘法", "Sigmoid", "LogLoss", "Softmax", "temperature", "QK^\\top", "遮罩", "梯度下降", "Recall@K", "matplotlib"]:
         assert token in source
     assert "高中" not in source
     assert source.count("plt.") >= 8
@@ -99,6 +99,24 @@ def test_deep_notebooks_derive_model_specific_structure_and_loss():
         assert "高中" not in source
 
 
+def test_generative_notebooks_are_cuda_first_with_cpu_basic_fallback():
+    names = [
+        "4_0_generative_foundations.ipynb",
+        "4_1_generative_overview.ipynb",
+        "4_2_openonerec_practice.ipynb",
+        "4_3_dlrm_hstu_practice.ipynb",
+    ]
+    for name in names:
+        notebook = nbformat.read(Path("notebooks") / name, as_version=4)
+        assert notebook.metadata["recsys"]["requires_cuda"] is True
+        source = "\n".join(cell.source for cell in notebook.cells)
+        assert "默认要求 CUDA" in source
+    for name in names[-2:]:
+        source = "\n".join(cell.source for cell in nbformat.read(Path("notebooks") / name, as_version=4).cells)
+        assert "cpu_smoke=not torch.cuda.is_available()" in source
+        assert "validation_mode" in source
+
+
 def test_pipeline_notebook_opens_imports_and_reimplements_core_steps():
     notebook = nbformat.read(Path("notebooks") / "3_0_data_pipeline.ipynb", as_version=4)
     source = "\n".join(cell.source for cell in notebook.cells)
@@ -120,6 +138,20 @@ def test_every_large_chapter_has_a_result_aggregation_notebook():
         source = "\n".join(cell.source for cell in notebook.cells)
         assert "results" in source and "不手填" in source
         assert f"len(comparison)=={count}" in source or (filename == "3_1_summary.ipynb" and "len(comparison) == 5" in source)
+
+
+def test_summary_notebooks_explain_paper_comparability_and_do_not_hide_glyph_warnings():
+    for filename in ["3_1_summary.ipynb", "3_2_summary.ipynb", "3_3_summary.ipynb"]:
+        notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
+        source = "\n".join(cell.source for cell in notebook.cells)
+        assert "原论文" in source and ("不可直接比较" in source or "不能相减" in source)
+    for filename in ["3_2_summary.ipynb", "3_3_summary.ipynb", "3_4_summary.ipynb", "4_1_generative_overview.ipynb"]:
+        notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
+        source = "\n".join(cell.source for cell in notebook.cells)
+        assert "Noto Sans CJK" in source and "ASCII fallback" in source
+        assert "warnings.filterwarnings(" not in source
+        output_text = "\n".join(str(output) for cell in notebook.cells for output in cell.get("outputs", []))
+        assert "Glyph " not in output_text
 
 
 def test_every_large_chapter_has_a_math_opening_with_python_demo():
@@ -146,9 +178,27 @@ def test_every_notebook_uses_a_task_appropriate_bundled_real_dataset():
         source = "\n".join(cell.source for cell in notebook.cells)
         if path.name.startswith(("3_0", "3_1")):
             assert "MovieLens latest-small" in source, path.name
+        elif path.name.startswith("3_2_1"):
+            assert "Amazon Reviews Books 5-core" in source, path.name
+        elif path.name.startswith("3_2_2"):
+            assert "Amazon Books 2014" in source and "6,271,511" in source, path.name
+        elif path.name.startswith("3_2_3"):
+            assert "MovieLens 1M" in source, path.name
         elif path.name.startswith("3_2"):
-            assert "Amazon Reviews 2023" in source, path.name
+            assert any(dataset in source for dataset in ["Amazon Reviews 2023", "Amazon Reviews Books 5-core", "Amazon Books 2014", "MovieLens 1M"]), path.name
+        elif path.name.startswith(("3_3_2", "3_3_3")):
+            assert "Amazon Reviews Electronics 5-core" in source, path.name
+        elif path.name.startswith(("3_4_1", "3_4_2", "3_4_summary")):
+            assert "Census-Income KDD" in source, path.name
         else:
             assert "KuaiRand" in source, path.name
         assert "REAL_DATASET" in source, path.name
         assert 'REAL_DATASET["randomly_fabricated_rows"] == 0' in source, path.name
+
+
+def test_notebooks_default_to_formal_full_profile():
+    for path in Path("notebooks").glob("*.ipynb"):
+        notebook = nbformat.read(path, as_version=4)
+        assert notebook.metadata["recsys"]["profile"] == "full", path.name
+        setup = "\n".join(cell.source for cell in notebook.cells[:4])
+        assert 'RECSYS_PROFILE", "full"' in setup, path.name

@@ -16,10 +16,12 @@ from recsys_lab.runtime import (
     safe_auc as _safe_auc,
     seed_everything,
     train_binary as _train_binary,
+    complete_or_recent,
+    real_multitask_dataset as _real_multitask,
 )
 
 def _multitask_view(interactions):
-    frame = interactions.sort_values("timestamp").tail(8000).copy()
+    frame = complete_or_recent(interactions, 8000)
     tabs = np.eye(int(interactions.tab.max()) + 1, dtype=np.float32)[frame.tab.to_numpy()]
     duration = np.eye(int(interactions.duration_bucket.max()) + 1, dtype=np.float32)[frame.duration_bucket.to_numpy()]
     continuous = np.c_[
@@ -31,7 +33,8 @@ def _multitask_view(interactions):
 
 def _run_multitask(kind: str, epochs: int) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
-    seed_everything(); interactions, _, provenance = _real_kuairand(); x, labels = _multitask_view(interactions); split = int(len(x) * .8)
+    seed_everything(); x_train, y_train, x_test, y_test, provenance = _real_multitask()
+    x = np.r_[x_train, x_test]; labels = np.r_[y_train, y_test]; split = len(x_train)
     features = [DenseFeature(f"x{i}") for i in range(x.shape[1])]
     expert = {"dims": [24, 12], "activation": "relu", "dropout": 0.0}; towers = [{"dims": [12], "activation": "relu", "dropout": 0.0}] * 2
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
@@ -40,12 +43,18 @@ def _run_multitask(kind: str, epochs: int) -> dict:
     # 3) optimizer 只在训练阶段更新参数；推理阶段不应再调用它。
     optimizer = torch.optim.Adam(model.parameters(), lr=.012); losses = []
     # 4) 一个 epoch：前向计算 → loss → 梯度清零 → 反向传播 → 参数更新。
+    batch_size = 4096
     for _ in range(epochs):
-        probability = model({name: value[:split] for name, value in data.items()})
-        loss = sum(torch.nn.functional.binary_cross_entropy(probability[:, task], target[:split, task]) for task in range(2))
-        optimizer.zero_grad(); loss.backward(); optimizer.step(); losses.append(float(loss.detach()))
+        epoch_loss = 0.0
+        for start in range(0, split, batch_size):
+            stop = min(start + batch_size, split)
+            probability = model({name: value[start:stop] for name, value in data.items()})
+            loss = sum(torch.nn.functional.binary_cross_entropy(probability[:, task], target[start:stop, task]) for task in range(2))
+            optimizer.zero_grad(); loss.backward(); optimizer.step()
+            epoch_loss += float(loss.detach()) * (stop - start)
+        losses.append(epoch_loss / split)
     # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
-    with torch.no_grad(): probability = model({name: value[split:] for name, value in data.items()}).numpy()
+    with torch.no_grad(): probability = torch.cat([model({name: value[start:start + batch_size] for name, value in data.items()}) for start in range(split, len(x), batch_size)]).numpy()
     independent_auc = []
     for task in range(2):
         baseline = LogisticRegression(max_iter=300, solver="liblinear").fit(x[:split], labels[:split, task])
@@ -53,7 +62,7 @@ def _run_multitask(kind: str, epochs: int) -> dict:
     # 6) 返回真实测试切分上的指标和必要诊断信息，供章节总结统一读取。
     return {
         "framework": f"torch_rechub.models.multi_task.{kind.upper()}",
-        "dataset": provenance | {"rows": len(x), "features": x.shape[1], "tasks": ["observed is_click", "observed long_view"]},
+        "dataset": provenance | {"rows": len(x), "train_rows": len(x_train), "test_rows": len(x_test), "features": x.shape[1]},
         "loss_curve": losses, "click_auc": _safe_auc(labels[split:, 0], probability[:, 0]),
         "long_view_auc": _safe_auc(labels[split:, 1], probability[:, 1]),
         "conversion_auc": _safe_auc(labels[split:, 1], probability[:, 1]), "independent_lr_auc": independent_auc,
