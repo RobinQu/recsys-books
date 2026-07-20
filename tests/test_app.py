@@ -12,7 +12,7 @@ client = TestClient(app)
 def test_health_and_model_api():
     health = client.get("/healthz")
     assert health.status_code == 200
-    assert health.json()["notebooks"] == 26
+    assert health.json()["notebooks"] == 27
     response = client.get("/api/models", params={"stage": "召回"})
     assert response.status_code == 200
     assert {m["id"] for m in response.json()["items"]} >= {"dssm", "mind"}
@@ -39,7 +39,7 @@ def test_home_contains_required_sections():
     assert 'class="sidebar-subnav"' in html
     assert "/notebooks/4_2_openonerec_practice" in html
     assert "/notebooks/4_3_dlrm_hstu_practice" in html
-    assert "查看 26 个实验" in html
+    assert "查看 27 个实验" in html
     assert "/notebooks/3_0_data_pipeline" in html
     assert "3.0.1" not in html
     assert "Amazon Reviews 2023" in html and "KuaiRand" in html
@@ -109,7 +109,7 @@ def test_dssm_preview_contains_model_structure_and_formula_derivation():
     assert content.status_code == 200
     for token in ["Model Structure &amp; Formula Walkthrough", "结构：两条独立编码路径", "从相似度到训练目标", "temperature", "[B,N]"]:
         assert token in content.text
-    for token in ["论文证据导读", "双塔结构", "NDCG 实验", "/static/paper-figures/dssm.webp", "paper-guide-split", "paper-annotation"]:
+    for token in ["论文证据导读", "双塔结构", "排序质量", "/static/paper-figures/dssm.webp", "paper-guide-split", "paper-annotation"]:
         assert token in shell
     assert shell.count('class="paper-annotation') >= 8
 
@@ -176,7 +176,7 @@ def test_cuda_compose_override_exposes_gpu_to_generative_services():
 
 
 def test_local_paper_reader_and_evidence_api():
-    reader = client.get("/papers/dssm", params={"page": 3, "evidence": "dssm-architecture"})
+    reader = client.get("/papers/dssm", params={"page": 3, "evidence": "fig1-dssm"})
     assert reader.status_code == 200
     for token in ["LOCAL PAPER", "Figure 1", "/resources/papers/dssm.pdf", "EmbedPDF", "scrollToPage", "ZoomMode.FitWidth"]:
         assert token in reader.text
@@ -190,13 +190,13 @@ def test_local_paper_reader_and_evidence_api():
 def test_embedded_paper_reader_is_viewer_only():
     embedded = client.get(
         "/papers/dssm",
-        params={"page": 3, "evidence": "dssm-architecture", "embedded": 1},
+        params={"page": 3, "evidence": "fig1-dssm", "embedded": 1},
     ).text
     assert "paper-embedded" in embedded and 'id="pdf-viewer"' in embedded
     for chrome in ['class="topbar"', 'class="sidebar"', 'class="paper-head"', 'class="active-citation"']:
         assert chrome not in embedded
     shell = client.get("/notebooks/3_2_1_dssm").text
-    assert "evidence=dssm-architecture&embedded=1" in shell
+    assert "evidence=fig1-dssm&embedded=1" in shell
 
 
 def test_sidebar_keeps_current_notebook_in_view():

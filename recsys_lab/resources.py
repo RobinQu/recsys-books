@@ -238,6 +238,7 @@ def ensure_resources(
     """Verify resources and optionally download missing manifest entries."""
     RESOURCE_ROOT.mkdir(parents=True, exist_ok=True)
     states: list[ResourceState] = []
+    fetched = 0  # resources actually downloaded this run (ready items are skipped)
     for kind, item in iter_resources(kinds, ids):
         state = inspect_resource(kind, item)
         should_fetch = download and state.status != "ready" and (item.get("required", False) or include_optional)
@@ -253,6 +254,8 @@ def ensure_resources(
                         raise RuntimeError("no direct download URL; Scholar is discovery metadata only")
                     _download_url(url, target_path(item))
                 state = inspect_resource(kind, item)
+                if state.status == "ready":
+                    fetched += 1
             except Exception as error:
                 state.message = str(error)
         states.append(state)
@@ -261,6 +264,7 @@ def ensure_resources(
         "generated_at": int(time.time()),
         "ready": sum(state.status == "ready" for state in states),
         "missing": sum(state.status != "ready" for state in states),
+        "fetched": fetched,
         "items": [asdict(state) for state in states],
     }
     LOCK_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

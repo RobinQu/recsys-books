@@ -12,7 +12,7 @@
     <header class="paper-head"><div><div class="section-kicker">LOCAL PAPER · VERIFIED RESOURCE</div><h1>{{ paper.title }}</h1><p>{{ paper.provider }} · {{ paper.path }} · 当前定位第 {{ paper_page }} 页</p></div><a class="ghost button-like" href="{{ paper.local_url }}#page={{ paper_page }}{% if selected_evidence %}&search={{ selected_evidence.search | urlencode }}{% endif %}" target="_blank">原生阅读器 ↗</a></header>
     {% if selected_evidence %}<aside class="active-citation"><b>{{ selected_evidence.label }}</b><q>{{ selected_evidence.quote }}</q><p>{{ selected_evidence.note }}</p></aside>{% endif %}
     {% endif %}
-    {% if paper.ready %}<div id="pdf-viewer" class="pdf-viewer" data-url="{{ paper.local_url }}" data-document="{{ paper.id }}" data-page="{{ paper_page }}" data-search="{{ selected_evidence.search if selected_evidence else '' }}"></div>
+    {% if paper.ready %}<div id="pdf-viewer" class="pdf-viewer" data-url="{{ paper.local_url }}" data-document="{{ paper.id }}" data-page="{{ paper_page }}" data-search="{{ selected_evidence.search if selected_evidence else '' }}" data-evidence="{{ selected_evidence.id if selected_evidence else '' }}" data-annotations='{{ paper.annotations | tojson }}'></div>
     <noscript><iframe class="native-pdf" src="{{ paper.local_url }}#page={{ paper_page }}"></iframe></noscript>
     {% else %}<div class="resource-missing"><h2>论文资源尚未初始化</h2><p>在项目根目录运行 <code>python scripts/init_resources.py --strict --kind papers --id {{ paper.id }}</code> 后刷新。</p></div>{% endif %}
   </main>
@@ -32,12 +32,74 @@
         const viewer = EmbedPDF.init({type:'container', target,
           documentManager:{initialDocuments:[{url:target.dataset.url,documentId:target.dataset.document}]},
           scroll:{defaultStrategy:'vertical',defaultPageGap:18},
-          zoom:{defaultZoomLevel:ZoomMode.FitWidth}});
+          zoom:{defaultZoomLevel:ZoomMode.FitWidth},
+          // Reading mode: disable all write-oriented feature categories so
+          // imported evidence annotations cannot be modified, deleted,
+          // exported, or augmented by the user.
+          disabledCategories:['annotation','form','redaction','insert','document-export']});
         const registry = await viewer.registry;
         const scroll = registry.getPlugin('scroll').provides();
         const scopedScroll = scroll.forDocument ? scroll.forDocument(target.dataset.document) : scroll;
         const zoom = registry.getPlugin('zoom')?.provides();
         const scopedZoom = zoom?.forDocument ? zoom.forDocument(target.dataset.document) : zoom;
+        // Runtime annotations: precise, visually verified regions drawn through the
+        // EmbedPDF annotation plugin (not baked into the PDF). Text passages become
+        // HIGHLIGHT with per-line segmentRects; figures/tables become SQUARE boxes.
+        let annotations = [];
+        try { annotations = JSON.parse(target.dataset.annotations || '[]'); } catch (_) { annotations = []; }
+        const evidenceId = target.dataset.evidence || '';
+        const annotationCap = registry.getPlugin('annotation')?.provides();
+        const annScope = annotationCap?.forDocument ? annotationCap.forDocument(target.dataset.document) : annotationCap;
+        let annotationItems = [];
+        if (annScope && annotations.length && typeof annScope.importAnnotations === 'function') {
+          annotationItems = annotations.map((a) => {
+            const base = {
+              id: a.id,
+              pageIndex: a.page - 1,
+              rect: a.rect,
+              created: new Date().toISOString(),
+              // Read-only viewer: standard PDF flags discourage move/edit/delete;
+              // the event guard below reverts any change as a backstop.
+              flags: ['print', 'readOnly', 'locked', 'lockedContents'],
+              strokeColor: a.color,
+              custom: { text: a.id },
+            };
+            return a.is_text
+              // HIGHLIGHT: multiply blend + <1 opacity keeps the text readable.
+              ? { annotation: { ...base, type: 9, color: a.color, opacity: 0.5, blendMode: 1, segmentRects: a.segmentRects } }
+              // SQUARE box: transparent fill, only a colored outline.
+              : { annotation: { ...base, type: 5, color: 'transparent', opacity: 1, strokeWidth: 2 } };
+          });
+          try { annScope.importAnnotations(annotationItems); } catch (error) { console.warn('EmbedPDF annotation import failed', error); }
+        }
+        // Read-only guard: revert any user attempt to create/update/delete an
+        // annotation, so the imported evidence regions can't be altered.
+        if (annScope && annotationItems.length && typeof annScope.onAnnotationEvent === 'function') {
+          const ourIds = new Set(annotations.map((a) => a.id));
+          let restoring = false;
+          const restore = () => {
+            if (restoring) return;
+            restoring = true;
+            try { annScope.importAnnotations(annotationItems); } catch (_) { /* best-effort */ }
+            window.setTimeout(() => { restoring = false; }, 250);
+          };
+          annScope.onAnnotationEvent((event) => {
+            if (restoring || !event || !event.type) return;
+            const id = event.annotation && event.annotation.id;
+            if (event.type === 'create' && id && !ourIds.has(id)) {
+              // A hand-drawn annotation appeared: remove it.
+              try { annScope.deleteAnnotation(event.pageIndex ?? 0, id); } catch (_) { /* best-effort */ }
+            } else if ((event.type === 'update' || event.type === 'delete') && id && ourIds.has(id)) {
+              restore();
+            }
+          });
+        }
+        const selectEvidence = () => {
+          if (!evidenceId || !annScope || typeof annScope.selectAnnotation !== 'function') return;
+          const target2 = annotations.find((a) => a.id === evidenceId);
+          if (!target2) return;
+          try { annScope.selectAnnotation(target2.page - 1, evidenceId); } catch (_) { /* selection is best-effort */ }
+        };
         const refit = () => {
           if (typeof scopedZoom?.setZoomLevel === 'function') scopedZoom.setZoomLevel(ZoomMode.FitWidth);
           else if (typeof scopedZoom?.zoomTo === 'function') scopedZoom.zoomTo(ZoomMode.FitWidth);
@@ -45,6 +107,9 @@
         const revealEvidence = () => {
           scopedScroll.scrollToPage({pageNumber:Number(target.dataset.page),behavior:'instant'});
           refit();
+          // Select (flash) the target annotation once its page is laid out.
+          window.setTimeout(selectEvidence, 120);
+          window.setTimeout(selectEvidence, 500);
         };
         scroll.onLayoutReady((event) => {
           if (!event?.documentId || event.documentId === target.dataset.document) revealEvidence();

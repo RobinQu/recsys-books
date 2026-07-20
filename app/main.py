@@ -134,6 +134,13 @@ def paper_reader(
     if paper is None:
         raise HTTPException(404, "Unknown paper")
     selected = next((item for item in paper["anchors"] if item["id"] == evidence), None)
+    if selected is None and evidence:
+        # A runtime annotation id (quick-index card or prose keyword) can also
+        # drive navigation: jump to its page so the reader flashes that region.
+        annotation = next((a for a in paper["annotations"] if a["id"] == evidence), None)
+        if annotation:
+            selected = {"id": annotation["id"], "page": annotation["page"],
+                        "label": annotation["id"], "search": "", "quote": "", "note": ""}
     if selected:
         page = selected["page"]
     context = page_context(request, "sources")

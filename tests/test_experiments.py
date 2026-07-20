@@ -15,6 +15,7 @@ def test_classic_metrics_are_functional():
     assert result["mf_rmse"] < 3
     assert 0 <= result["fm_auc"] <= 1
     assert 0 <= result["gbdt_lr_auc"] <= 1
+    assert 0 <= result["word2vec_recall@5"] <= 1
     assert result["randomly_fabricated_rows"] == 0
 
 

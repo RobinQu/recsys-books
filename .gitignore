@@ -4,7 +4,13 @@ __pycache__/
 .ipynb_checkpoints/
 *.pyc
 .ruff_cache/
-# Downloaded papers, full datasets, viewer bundles and generated resource locks.
+# Paper PDFs are tracked under resources/papers/ so the in-site reader works
+# right after clone. Full datasets, the EmbedPDF viewer bundle and the generated
+# resource lock stay ignored; the download module fetches only missing items.
 # The tracked manifest lives at config/resources.json.
-resources/
+resources/datasets/
+resources/vendor/
+resources/resource-lock.json
 tmp/
+.idea/
+*.iml

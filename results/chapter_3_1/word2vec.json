@@ -1,0 +1,14 @@
+{
+  "records": [
+    {
+      "algorithm": "word2vec / Item2Vec",
+      "task": "Top-K",
+      "metric": "Recall@5 ↑",
+      "value": 0.05,
+      "secondary_metric": "Coverage",
+      "secondary_value": 0.18282548476454294,
+      "online_inference": "物品向量 ANN 召回",
+      "source_notebook": "3_1_5_word2vec"
+    }
+  ]
+}

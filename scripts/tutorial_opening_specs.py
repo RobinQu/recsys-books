@@ -8,8 +8,8 @@ def build_opening_specs(md, code, notebook):
         {
             "slug": "3_1_0_classic_foundations",
             "title": "3.1 导读与数学基础：经典算法",
-            "goal": "在进入协同过滤、MF、FM 与 GBDT+LR 前，建立邻域、低秩、特征交互和二分类概率的共同数学地图。",
-            "source": "[GroupLens](https://dl.acm.org/doi/10.1145/192844.192905) · [ItemCF](https://dl.acm.org/doi/10.1145/371920.372071) · [MF](https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf) · [FM](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf) · [GBDT+LR](https://research.facebook.com/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/)",
+            "goal": "在进入协同过滤、MF、FM、GBDT+LR 与 word2vec 前，建立邻域、低秩、特征交互、二分类概率和序列嵌入的共同数学地图。",
+            "source": "[GroupLens](https://dl.acm.org/doi/10.1145/192844.192905) · [ItemCF](https://dl.acm.org/doi/10.1145/371920.372071) · [MF](https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf) · [FM](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf) · [GBDT+LR](https://research.facebook.com/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/) · [word2vec](https://arxiv.org/abs/1301.3781)",
             "layout": """## 本章布局与选型地图
 
 | 子章节 | 解决的问题 | 共同数学 | 典型位置 |
@@ -18,9 +18,10 @@ def build_opening_specs(md, code, notebook):
 | 3.1.2 BiasMF | 用低维坐标压缩稀疏评分矩阵 | 矩阵乘法、内积、均方误差 | 召回、评分预测 |
 | 3.1.3 FM | 学习稀疏 field 的二阶交互 | one-hot、向量内积、LogLoss | CTR 排序 |
 | 3.1.4 GBDT+LR | 用树规则产生特征并预测点击概率 | 条件分支、one-hot、Sigmoid | CTR 排序 |
+| 3.1.5 word2vec / Item2Vec | 把行为序列学成物品向量做召回 | 中心-上下文内积、负采样、Sigmoid | 向量召回 |
 | 3.1 总结 | 从实际 JSON 汇总指标 | 指标方向与公平比较 | 选型 |
 
-应用场景并非互斥：ItemCF 常作为可解释兜底通道；MF 是向量召回的最小原型；FM 与 GBDT+LR 是成熟 CTR 基线。学习顺序建议从矩阵共现开始，再进入可训练表示和概率模型。""",
+应用场景并非互斥：ItemCF 常作为可解释兜底通道；MF 是向量召回的最小原型；FM 与 GBDT+LR 是成熟 CTR 基线；word2vec 把序列共现压成可 ANN 的物品向量，衔接后续 DSSM、SASRec。学习顺序建议从矩阵共现开始，再进入可训练表示、概率模型和序列嵌入。""",
             "papers": """## 来源论文解读
 
 - **Resnick et al. (1994)** 把相似用户评分加权落成可运行系统，核心遗产是“从群体行为借信号”。
@@ -28,9 +29,10 @@ def build_opening_specs(md, code, notebook):
 - **Koren et al. (2009)** 强调只在已观察集合上训练、加入用户/物品偏置并正则化低秩向量。
 - **Rendle (2010)** 用共享隐向量估计从未共同出现过的稀疏特征组合。
 - **He et al. (2014)** 把树当监督式特征变换，再由 LR 输出可校准概率。
+- **Mikolov et al. (2013)** 用中心词预测上下文高效学词向量；推荐系统把行为序列当句子学物品向量（Item2Vec），是向量召回的起点。
 
-这些论文对应两种数据生成机制：CF/MF 学 user–item 行为或评分；FM/GBDT+LR 学曝光后的点击。两类指标不能直接排名。""",
-            "math": r"""## 共同数学：一张矩阵，三种读法
+这些论文对应两种数据生成机制：CF/MF/word2vec 学 user–item 行为或行为序列；FM/GBDT+LR 学曝光后的点击。两类指标不能直接排名。""",
+            "math": r"""## 共同数学：从矩阵到序列
 
 设 $R\in\mathbb R^{|U|\times|I|}$ 是用户—物品矩阵。
 
@@ -38,6 +40,7 @@ def build_opening_specs(md, code, notebook):
 2. **低秩：** $R\approx PQ^\top$，把每位用户和物品映射到 $d$ 维坐标。$P_u^\top Q_i$ 是两张坐标卡逐项相乘求和。
 3. **稀疏交互：** FM 为 one-hot 特征配置向量，使用 $\langle v_i,v_j\rangle x_ix_j$ 表示任意两项交互。
 4. **CTR 概率：** LR/GBDT+LR/FM 排序都可输出 logit $z$，再用 $\sigma(z)=1/(1+e^{-z})$ 得到概率，并以 LogLoss 训练。
+5. **序列嵌入：** word2vec 把每个用户的正反馈序列当一句话，用中心向量 $v_c$ 与上下文向量 $v_w$ 的内积衡量共现；负采样再随机抽不共现的物品配对，同样套用 $\sigma$ 与 LogLoss 拉正推负，训练后取中心向量做全库 ANN 召回。
 
 先看形状，再看每个数字代表什么，比背公式更重要。""",
             "demo": """import numpy as np, matplotlib.pyplot as plt
@@ -50,11 +53,15 @@ for ax,matrix,title in [(axes[0],R,'behavior R'),(axes[1],item_common,'R.T @ R: 
     for row in range(matrix.shape[0]):
         for col in range(matrix.shape[1]): ax.text(col,row,f'{matrix[row,col]:.1f}',ha='center',va='center',fontsize=8)
 plt.tight_layout(); plt.show()
-z=np.array([-2.,0.,2.]); print({'logit':z.tolist(),'sigmoid':(1/(1+np.exp(-z))).round(3).tolist()})""",
+z=np.array([-2.,0.,2.]); print({'logit':z.tolist(),'sigmoid':(1/(1+np.exp(-z))).round(3).tolist()})
+# word2vec：把序列当一句话，窗口内的(中心,上下文)物品对就是 Skip-gram 的正样本。
+seq=[1,2,3,2]; w2v_pairs=[(seq[i],seq[j]) for i in range(len(seq)) for j in range(max(0,i-1),min(len(seq),i+2)) if i!=j]
+print({'skip_gram_pairs':w2v_pairs})""",
             "checks": """assert user_common.shape==(3,3)
 assert item_common.shape==(4,4)
 assert rank2.shape==R.shape
-print('PASS：共现、低秩近似和概率变换的基础形状正确。')""",
+assert (2,3) in w2v_pairs and (3,2) in w2v_pairs
+print('PASS：共现、低秩近似、概率变换与序列共现对的基础形状正确。')""",
         },
         {
             "slug": "3_2_0_retrieval_foundations",

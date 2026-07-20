@@ -64,7 +64,7 @@
       <dialog id="compare-dialog"><form method="dialog"><button class="dialog-close" aria-label="关闭">×</button><h2>典型模型横向对比</h2><div id="compare-table"></div></form></dialog>
     </section>
 
-    <section id="classic" class="section lab-section reveal"><div class="section-kicker">3.1 · HANDS-ON</div><div class="lab-head"><div><h2>经典算法：一个方案，一个 Notebook</h2><p>从本章数学导读进入，再分别学习协同过滤、MF、FM、GBDT+LR，最后打开基于四个实验结果的总结。</p></div><div class="lab-actions"><a class="button" href="/notebooks/3_1_0_classic_foundations">数学导读</a><a class="ghost button-like" href="/notebooks/3_1_summary">结果总结</a></div></div>
+    <section id="classic" class="section lab-section reveal"><div class="section-kicker">3.1 · HANDS-ON</div><div class="lab-head"><div><h2>经典算法：一个方案，一个 Notebook</h2><p>从本章数学导读进入，再分别学习协同过滤、MF、FM、GBDT+LR、word2vec，最后打开基于五个实验结果的总结。</p></div><div class="lab-actions"><a class="button" href="/notebooks/3_1_0_classic_foundations">数学导读</a><a class="ghost button-like" href="/notebooks/3_1_summary">结果总结</a></div></div>
       <div class="notebook-list chapter-notebooks">{% for n in notebooks %}{% if n.slug[:4] == '3_1_' %}<article><div><span>{{ n.framework }}</span><h3>{{ n.title }}</h3><p>{{ n.dataset }} · {{ n.runtime }}</p></div><div><a href="/notebooks/{{ n.slug }}" target="_blank">预览</a><a href="{{ jupyter_url }}/lab/tree/notebooks/{{ n.slug }}.ipynb?token=recsys" target="_blank">运行 ↗</a></div></article>{% endif %}{% endfor %}</div>
     </section>
 

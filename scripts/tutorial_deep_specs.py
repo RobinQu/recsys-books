@@ -626,6 +626,13 @@ print('结论：当前结果是可执行的 smoke/教学实验，不是 paper re
 本章节固定为 **开篇导读 → 独立算法教程 → 结果总结**。每篇算法 Notebook 都包含论文、数学、数据、训练、推理、测试与讨论；本页不重新训练，也不手填数字。
 
 {interpretation}"""),
+                md("## Paper Evidence Map\n\n本页聚合本章核心论文的关键证据。点击上方“论文导读”可逐条跳转到 PDF 原页；这里的表格只列出证据与对应 Notebook，不替代原文阅读。"),
+                code(f"""from app.evidence import load_evidence, _chapter_items
+evidence = load_evidence()
+rows = []
+for item in _chapter_items(evidence.get({slug!r})):
+    rows.append({{'paper': item['paper_id'], 'page': item['page'], 'keyword': item['keyword'], 'quote': item['quote'][:120] + '...'}})
+display(pd.DataFrame(rows))"""),
                 md("## Results\n\n读取 results 目录。若缺文件，请先按章节顺序执行算法 Notebook。"),
                 code(f"""import json
 import pandas as pd

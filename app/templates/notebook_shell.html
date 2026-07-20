@@ -32,10 +32,28 @@
       <div class="paper-guide-split" data-paper-guide data-evidence-reader>
         <article class="paper-guide-prose">
           <header class="paper-guide-heading"><span>PAPER EVIDENCE GUIDE</span><h2>论文证据导读</h2><p>{{ paper_guide.intro }}</p></header>
+          {% if paper_guide.quick_index %}
+          <section class="paper-quick-index" aria-label="快速索引">
+            <h3>快速索引</h3>
+            <ul>{% for q in paper_guide.quick_index %}<li><button class="paper-annotation quick-index-card" type="button" data-paper-id="{{ q.paper_id }}" data-evidence-id="{{ q.evidence_id }}" data-page="{{ q.page }}" data-label="{{ q.label }}"><span class="qi-kind qi-{{ q.kind }}">{{ q.kind }}</span><b>{{ q.label }}</b><em>p.{{ q.page }}</em></button></li>{% endfor %}</ul>
+          </section>
+          {% endif %}
+          {% if paper_guide.guide %}
+          {% set guide_labels = {"background":"研究背景","problem":"核心问题","innovation":"创新点","method":"方法","findings":"主要发现","contribution":"领域贡献","limitations":"局限","one_liner":"一句话总结"} %}
+          <section class="paper-guide-summary">
+            {% if paper_guide.guide.one_liner %}<p class="guide-one-liner"><span class="guide-one-liner-tag">一句话总结</span>{% for seg in paper_guide.guide.one_liner %}{% if seg.type == "link" %}<button class="paper-annotation" type="button" data-paper-id="{{ seg.paper_id }}" data-evidence-id="{{ seg.evidence_id }}" data-page="{{ seg.page }}" data-label="{{ seg.term }}">{{ seg.term }}</button>{% else %}{{ seg.value }}{% endif %}{% endfor %}</p>{% endif %}
+            <dl>{% for field, segments in paper_guide.guide.items() if field != "one_liner" %}<dt>{{ guide_labels[field] }}</dt><dd>{% for seg in segments %}{% if seg.type == "link" %}<button class="paper-annotation" type="button" data-paper-id="{{ seg.paper_id }}" data-evidence-id="{{ seg.evidence_id }}" data-page="{{ seg.page }}" data-label="{{ seg.term }}">{{ seg.term }}</button>{% else %}{{ seg.value }}{% endif %}{% endfor %}</dd>{% endfor %}</dl>
+          </section>
+          {% endif %}
           {% if paper_guide.structure_figure %}<figure class="guide-diagram paper-original-figure"><button class="figure-evidence-button" type="button" data-paper-id="{{ paper_guide.structure_figure.paper_id }}" data-evidence-id="{{ paper_guide.architecture_item.id }}" data-page="{{ paper_guide.architecture_item.page }}" data-label="{{ paper_guide.architecture_item.label }}"><img src="{{ paper_guide.structure_figure.url }}" alt="{{ paper_guide.structure_figure.label }} 论文原图节选"></button><figcaption>论文原图节选 · {{ paper_guide.structure_figure.label }} · PDF p.{{ paper_guide.structure_figure.page }}。点击图片在右侧核对原页。</figcaption></figure>
           {% elif paper_guide.diagram_id %}<figure class="guide-diagram"><img src="/static/diagrams/{{ paper_guide.diagram_id }}.svg" alt="{{ paper_guide.diagram_id }} 模型结构教学示意图"><figcaption>该论文没有可直接截取的完整模型图；此图依据论文描述重组。点击下文标注核对原页。</figcaption></figure>{% endif %}
           {% if paper_guide.layers %}<section class="model-layer-guide"><h3>关键层级</h3>{% for layer in paper_guide.layers %}<button class="model-layer-card paper-annotation-card" type="button" data-paper-id="{{ layer.paper_id }}" data-evidence-id="{{ layer.evidence_id }}" data-page="{{ layer.page }}" data-label="{{ layer.label }}"><b>{{ loop.index }}. {{ layer.name }}</b><span>{{ layer.explanation }}</span></button>{% endfor %}</section>{% endif %}
           <section class="reading-route"><h3>阅读路线</h3><p>本页关联 {% for title in paper_guide.papers %}<em>{{ title }}</em>{{ '、' if not loop.last else '' }}{% endfor %}。建议先读模型结构，再核对实验设置，最后判断论文结论能否迁移到本教程的数据与指标口径。</p></section>
+          {# Chapters on the new 七字段 guide scheme (marked by the "innovation"
+             field) navigate via keyword annotations + quick-index cards, so the
+             older E01… evidence cards are redundant and hidden. Chapters still on
+             the legacy guide keep the detailed evidence cards. #}
+          {% if "innovation" not in paper_guide.guide %}
           {% for item in paper_guide["items"] %}
           <section class="evidence-reading" id="guide-{{ item.id }}">
             <span class="evidence-index">E{{ '%02d'|format(loop.index) }} · p.{{ item.page }}</span>
@@ -51,6 +69,7 @@
             <p>{{ item.note }} <button class="paper-annotation evidence-return" type="button" data-paper-id="{{ item.paper_id }}" data-evidence-id="{{ item.id }}" data-page="{{ item.page }}" data-label="{{ item.label }}">回到原文核对</button></p>
           </section>
           {% endfor %}
+          {% endif %}
         </article>
         <aside class="paper-guide-viewer">
           <header><div><b data-paper-current>{{ paper_guide["items"][0].label }}</b><span data-paper-page>PDF p.{{ paper_guide["items"][0].page }} · 点击左侧下划线切换证据</span></div><a data-paper-popout href="/papers/{{ paper_guide["items"][0].paper_id }}?page={{ paper_guide["items"][0].page }}&evidence={{ paper_guide["items"][0].id }}" target="_blank" rel="noreferrer">单独打开 ↗</a></header>

@@ -16,12 +16,14 @@ def run_classic(epochs: int = 8) -> dict:
     mf = execute("3_1_2_matrix_factorization")
     fm = execute("3_1_3_factorization_machine")
     gbdt_lr = execute("3_1_4_gbdt_lr")
+    word2vec = execute("3_1_5_word2vec")
     return {
         "dataset": "MovieLens latest-small",
         "randomly_fabricated_rows": 0,
         "cf_recall@5": round(cf["recall@5"], 4), "mf_rmse": round(mf["rmse"], 4),
         "fm_auc": round(fm["auc"], 4), "gbdt_lr_auc": round(gbdt_lr["auc"], 4),
         "gbdt_lr_logloss": round(gbdt_lr["logloss"], 4),
+        "word2vec_recall@5": round(word2vec["recall@5"], 4),
     }
 
 

@@ -1,0 +1,11 @@
+{
+  "include": [
+    "."
+  ],
+  "extraPaths": [
+    "../..",
+    "/opt/venv/lib/python3.11/site-packages"
+  ],
+  "useLibraryCodeForTypes": true,
+  "typeCheckingMode": "off"
+}

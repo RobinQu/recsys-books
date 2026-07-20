@@ -1,0 +1,5707 @@
+{
+  "he2014": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "abs-model",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 284.9
+          },
+          "size": {
+            "width": 239.1,
+            "height": 29.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 220.5,
+              "y": 284.9
+            },
+            "size": {
+              "width": 72.5,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 295.4
+            },
+            "size": {
+              "width": 239.1,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 305.8
+            },
+            "size": {
+              "width": 131.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-features",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 347.7
+          },
+          "size": {
+            "width": 239.2,
+            "height": 29.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 93.2,
+              "y": 347.7
+            },
+            "size": {
+              "width": 199.7,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 358.1
+            },
+            "size": {
+              "width": 239.2,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 368.6
+            },
+            "size": {
+              "width": 136.4,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-challenging",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 141.3,
+            "y": 274.4
+          },
+          "size": {
+            "width": 138.8,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 141.3,
+              "y": 274.4
+            },
+            "size": {
+              "width": 138.8,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-750m",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 179.6,
+            "y": 253.5
+          },
+          "size": {
+            "width": 113.3,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 179.6,
+              "y": 253.5
+            },
+            "size": {
+              "width": 113.3,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig1-hybrid",
+        "page": 2,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 318,
+            "y": 55
+          },
+          "size": {
+            "width": 196,
+            "height": 193
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "eq-ne",
+        "page": 2,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 68,
+            "y": 645
+          },
+          "size": {
+            "width": 223,
+            "height": 37
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "method-1ofk",
+        "page": 3,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 316.8,
+            "y": 354.6
+          },
+          "size": {
+            "width": 239.1,
+            "height": 29.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 477.5,
+              "y": 354.6
+            },
+            "size": {
+              "width": 78.4,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 316.8,
+              "y": 365.1
+            },
+            "size": {
+              "width": 239.1,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 316.8,
+              "y": 375.6
+            },
+            "size": {
+              "width": 193.4,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "method-onehot",
+        "page": 3,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 316.8,
+            "y": 427.9
+          },
+          "size": {
+            "width": 239.1,
+            "height": 19.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 381.6,
+              "y": 427.9
+            },
+            "size": {
+              "width": 174.4,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 316.8,
+              "y": 438.3
+            },
+            "size": {
+              "width": 135.7,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "result-3-4pct",
+        "page": 3,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 316.8,
+            "y": 658.0
+          },
+          "size": {
+            "width": 239.1,
+            "height": 19.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 316.8,
+              "y": 658.0
+            },
+            "size": {
+              "width": 239.1,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 316.8,
+              "y": 668.5
+            },
+            "size": {
+              "width": 127.7,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "table1-combination",
+        "page": 4,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 77,
+            "y": 102
+          },
+          "size": {
+            "width": 191,
+            "height": 48
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "fig2-freshness",
+        "page": 4,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 59,
+            "y": 170
+          },
+          "size": {
+            "width": 243,
+            "height": 150
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "freshness-1pct",
+        "page": 4,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 161.5,
+            "y": 647.5
+          },
+          "size": {
+            "width": 131.4,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 161.5,
+              "y": 647.5
+            },
+            "size": {
+              "width": 131.4,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "freshness-daily",
+        "page": 4,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 99.6,
+            "y": 658.0
+          },
+          "size": {
+            "width": 191.3,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 99.6,
+              "y": 658.0
+            },
+            "size": {
+              "width": 191.3,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "percoord-sgd",
+        "page": 4,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 316.8,
+            "y": 689.4
+          },
+          "size": {
+            "width": 239.2,
+            "height": 19.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 415.7,
+              "y": 689.4
+            },
+            "size": {
+              "width": 140.3,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 316.8,
+              "y": 699.8
+            },
+            "size": {
+              "width": 176.1,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig4-joiner",
+        "page": 5,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 350,
+            "y": 50
+          },
+          "size": {
+            "width": 166,
+            "height": 130
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "fig3-lrrate",
+        "page": 5,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 61,
+            "y": 159
+          },
+          "size": {
+            "width": 241,
+            "height": 152
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "trees-500",
+        "page": 6,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 316.8,
+            "y": 561.4
+          },
+          "size": {
+            "width": 239.2,
+            "height": 19.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 341.2,
+              "y": 561.4
+            },
+            "size": {
+              "width": 214.8,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 316.8,
+              "y": 571.9
+            },
+            "size": {
+              "width": 21.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig5-trees",
+        "page": 6,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 320,
+            "y": 327
+          },
+          "size": {
+            "width": 235,
+            "height": 143
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "fig6-importance",
+        "page": 7,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 70,
+            "y": 193
+          },
+          "size": {
+            "width": 214,
+            "height": 139
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "top10-historical",
+        "page": 7,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 316.8,
+            "y": 595.2
+          },
+          "size": {
+            "width": 239.1,
+            "height": 19.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 465.2,
+              "y": 595.2
+            },
+            "size": {
+              "width": 90.8,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 316.8,
+              "y": 605.7
+            },
+            "size": {
+              "width": 189.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig8-historical",
+        "page": 7,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 320,
+            "y": 366
+          },
+          "size": {
+            "width": 239,
+            "height": 150
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "table4-features",
+        "page": 8,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 73,
+            "y": 89
+          },
+          "size": {
+            "width": 200,
+            "height": 41
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "ctx-4-5-loss",
+        "page": 8,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 152.6
+          },
+          "size": {
+            "width": 239.1,
+            "height": 19.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 152.6
+            },
+            "size": {
+              "width": 239.1,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 163.1
+            },
+            "size": {
+              "width": 81.4,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "disc-freshness",
+        "page": 9,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 76.2,
+            "y": 468.2
+          },
+          "size": {
+            "width": 216.7,
+            "height": 19.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 76.2,
+              "y": 468.2
+            },
+            "size": {
+              "width": 216.7,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 76.2,
+              "y": 478.7
+            },
+            "size": {
+              "width": 21.5,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "disc-transform",
+        "page": 9,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 76.2,
+            "y": 526.6
+          },
+          "size": {
+            "width": 216.7,
+            "height": 29.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 76.2,
+              "y": 526.6
+            },
+            "size": {
+              "width": 216.7,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 76.2,
+              "y": 537.1
+            },
+            "size": {
+              "width": 216.7,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 76.2,
+              "y": 547.6
+            },
+            "size": {
+              "width": 154.3,
+              "height": 9.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "grouplens": {
+    "page_height": 797.0,
+    "annotations": [
+      {
+        "id": "abs-cf-definition",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 55.4,
+            "y": 248.7
+          },
+          "size": {
+            "width": 238.6,
+            "height": 22.2
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 55.4,
+              "y": 248.7
+            },
+            "size": {
+              "width": 238.6,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 55.4,
+              "y": 260.0
+            },
+            "size": {
+              "width": 108.1,
+              "height": 10.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-heuristic",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 55.4,
+            "y": 337.0
+          },
+          "size": {
+            "width": 238.1,
+            "height": 21.7
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 169.0,
+              "y": 337.0
+            },
+            "size": {
+              "width": 124.6,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 55.4,
+              "y": 347.8
+            },
+            "size": {
+              "width": 105.4,
+              "height": 10.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-pseudonyms",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 67.7,
+            "y": 358.9
+          },
+          "size": {
+            "width": 136.8,
+            "height": 10.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 67.7,
+              "y": 358.9
+            },
+            "size": {
+              "width": 136.8,
+              "height": 10.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "grouplens-architecture",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 55.4,
+            "y": 369.7
+          },
+          "size": {
+            "width": 233.8,
+            "height": 21.7
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 222.7,
+              "y": 369.7
+            },
+            "size": {
+              "width": 66.5,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 55.4,
+              "y": 380.5
+            },
+            "size": {
+              "width": 28.6,
+              "height": 10.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "cf-idea",
+        "page": 2,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 65.8,
+            "y": 374.9
+          },
+          "size": {
+            "width": 239.6,
+            "height": 32.7
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 128.2,
+              "y": 374.9
+            },
+            "size": {
+              "width": 170.7,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 66.0,
+              "y": 385.9
+            },
+            "size": {
+              "width": 239.4,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 65.8,
+              "y": 396.7
+            },
+            "size": {
+              "width": 22.1,
+              "height": 10.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "cf-twostep",
+        "page": 2,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 65.5,
+            "y": 418.8
+          },
+          "size": {
+            "width": 237.8,
+            "height": 21.7
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 65.8,
+              "y": 418.8
+            },
+            "size": {
+              "width": 237.6,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 65.5,
+              "y": 429.6
+            },
+            "size": {
+              "width": 156.8,
+              "height": 10.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "grouplens-mechanism",
+        "page": 3,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 54.5,
+            "y": 60.2
+          },
+          "size": {
+            "width": 238.6,
+            "height": 33.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 202.3,
+              "y": 60.2
+            },
+            "size": {
+              "width": 90.8,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 54.5,
+              "y": 71.9
+            },
+            "size": {
+              "width": 233.8,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 54.5,
+              "y": 83.2
+            },
+            "size": {
+              "width": 161.6,
+              "height": 10.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "system-def",
+        "page": 3,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 50.6,
+            "y": 633.3
+          },
+          "size": {
+            "width": 230.9,
+            "height": 21.7
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 50.6,
+              "y": 633.3
+            },
+            "size": {
+              "width": 230.9,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 50.6,
+              "y": 644.1
+            },
+            "size": {
+              "width": 126.0,
+              "height": 10.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "scalability",
+        "page": 3,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 315.8,
+            "y": 259.8
+          },
+          "size": {
+            "width": 239.1,
+            "height": 21.7
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 367.5,
+              "y": 259.8
+            },
+            "size": {
+              "width": 187.5,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 315.8,
+              "y": 270.6
+            },
+            "size": {
+              "width": 107.3,
+              "height": 10.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig1-netnews",
+        "page": 4,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 140,
+            "y": 40
+          },
+          "size": {
+            "width": 340,
+            "height": 205
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "fig2-grouplens",
+        "page": 4,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 65,
+            "y": 315
+          },
+          "size": {
+            "width": 500,
+            "height": 340
+          }
+        },
+        "segmentRects": null
+      }
+    ]
+  },
+  "matrix-factorization": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "abs-superior",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 56.0,
+            "y": 424.0
+          },
+          "size": {
+            "width": 224.5,
+            "height": 39.3
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 119.8,
+              "y": 424.0
+            },
+            "size": {
+              "width": 160.7,
+              "height": 11.3
+            }
+          },
+          {
+            "origin": {
+              "x": 56.0,
+              "y": 438.0
+            },
+            "size": {
+              "width": 224.5,
+              "height": 11.3
+            }
+          },
+          {
+            "origin": {
+              "x": 56.0,
+              "y": 452.0
+            },
+            "size": {
+              "width": 57.9,
+              "height": 11.3
+            }
+          }
+        ]
+      },
+      {
+        "id": "mf-latent-space",
+        "page": 3,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 57.2,
+            "y": 676.2
+          },
+          "size": {
+            "width": 223.2,
+            "height": 22.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 68.0,
+              "y": 676.2
+            },
+            "size": {
+              "width": 212.4,
+              "height": 10.4
+            }
+          },
+          {
+            "origin": {
+              "x": 57.2,
+              "y": 688.1
+            },
+            "size": {
+              "width": 107.4,
+              "height": 10.4
+            }
+          }
+        ]
+      },
+      {
+        "id": "sgd",
+        "page": 4,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 48.6,
+            "y": 181.1
+          },
+          "size": {
+            "width": 128.2,
+            "height": 13.6
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 48.6,
+              "y": 181.1
+            },
+            "size": {
+              "width": 128.2,
+              "height": 13.6
+            }
+          }
+        ]
+      },
+      {
+        "id": "als",
+        "page": 4,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 130.1,
+            "y": 160.3
+          },
+          "size": {
+            "width": 93.9,
+            "height": 10.3
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 130.1,
+              "y": 160.3
+            },
+            "size": {
+              "width": 93.9,
+              "height": 10.3
+            }
+          }
+        ]
+      },
+      {
+        "id": "biases",
+        "page": 4,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 48.6,
+            "y": 685.1
+          },
+          "size": {
+            "width": 77.9,
+            "height": 13.6
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 48.6,
+              "y": 685.1
+            },
+            "size": {
+              "width": 77.9,
+              "height": 13.6
+            }
+          }
+        ]
+      },
+      {
+        "id": "implicit-feedback",
+        "page": 5,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 57.2,
+            "y": 112.1
+          },
+          "size": {
+            "width": 223.2,
+            "height": 10.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 57.2,
+              "y": 112.1
+            },
+            "size": {
+              "width": 223.2,
+              "height": 10.4
+            }
+          }
+        ]
+      },
+      {
+        "id": "temporal-dynamics",
+        "page": 5,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 134.5,
+            "y": 664.1
+          },
+          "size": {
+            "width": 131.8,
+            "height": 10.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 134.5,
+              "y": 664.1
+            },
+            "size": {
+              "width": 131.8,
+              "height": 10.4
+            }
+          }
+        ]
+      },
+      {
+        "id": "netflix-contest",
+        "page": 6,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 48.6,
+            "y": 364.2
+          },
+          "size": {
+            "width": 141.4,
+            "height": 34.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 97.7,
+              "y": 364.2
+            },
+            "size": {
+              "width": 92.3,
+              "height": 10.4
+            }
+          },
+          {
+            "origin": {
+              "x": 48.6,
+              "y": 376.1
+            },
+            "size": {
+              "width": 141.4,
+              "height": 10.4
+            }
+          },
+          {
+            "origin": {
+              "x": 48.6,
+              "y": 388.1
+            },
+            "size": {
+              "width": 14.1,
+              "height": 10.4
+            }
+          }
+        ]
+      },
+      {
+        "id": "netflix-rmse",
+        "page": 7,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 57.0,
+            "y": 372.3
+          },
+          "size": {
+            "width": 55.0,
+            "height": 10.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 57.0,
+              "y": 372.3
+            },
+            "size": {
+              "width": 55.0,
+              "height": 10.4
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig1-neighborhood",
+        "page": 2,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 305,
+            "y": 175
+          },
+          "size": {
+            "width": 243,
+            "height": 315
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "fig2-latent-axes",
+        "page": 3,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 57,
+            "y": 40
+          },
+          "size": {
+            "width": 248,
+            "height": 255
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "fig3-factor-vectors",
+        "page": 6,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 360,
+            "y": 85
+          },
+          "size": {
+            "width": 188,
+            "height": 260
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "fig4-accuracy",
+        "page": 7,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 57,
+            "y": 95
+          },
+          "size": {
+            "width": 258,
+            "height": 460
+          }
+        },
+        "segmentRects": null
+      }
+    ]
+  },
+  "fm": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "abs-intro",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 58.9,
+            "y": 188.7
+          },
+          "size": {
+            "width": 241.2,
+            "height": 10.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 58.9,
+              "y": 188.7
+            },
+            "size": {
+              "width": 48.3,
+              "height": 10.8
+            }
+          },
+          {
+            "origin": {
+              "x": 110.6,
+              "y": 190.6
+            },
+            "size": {
+              "width": 189.5,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-factorized-interactions",
+        "page": 1,
+        "kind": "innovation",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 49.0,
+            "y": 230.4
+          },
+          "size": {
+            "width": 251.0,
+            "height": 18.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 263.6,
+              "y": 230.4
+            },
+            "size": {
+              "width": 36.3,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 49.0,
+              "y": 240.4
+            },
+            "size": {
+              "width": 228.9,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-linear-time",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 385.1,
+            "y": 225.7
+          },
+          "size": {
+            "width": 130.9,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 385.1,
+              "y": 225.7
+            },
+            "size": {
+              "width": 130.9,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-subsume",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 312.0,
+            "y": 309.5
+          },
+          "size": {
+            "width": 251.1,
+            "height": 21.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 466.9,
+              "y": 309.5
+            },
+            "size": {
+              "width": 96.2,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 312.0,
+              "y": 321.4
+            },
+            "size": {
+              "width": 130.4,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fm-equation",
+        "page": 2,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 312.0,
+            "y": 305.2
+          },
+          "size": {
+            "width": 251.2,
+            "height": 21.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 407.9,
+              "y": 305.2
+            },
+            "size": {
+              "width": 155.3,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 312.0,
+              "y": 316.9
+            },
+            "size": {
+              "width": 159.8,
+              "height": 10.2
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig1-feature-vector",
+        "page": 2,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 50,
+            "y": 40
+          },
+          "size": {
+            "width": 255,
+            "height": 130
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "fm-linear-complexity",
+        "page": 3,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 49.0,
+            "y": 703.9
+          },
+          "size": {
+            "width": 170.8,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 49.0,
+              "y": 703.9
+            },
+            "size": {
+              "width": 170.8,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fm-sparse-success",
+        "page": 4,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 312.0,
+            "y": 182.1
+          },
+          "size": {
+            "width": 251.0,
+            "height": 17.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 340.0,
+              "y": 182.1
+            },
+            "size": {
+              "width": 223.0,
+              "height": 8.0
+            }
+          },
+          {
+            "origin": {
+              "x": 312.0,
+              "y": 191.1
+            },
+            "size": {
+              "width": 29.5,
+              "height": 8.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig2-netflix-error",
+        "page": 4,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 360,
+            "y": 40
+          },
+          "size": {
+            "width": 200,
+            "height": 175
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "fig3-tag-rec",
+        "page": 6,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 55,
+            "y": 50
+          },
+          "size": {
+            "width": 215,
+            "height": 225
+          }
+        },
+        "segmentRects": null
+      }
+    ]
+  },
+  "word2vec": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "abs-architectures",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 143.9,
+            "y": 343.7
+          },
+          "size": {
+            "width": 324.3,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 192.6,
+              "y": 343.7
+            },
+            "size": {
+              "width": 275.6,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 143.9,
+              "y": 354.7
+            },
+            "size": {
+              "width": 39.9,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-sota",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 143.9,
+            "y": 409.5
+          },
+          "size": {
+            "width": 324.3,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 378.8,
+              "y": 409.5
+            },
+            "size": {
+              "width": 89.4,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 143.9,
+              "y": 420.4
+            },
+            "size": {
+              "width": 307.0,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-fast",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 143.9,
+            "y": 398.5
+          },
+          "size": {
+            "width": 324.3,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 167.2,
+              "y": 398.5
+            },
+            "size": {
+              "width": 300.9,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 143.9,
+              "y": 409.5
+            },
+            "size": {
+              "width": 32.9,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "cbow-desc",
+        "page": 4,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 108.0,
+            "y": 405.2
+          },
+          "size": {
+            "width": 278.4,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 108.0,
+              "y": 405.2
+            },
+            "size": {
+              "width": 278.4,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "skipgram-desc",
+        "page": 4,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 108.0,
+            "y": 585.0
+          },
+          "size": {
+            "width": 177.5,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 108.0,
+              "y": 585.0
+            },
+            "size": {
+              "width": 177.5,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig1-architectures",
+        "page": 5,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 100,
+            "y": 100
+          },
+          "size": {
+            "width": 420,
+            "height": 280
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "cbow-predicts",
+        "page": 5,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 108.0,
+            "y": 355.4
+          },
+          "size": {
+            "width": 396.0,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 270.3,
+              "y": 355.4
+            },
+            "size": {
+              "width": 233.7,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 108.0,
+              "y": 366.3
+            },
+            "size": {
+              "width": 31.7,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "skipgram-predicts",
+        "page": 5,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 173.7,
+            "y": 366.3
+          },
+          "size": {
+            "width": 248.4,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 173.7,
+              "y": 366.3
+            },
+            "size": {
+              "width": 248.4,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "skipgram-syntactic",
+        "page": 7,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 108.0,
+            "y": 649.3
+          },
+          "size": {
+            "width": 396.0,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 262.7,
+              "y": 649.3
+            },
+            "size": {
+              "width": 241.3,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 108.0,
+              "y": 660.2
+            },
+            "size": {
+              "width": 16.0,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "skipgram-semantic",
+        "page": 7,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 108.0,
+            "y": 660.2
+          },
+          "size": {
+            "width": 396.0,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 372.6,
+              "y": 660.2
+            },
+            "size": {
+              "width": 131.4,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 108.0,
+              "y": 671.2
+            },
+            "size": {
+              "width": 142.8,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "table6-distbelief",
+        "page": 9,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": false,
+        "rect": {
+          "origin": {
+            "x": 85,
+            "y": 80
+          },
+          "size": {
+            "width": 440,
+            "height": 130
+          }
+        },
+        "segmentRects": null
+      },
+      {
+        "id": "training-time",
+        "page": 8,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 108.0,
+            "y": 580.9
+          },
+          "size": {
+            "width": 396.0,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 290.4,
+              "y": 580.9
+            },
+            "size": {
+              "width": 213.6,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 108.0,
+              "y": 591.9
+            },
+            "size": {
+              "width": 20.8,
+              "height": 10.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "dssm": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "abs-deep",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 54.0,
+            "y": 256.9
+          },
+          "size": {
+            "width": 240.2,
+            "height": 20.3
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 180.0,
+              "y": 256.9
+            },
+            "size": {
+              "width": 114.2,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 267.2
+            },
+            "size": {
+              "width": 192.8,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-discriminative",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 54.0,
+            "y": 298.3
+          },
+          "size": {
+            "width": 240.2,
+            "height": 30.6
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 219.5,
+              "y": 298.3
+            },
+            "size": {
+              "width": 74.7,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 308.6
+            },
+            "size": {
+              "width": 240.2,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 318.9
+            },
+            "size": {
+              "width": 239.9,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-wordhash",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 54.0,
+            "y": 329.2
+          },
+          "size": {
+            "width": 240.1,
+            "height": 30.7
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 216.3,
+              "y": 329.2
+            },
+            "size": {
+              "width": 77.7,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 339.7
+            },
+            "size": {
+              "width": 240.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 350.0
+            },
+            "size": {
+              "width": 119.5,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig1-dssm",
+        "page": 3,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 170.8,
+            "y": 277.6
+          },
+          "size": {
+            "width": 374.3,
+            "height": 8.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 170.8,
+              "y": 277.6
+            },
+            "size": {
+              "width": 374.3,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "eq-relevance",
+        "page": 3,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 54.0,
+            "y": 511.1
+          },
+          "size": {
+            "width": 240.1,
+            "height": 20.5
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 511.1
+            },
+            "size": {
+              "width": 240.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 62.8,
+              "y": 521.6
+            },
+            "size": {
+              "width": 72.7,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "wordhash-detail",
+        "page": 3,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 317.9,
+            "y": 330.4
+          },
+          "size": {
+            "width": 240.1,
+            "height": 20.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 317.9,
+              "y": 330.4
+            },
+            "size": {
+              "width": 240.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 317.9,
+              "y": 340.9
+            },
+            "size": {
+              "width": 184.1,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "table1-wordhash",
+        "page": 4,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 55.6,
+            "y": 173.8
+          },
+          "size": {
+            "width": 238.7,
+            "height": 20.3
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 93.4,
+              "y": 173.8
+            },
+            "size": {
+              "width": 200.9,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 55.6,
+              "y": 184.1
+            },
+            "size": {
+              "width": 219.0,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "dssm-results",
+        "page": 6,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 54.0,
+            "y": 266.2
+          },
+          "size": {
+            "width": 238.9,
+            "height": 20.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 266.2
+            },
+            "size": {
+              "width": 238.9,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 276.7
+            },
+            "size": {
+              "width": 153.0,
+              "height": 10.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "mind": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "abs-multi-interest",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 422.8
+          },
+          "size": {
+            "width": 240.2,
+            "height": 30.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 77.6,
+              "y": 422.8
+            },
+            "size": {
+              "width": 216.4,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 433.7
+            },
+            "size": {
+              "width": 240.2,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 444.6
+            },
+            "size": {
+              "width": 71.9,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-dynamic-routing",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 444.6
+          },
+          "size": {
+            "width": 240.2,
+            "height": 30.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 127.9,
+              "y": 444.6
+            },
+            "size": {
+              "width": 166.1,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 455.7
+            },
+            "size": {
+              "width": 240.2,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 466.7
+            },
+            "size": {
+              "width": 68.8,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig1-tmall",
+        "page": 1,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 318.0,
+            "y": 419.3
+          },
+          "size": {
+            "width": 240.2,
+            "height": 19.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 355.8,
+              "y": 419.3
+            },
+            "size": {
+              "width": 202.4,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 318.0,
+              "y": 430.2
+            },
+            "size": {
+              "width": 193.1,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig2-mind",
+        "page": 3,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 313.9
+          },
+          "size": {
+            "width": 506.0,
+            "height": 19.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 313.9
+            },
+            "size": {
+              "width": 506.0,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 324.9
+            },
+            "size": {
+              "width": 298.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "b2i-routing",
+        "page": 5,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.5,
+            "y": 86.1
+          },
+          "size": {
+            "width": 132.9,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 53.5,
+              "y": 86.1
+            },
+            "size": {
+              "width": 132.9,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "dynamic-interest-number",
+        "page": 5,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 69.0,
+            "y": 146.4
+          },
+          "size": {
+            "width": 204.9,
+            "height": 9.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 69.0,
+              "y": 146.4
+            },
+            "size": {
+              "width": 204.9,
+              "height": 9.4
+            }
+          }
+        ]
+      },
+      {
+        "id": "label-aware-attention",
+        "page": 5,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 337.3
+          },
+          "size": {
+            "width": 240.2,
+            "height": 20.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 171.6,
+              "y": 337.3
+            },
+            "size": {
+              "width": 122.4,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 348.2
+            },
+            "size": {
+              "width": 229.9,
+              "height": 9.1
+            }
+          }
+        ]
+      },
+      {
+        "id": "mind-results",
+        "page": 7,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 318.0,
+            "y": 409.2
+          },
+          "size": {
+            "width": 240.5,
+            "height": 30.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 481.5,
+              "y": 409.2
+            },
+            "size": {
+              "width": 77.0,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 318.0,
+              "y": 420.2
+            },
+            "size": {
+              "width": 240.2,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 318.0,
+              "y": 431.1
+            },
+            "size": {
+              "width": 22.0,
+              "height": 9.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "sasrec": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "abs-sequential-dynamics",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 49.0,
+            "y": 159.6
+          },
+          "size": {
+            "width": 252.5,
+            "height": 38.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 58.9,
+              "y": 159.6
+            },
+            "size": {
+              "width": 241.4,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 49.0,
+              "y": 169.6
+            },
+            "size": {
+              "width": 252.5,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 49.0,
+              "y": 179.6
+            },
+            "size": {
+              "width": 251.1,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 49.0,
+              "y": 189.5
+            },
+            "size": {
+              "width": 77.3,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-self-attention",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 49.0,
+            "y": 279.2
+          },
+          "size": {
+            "width": 251.1,
+            "height": 18.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 160.1,
+              "y": 279.2
+            },
+            "size": {
+              "width": 139.9,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 49.0,
+              "y": 289.1
+            },
+            "size": {
+              "width": 106.5,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fig1-sasrec",
+        "page": 1,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 311.6,
+            "y": 575.3
+          },
+          "size": {
+            "width": 251.4,
+            "height": 22.2
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 415.8,
+              "y": 575.3
+            },
+            "size": {
+              "width": 147.2,
+              "height": 10.2
+            }
+          },
+          {
+            "origin": {
+              "x": 311.6,
+              "y": 587.5
+            },
+            "size": {
+              "width": 178.0,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "notation-table",
+        "page": 3,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 136.4,
+            "y": 47.8
+          },
+          "size": {
+            "width": 72.3,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 136.4,
+              "y": 47.8
+            },
+            "size": {
+              "width": 72.3,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "embedding-layer",
+        "page": 3,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 60.9,
+            "y": 493.7
+          },
+          "size": {
+            "width": 148.9,
+            "height": 9.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 60.9,
+              "y": 493.7
+            },
+            "size": {
+              "width": 148.9,
+              "height": 9.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "causal-mask",
+        "page": 3,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 379.5,
+            "y": 421.7
+          },
+          "size": {
+            "width": 183.5,
+            "height": 22.5
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 379.5,
+              "y": 421.7
+            },
+            "size": {
+              "width": 183.5,
+              "height": 9.9
+            }
+          },
+          {
+            "origin": {
+              "x": 385.0,
+              "y": 433.4
+            },
+            "size": {
+              "width": 80.5,
+              "height": 10.8
+            }
+          }
+        ]
+      },
+      {
+        "id": "self-attention-block",
+        "page": 3,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 321.9,
+            "y": 66.3
+          },
+          "size": {
+            "width": 204.8,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 321.9,
+              "y": 66.3
+            },
+            "size": {
+              "width": 204.8,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "sasrec-results",
+        "page": 7,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 312.0,
+            "y": 354.4
+          },
+          "size": {
+            "width": 251.1,
+            "height": 21.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 321.9,
+              "y": 354.4
+            },
+            "size": {
+              "width": 241.1,
+              "height": 9.9
+            }
+          },
+          {
+            "origin": {
+              "x": 312.0,
+              "y": 366.3
+            },
+            "size": {
+              "width": 76.5,
+              "height": 9.9
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "deepfm": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "fig1-deepfm",
+        "page": 1,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 315.0,
+            "y": 331.8
+          },
+          "size": {
+            "width": 243.0,
+            "height": 38.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 353.6,
+              "y": 331.8
+            },
+            "size": {
+              "width": 204.4,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 315.0,
+              "y": 341.8
+            },
+            "size": {
+              "width": 243.0,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 315.0,
+              "y": 351.7
+            },
+            "size": {
+              "width": 243.0,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 315.0,
+              "y": 361.7
+            },
+            "size": {
+              "width": 129.9,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-intro",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 73.9,
+            "y": 335.6
+          },
+          "size": {
+            "width": 203.1,
+            "height": 42.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 335.6
+            },
+            "size": {
+              "width": 203.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 346.6
+            },
+            "size": {
+              "width": 203.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 357.6
+            },
+            "size": {
+              "width": 203.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 368.5
+            },
+            "size": {
+              "width": 18.0,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-shared-input",
+        "page": 1,
+        "kind": "innovation",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 73.9,
+            "y": 379.5
+          },
+          "size": {
+            "width": 203.1,
+            "height": 31.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 134.3,
+              "y": 379.5
+            },
+            "size": {
+              "width": 142.8,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 390.4
+            },
+            "size": {
+              "width": 203.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 401.4
+            },
+            "size": {
+              "width": 135.3,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "model-components",
+        "page": 2,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 73.9,
+            "y": 456.6
+          },
+          "size": {
+            "width": 223.1,
+            "height": 53.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 197.8,
+              "y": 456.6
+            },
+            "size": {
+              "width": 99.2,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 467.6
+            },
+            "size": {
+              "width": 223.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 478.5
+            },
+            "size": {
+              "width": 223.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 488.6
+            },
+            "size": {
+              "width": 223.1,
+              "height": 10.9
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 500.5
+            },
+            "size": {
+              "width": 157.3,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "shared-embedding",
+        "page": 2,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 73.9,
+            "y": 527.2
+          },
+          "size": {
+            "width": 223.1,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 259.6,
+              "y": 527.2
+            },
+            "size": {
+              "width": 37.4,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 538.2
+            },
+            "size": {
+              "width": 168.3,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "fm-component",
+        "page": 2,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 54.0,
+            "y": 67.4
+          },
+          "size": {
+            "width": 243.0,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 67.4
+            },
+            "size": {
+              "width": 243.0,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 78.3
+            },
+            "size": {
+              "width": 94.5,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "deepfm-results",
+        "page": 5,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 73.9,
+            "y": 521.6
+          },
+          "size": {
+            "width": 223.1,
+            "height": 31.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 108.2,
+              "y": 521.6
+            },
+            "size": {
+              "width": 188.8,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 532.6
+            },
+            "size": {
+              "width": 223.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 73.9,
+              "y": 543.2
+            },
+            "size": {
+              "width": 209.6,
+              "height": 10.3
+            }
+          }
+        ]
+      },
+      {
+        "id": "table2-deepfm",
+        "page": 5,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 360.1,
+            "y": 144.9
+          },
+          "size": {
+            "width": 152.8,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 360.1,
+              "y": 144.9
+            },
+            "size": {
+              "width": 32.1,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 395.3,
+              "y": 145.7
+            },
+            "size": {
+              "width": 117.5,
+              "height": 9.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "din": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "fig2-din",
+        "page": 4,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 262.1
+          },
+          "size": {
+            "width": 127.2,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 262.1
+            },
+            "size": {
+              "width": 127.2,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-fixed-vector",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 285.7
+          },
+          "size": {
+            "width": 241.8,
+            "height": 20.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 89.8,
+              "y": 285.7
+            },
+            "size": {
+              "width": 205.7,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 296.7
+            },
+            "size": {
+              "width": 209.0,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-din-proposed",
+        "page": 1,
+        "kind": "innovation",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 329.7
+          },
+          "size": {
+            "width": 241.8,
+            "height": 52.7
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 252.8,
+              "y": 329.7
+            },
+            "size": {
+              "width": 41.2,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 340.7
+            },
+            "size": {
+              "width": 241.8,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 351.5
+            },
+            "size": {
+              "width": 240.2,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 362.5
+            },
+            "size": {
+              "width": 241.8,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 373.5
+            },
+            "size": {
+              "width": 71.9,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "local-activation",
+        "page": 4,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 318.0,
+            "y": 509.5
+          },
+          "size": {
+            "width": 240.2,
+            "height": 20.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 541.9,
+              "y": 509.5
+            },
+            "size": {
+              "width": 16.3,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 318.0,
+              "y": 520.5
+            },
+            "size": {
+              "width": 170.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "local-activation-formula",
+        "page": 4,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 322.3,
+            "y": 623.9
+          },
+          "size": {
+            "width": 235.9,
+            "height": 9.3
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 322.3,
+              "y": 623.9
+            },
+            "size": {
+              "width": 235.9,
+              "height": 9.3
+            }
+          }
+        ]
+      },
+      {
+        "id": "dice-activation",
+        "page": 6,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 86.9
+          },
+          "size": {
+            "width": 241.8,
+            "height": 30.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 63.8,
+              "y": 86.9
+            },
+            "size": {
+              "width": 230.3,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 97.9
+            },
+            "size": {
+              "width": 241.8,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 108.8
+            },
+            "size": {
+              "width": 241.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "din-metrics",
+        "page": 6,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 318.0,
+            "y": 531.5
+          },
+          "size": {
+            "width": 197.7,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 318.0,
+              "y": 531.5
+            },
+            "size": {
+              "width": 197.7,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "din-results",
+        "page": 6,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 222.5
+          },
+          "size": {
+            "width": 240.2,
+            "height": 19.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 222.5
+            },
+            "size": {
+              "width": 240.2,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 233.4
+            },
+            "size": {
+              "width": 89.8,
+              "height": 9.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "dien": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "fig1-dien",
+        "page": 4,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 54.0,
+            "y": 287.3
+          },
+          "size": {
+            "width": 131.8,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 287.3
+            },
+            "size": {
+              "width": 131.8,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-dien",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 64.0,
+            "y": 353.6
+          },
+          "size": {
+            "width": 218.6,
+            "height": 38.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 80.0,
+              "y": 353.6
+            },
+            "size": {
+              "width": 202.6,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 64.0,
+              "y": 363.6
+            },
+            "size": {
+              "width": 218.6,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 64.0,
+              "y": 373.5
+            },
+            "size": {
+              "width": 218.6,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 64.0,
+              "y": 383.5
+            },
+            "size": {
+              "width": 117.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-aux-loss",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 64.0,
+            "y": 383.5
+          },
+          "size": {
+            "width": 218.6,
+            "height": 18.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 184.5,
+              "y": 383.5
+            },
+            "size": {
+              "width": 98.0,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 64.0,
+              "y": 393.4
+            },
+            "size": {
+              "width": 218.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "aux-loss-formula",
+        "page": 4,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 54.0,
+            "y": 406.7
+          },
+          "size": {
+            "width": 238.5,
+            "height": 19.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 254.3,
+              "y": 406.7
+            },
+            "size": {
+              "width": 38.2,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 54.0,
+              "y": 416.6
+            },
+            "size": {
+              "width": 103.5,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "augru-intro",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 319.5,
+            "y": 672.5
+          },
+          "size": {
+            "width": 238.5,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 473.7,
+              "y": 672.5
+            },
+            "size": {
+              "width": 84.3,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 319.5,
+              "y": 683.5
+            },
+            "size": {
+              "width": 139.0,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "interest-evolving",
+        "page": 4,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 319.5,
+            "y": 628.7
+          },
+          "size": {
+            "width": 238.5,
+            "height": 64.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 509.3,
+              "y": 628.7
+            },
+            "size": {
+              "width": 48.7,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 319.5,
+              "y": 639.6
+            },
+            "size": {
+              "width": 238.5,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 319.5,
+              "y": 650.6
+            },
+            "size": {
+              "width": 238.5,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 319.5,
+              "y": 661.6
+            },
+            "size": {
+              "width": 238.5,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 319.5,
+              "y": 672.5
+            },
+            "size": {
+              "width": 238.5,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 319.5,
+              "y": 683.5
+            },
+            "size": {
+              "width": 86.0,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "dien-online",
+        "page": 7,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 91.5,
+            "y": 54.1
+          },
+          "size": {
+            "width": 163.6,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 91.5,
+              "y": 54.1
+            },
+            "size": {
+              "width": 163.6,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "dien-gains",
+        "page": 7,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 319.5,
+            "y": 419.9
+          },
+          "size": {
+            "width": 96.6,
+            "height": 10.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 319.5,
+              "y": 419.9
+            },
+            "size": {
+              "width": 96.6,
+              "height": 10.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "mmoe": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "fig1-mmoe",
+        "page": 2,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 130.9,
+            "y": 281.6
+          },
+          "size": {
+            "width": 153.7,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 130.9,
+              "y": 281.6
+            },
+            "size": {
+              "width": 153.7,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-mmoe",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 324.1
+          },
+          "size": {
+            "width": 240.2,
+            "height": 19.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 324.1
+            },
+            "size": {
+              "width": 240.2,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 335.0
+            },
+            "size": {
+              "width": 143.2,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "mmoe-idea",
+        "page": 2,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 440.8
+          },
+          "size": {
+            "width": 240.5,
+            "height": 30.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 114.9,
+              "y": 440.8
+            },
+            "size": {
+              "width": 179.3,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 451.7
+            },
+            "size": {
+              "width": 240.2,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 462.7
+            },
+            "size": {
+              "width": 168.0,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "gating-network",
+        "page": 2,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.5,
+            "y": 473.6
+          },
+          "size": {
+            "width": 242.1,
+            "height": 41.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 178.9,
+              "y": 473.6
+            },
+            "size": {
+              "width": 116.7,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.5,
+              "y": 484.6
+            },
+            "size": {
+              "width": 240.6,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 495.6
+            },
+            "size": {
+              "width": 241.2,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 506.5
+            },
+            "size": {
+              "width": 188.5,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "mmoe-formula",
+        "page": 5,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 116.2,
+            "y": 373.9
+          },
+          "size": {
+            "width": 46.5,
+            "height": 11.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 116.2,
+              "y": 373.9
+            },
+            "size": {
+              "width": 46.5,
+              "height": 11.8
+            }
+          }
+        ]
+      },
+      {
+        "id": "mmoe-trainability",
+        "page": 6,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 78.2,
+            "y": 218.0
+          },
+          "size": {
+            "width": 217.3,
+            "height": 19.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 94.3,
+              "y": 218.0
+            },
+            "size": {
+              "width": 201.3,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 78.2,
+              "y": 228.9
+            },
+            "size": {
+              "width": 53.8,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "mmoe-results",
+        "page": 8,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 578.6
+          },
+          "size": {
+            "width": 241.6,
+            "height": 19.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 92.2,
+              "y": 578.6
+            },
+            "size": {
+              "width": 201.8,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 589.6
+            },
+            "size": {
+              "width": 241.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "mmoe-google",
+        "page": 8,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 318.0,
+            "y": 674.4
+          },
+          "size": {
+            "width": 226.3,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 318.0,
+              "y": 674.4
+            },
+            "size": {
+              "width": 226.3,
+              "height": 9.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "ple": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "fig4-ple",
+        "page": 5,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 76.4,
+            "y": 689.3
+          },
+          "size": {
+            "width": 195.0,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 76.4,
+              "y": 689.3
+            },
+            "size": {
+              "width": 195.0,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "abs-ple",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 361.9
+          },
+          "size": {
+            "width": 240.2,
+            "height": 20.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 149.8,
+              "y": 361.9
+            },
+            "size": {
+              "width": 144.2,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 372.9
+            },
+            "size": {
+              "width": 128.4,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "seesaw",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 318.0
+          },
+          "size": {
+            "width": 241.8,
+            "height": 31.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 229.0,
+              "y": 318.0
+            },
+            "size": {
+              "width": 66.6,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 329.0
+            },
+            "size": {
+              "width": 240.2,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 340.0
+            },
+            "size": {
+              "width": 137.6,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "cgc-gate",
+        "page": 5,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 318.0,
+            "y": 275.9
+          },
+          "size": {
+            "width": 240.2,
+            "height": 19.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 327.9,
+              "y": 275.9
+            },
+            "size": {
+              "width": 230.3,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 318.0,
+              "y": 287.0
+            },
+            "size": {
+              "width": 164.5,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "cgc-formula",
+        "page": 5,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 327.9,
+            "y": 522.8
+          },
+          "size": {
+            "width": 124.1,
+            "height": 9.4
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 327.9,
+              "y": 522.8
+            },
+            "size": {
+              "width": 124.1,
+              "height": 9.4
+            }
+          }
+        ]
+      },
+      {
+        "id": "ple-progressive",
+        "page": 6,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 667.8
+          },
+          "size": {
+            "width": 241.8,
+            "height": 30.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 233.3,
+              "y": 667.8
+            },
+            "size": {
+              "width": 60.7,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 678.6
+            },
+            "size": {
+              "width": 241.8,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 689.7
+            },
+            "size": {
+              "width": 75.4,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "ple-results",
+        "page": 8,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.5,
+            "y": 196.4
+          },
+          "size": {
+            "width": 240.6,
+            "height": 41.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 239.0,
+              "y": 196.4
+            },
+            "size": {
+              "width": 55.1,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.5,
+              "y": 207.4
+            },
+            "size": {
+              "width": 240.6,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 218.4
+            },
+            "size": {
+              "width": 240.2,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.5,
+              "y": 229.4
+            },
+            "size": {
+              "width": 23.4,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "ple-online",
+        "page": 8,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.5,
+            "y": 583.3
+          },
+          "size": {
+            "width": 240.5,
+            "height": 19.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 53.5,
+              "y": 583.3
+            },
+            "size": {
+              "width": 240.5,
+              "height": 9.0
+            }
+          },
+          {
+            "origin": {
+              "x": 53.5,
+              "y": 594.2
+            },
+            "size": {
+              "width": 16.7,
+              "height": 9.0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "tiger": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "fig1-tiger",
+        "page": 1,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 286.2,
+            "y": 637.8
+          },
+          "size": {
+            "width": 82.4,
+            "height": 9.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 286.2,
+              "y": 637.8
+            },
+            "size": {
+              "width": 82.4,
+              "height": 9.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "tiger-proposed",
+        "page": 1,
+        "kind": "innovation",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 143.9,
+            "y": 387.3
+          },
+          "size": {
+            "width": 325.9,
+            "height": 21.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 377.1,
+              "y": 387.3
+            },
+            "size": {
+              "width": 92.7,
+              "height": 10.1
+            }
+          },
+          {
+            "origin": {
+              "x": 143.9,
+              "y": 398.2
+            },
+            "size": {
+              "width": 254.2,
+              "height": 10.1
+            }
+          }
+        ]
+      },
+      {
+        "id": "tiger-semantic-id",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 143.9,
+            "y": 409.1
+          },
+          "size": {
+            "width": 324.4,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 403.4,
+              "y": 409.1
+            },
+            "size": {
+              "width": 64.9,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 143.9,
+              "y": 420.0
+            },
+            "size": {
+              "width": 41.8,
+              "height": 10.1
+            }
+          }
+        ]
+      },
+      {
+        "id": "tiger-encoder-decoder",
+        "page": 3,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 336.0,
+            "y": 194.3
+          },
+          "size": {
+            "width": 153.8,
+            "height": 9.1
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 336.0,
+              "y": 194.3
+            },
+            "size": {
+              "width": 153.8,
+              "height": 9.1
+            }
+          }
+        ]
+      },
+      {
+        "id": "tiger-results",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 143.6,
+            "y": 452.8
+          },
+          "size": {
+            "width": 324.5,
+            "height": 20.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 308.1,
+              "y": 452.8
+            },
+            "size": {
+              "width": 160.0,
+              "height": 9.9
+            }
+          },
+          {
+            "origin": {
+              "x": 143.6,
+              "y": 463.6
+            },
+            "size": {
+              "width": 67.2,
+              "height": 10.1
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "onerec": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "fig2-onerec",
+        "page": 3,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 377.9
+          },
+          "size": {
+            "width": 183.1,
+            "height": 9.1
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 377.9
+            },
+            "size": {
+              "width": 183.1,
+              "height": 9.1
+            }
+          }
+        ]
+      },
+      {
+        "id": "onerec-proposed",
+        "page": 1,
+        "kind": "innovation",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 375.8
+          },
+          "size": {
+            "width": 241.6,
+            "height": 20.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 155.9,
+              "y": 375.8
+            },
+            "size": {
+              "width": 138.2,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 386.9
+            },
+            "size": {
+              "width": 241.6,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "onerec-encoder-decoder",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.6,
+            "y": 430.6
+          },
+          "size": {
+            "width": 240.5,
+            "height": 31.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 98.6,
+              "y": 430.6
+            },
+            "size": {
+              "width": 195.4,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 441.6
+            },
+            "size": {
+              "width": 240.2,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.6,
+              "y": 452.7
+            },
+            "size": {
+              "width": 147.5,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "onerec-moe",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 452.7
+          },
+          "size": {
+            "width": 241.8,
+            "height": 30.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 203.2,
+              "y": 452.7
+            },
+            "size": {
+              "width": 92.4,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 463.5
+            },
+            "size": {
+              "width": 240.5,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 474.6
+            },
+            "size": {
+              "width": 117.3,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "onerec-session",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 485.5
+          },
+          "size": {
+            "width": 240.5,
+            "height": 30.8
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 252.9,
+              "y": 485.5
+            },
+            "size": {
+              "width": 41.1,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 496.5
+            },
+            "size": {
+              "width": 240.5,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 507.5
+            },
+            "size": {
+              "width": 144.5,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "onerec-ipa",
+        "page": 1,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.8,
+            "y": 518.2
+          },
+          "size": {
+            "width": 241.6,
+            "height": 31.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 246.2,
+              "y": 518.2
+            },
+            "size": {
+              "width": 47.9,
+              "height": 9.1
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 529.3
+            },
+            "size": {
+              "width": 240.2,
+              "height": 8.9
+            }
+          },
+          {
+            "origin": {
+              "x": 53.8,
+              "y": 540.3
+            },
+            "size": {
+              "width": 241.6,
+              "height": 8.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "onerec-results",
+        "page": 1,
+        "kind": "conclusion",
+        "color": "#FFCD45",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 364.3,
+            "y": 405.9
+          },
+          "size": {
+            "width": 107.9,
+            "height": 9.1
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 364.3,
+              "y": 405.9
+            },
+            "size": {
+              "width": 107.9,
+              "height": 9.1
+            }
+          }
+        ]
+      },
+      {
+        "id": "onerec-table1",
+        "page": 6,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 53.5,
+            "y": 86.2
+          },
+          "size": {
+            "width": 225.5,
+            "height": 9.1
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 53.5,
+              "y": 86.2
+            },
+            "size": {
+              "width": 225.5,
+              "height": 9.1
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "hstu": {
+    "page_height": 792.0,
+    "annotations": [
+      {
+        "id": "fig3-hstu",
+        "page": 4,
+        "kind": "figure",
+        "color": "#FF9E64",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 306.9,
+            "y": 313.1
+          },
+          "size": {
+            "width": 236.1,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 306.9,
+              "y": 313.1
+            },
+            "size": {
+              "width": 236.1,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "hstu-proposed",
+        "page": 1,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 75.4,
+            "y": 374.8
+          },
+          "size": {
+            "width": 195.9,
+            "height": 34.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 198.9,
+              "y": 374.8
+            },
+            "size": {
+              "width": 72.3,
+              "height": 10.1
+            }
+          },
+          {
+            "origin": {
+              "x": 75.4,
+              "y": 386.8
+            },
+            "size": {
+              "width": 195.4,
+              "height": 10.1
+            }
+          },
+          {
+            "origin": {
+              "x": 75.4,
+              "y": 398.7
+            },
+            "size": {
+              "width": 195.9,
+              "height": 10.1
+            }
+          }
+        ]
+      },
+      {
+        "id": "hstu-equations",
+        "page": 4,
+        "kind": "definition",
+        "color": "#B8F0B0",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 55.1,
+            "y": 310.7
+          },
+          "size": {
+            "width": 236.0,
+            "height": 33.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 55.4,
+              "y": 310.7
+            },
+            "size": {
+              "width": 234.0,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 55.1,
+              "y": 322.6
+            },
+            "size": {
+              "width": 236.0,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 55.1,
+              "y": 334.6
+            },
+            "size": {
+              "width": 137.7,
+              "height": 10.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "hstu-pointwise",
+        "page": 4,
+        "kind": "method",
+        "color": "#8FD3FF",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 307.4,
+            "y": 534.1
+          },
+          "size": {
+            "width": 235.7,
+            "height": 21.9
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 307.4,
+              "y": 534.1
+            },
+            "size": {
+              "width": 235.7,
+              "height": 10.0
+            }
+          },
+          {
+            "origin": {
+              "x": 307.4,
+              "y": 546.2
+            },
+            "size": {
+              "width": 74.2,
+              "height": 9.9
+            }
+          }
+        ]
+      },
+      {
+        "id": "hstu-results",
+        "page": 7,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 144.7,
+            "y": 62.9
+          },
+          "size": {
+            "width": 152.1,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 144.7,
+              "y": 62.9
+            },
+            "size": {
+              "width": 152.1,
+              "height": 9.0
+            }
+          }
+        ]
+      },
+      {
+        "id": "hstu-online",
+        "page": 7,
+        "kind": "table",
+        "color": "#C792EA",
+        "is_text": true,
+        "rect": {
+          "origin": {
+            "x": 322.6,
+            "y": 311.2
+          },
+          "size": {
+            "width": 203.6,
+            "height": 9.0
+          }
+        },
+        "segmentRects": [
+          {
+            "origin": {
+              "x": 322.6,
+              "y": 311.2
+            },
+            "size": {
+              "width": 203.6,
+              "height": 9.0
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

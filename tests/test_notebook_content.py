@@ -29,11 +29,12 @@ def test_math_foundations_defines_and_computes_recommendation_metrics():
 
 def test_chapter_31_is_split_by_algorithm_with_summary():
     expected = {
-        "3_1_summary.ipynb": ["横向对比", "UserCF", "BiasMF", "FM", "GBDT+LR", "results/chapter_3_1", "来源论文"],
+        "3_1_summary.ipynb": ["横向对比", "UserCF", "BiasMF", "FM", "GBDT+LR", "word2vec", "results/chapter_3_1", "来源论文"],
         "3_1_1_collaborative_filtering.ipynb": ["UserCF", "ItemCF", "余弦相似度", "推理", "结果讨论", "toy_R @ toy_R.T", "Sarwar", "直觉版"],
         "3_1_2_matrix_factorization.ipynb": ["BiasMF", "低秩", "训练", "Top-K", "结果讨论", "直觉版"],
         "3_1_3_factorization_machine.ipynb": ["FactorizationMachine", "二阶交互", "AUC", "LogLoss", "结果讨论", "直觉版"],
         "3_1_4_gbdt_lr.ipynb": ["XGBClassifier", "叶节点", "LogisticRegression", "推理", "结果讨论", "直觉版"],
+        "3_1_5_word2vec.ipynb": ["SkipGram", "Item2Vec", "负采样", "Recall", "结果讨论", "直觉版"],
     }
     for filename, required in expected.items():
         notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
@@ -50,6 +51,7 @@ def test_chapter_31_algorithm_notebooks_export_metrics():
         "3_1_2_matrix_factorization.ipynb",
         "3_1_3_factorization_machine.ipynb",
         "3_1_4_gbdt_lr.ipynb",
+        "3_1_5_word2vec.ipynb",
     ]:
         notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
         source = "\n".join(cell.source for cell in notebook.cells)
@@ -127,7 +129,7 @@ def test_pipeline_notebook_opens_imports_and_reimplements_core_steps():
 
 def test_every_large_chapter_has_a_result_aggregation_notebook():
     expected = {
-        "3_1_summary.ipynb": 4,
+        "3_1_summary.ipynb": 6,
         "3_2_summary.ipynb": 3,
         "3_3_summary.ipynb": 3,
         "3_4_summary.ipynb": 2,
@@ -137,7 +139,7 @@ def test_every_large_chapter_has_a_result_aggregation_notebook():
         notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
         source = "\n".join(cell.source for cell in notebook.cells)
         assert "results" in source and "不手填" in source
-        assert f"len(comparison)=={count}" in source or (filename == "3_1_summary.ipynb" and "len(comparison) == 5" in source)
+        assert f"len(comparison)=={count}" in source or (filename == "3_1_summary.ipynb" and "len(comparison) == 6" in source)
 
 
 def test_summary_notebooks_explain_paper_comparability_and_do_not_hide_glyph_warnings():
@@ -172,7 +174,7 @@ def test_every_large_chapter_has_a_math_opening_with_python_demo():
 
 def test_every_notebook_uses_a_task_appropriate_bundled_real_dataset():
     notebook_paths = sorted(Path("notebooks").glob("*.ipynb"))
-    assert len(notebook_paths) == 26
+    assert len(notebook_paths) == 27
     for path in notebook_paths:
         notebook = nbformat.read(path, as_version=4)
         source = "\n".join(cell.source for cell in notebook.cells)
