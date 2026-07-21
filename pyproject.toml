@@ -36,8 +36,9 @@ dev = [
 [tool.uv]
 package = false
 
-# Linux images use the CPU-only PyTorch wheel (PyPI's linux wheel bundles CUDA);
-# macOS resolves torch from PyPI as usual.
+# The CPU image and local linux dev use the CPU-only PyTorch wheel (PyPI's linux
+# wheel bundles CUDA); macOS resolves torch from PyPI as usual. Dockerfile.cuda
+# skips this wheel and installs the CUDA-enabled torch build from PyPI instead.
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"

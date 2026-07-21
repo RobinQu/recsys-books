@@ -7,19 +7,24 @@
   <title>{{ notebook.title }} · RecSys Atlas</title>
   <link rel="stylesheet" href="/static/app.css">
   <link rel="stylesheet" href="/static/navigation.css">
-  <link rel="stylesheet" href="/static/notebook.css?v=20260717-3">
+  <link rel="stylesheet" href="/static/notebook.css?v=20260721-1">
 </head>
-<body class="notebook-shell-page">
+<body class="notebook-shell-page{{ ' embedded' if embedded }}">
+  <script>
+    // Safety net: a detail page that ever ends up inside an iframe (e.g. a
+    // stale preview link) degrades to content-only instead of nested chrome.
+    if (window.self !== window.top) document.body.classList.add('embedded');
+  </script>
   {% include "_site_header.html" %}
   {% include "_site_sidebar.html" %}
 
   <main class="notebook-shell-main">
     <section class="notebook-reader-head">
       <div><div class="section-kicker">EXECUTED NOTEBOOK · NBCONVERT PREVIEW</div><h1>{{ notebook.title }}</h1><p>{{ notebook.framework }} · {{ notebook.dataset }} · {{ notebook.runtime }}</p></div>
-      <div class="notebook-mode"><span class="mode-dot"></span><div><b>一个章节，四种模式</b><small>论文证据、实验叙事、交互执行和实现源码可在下方直接切换。</small>{% if chapter_slug == 'generative' %}<small class="cuda-status">{{ 'CUDA 已就绪 · ' ~ cuda.name if cuda.available else '未检测到 CUDA · 交互执行已禁用' }}</small>{% endif %}<a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">在独立 IDE 中打开 ↗</a></div></div>
+      <div class="notebook-mode"><span class="mode-dot"></span><div>{% if notebook.kind == 'curriculum' %}<b>课程阅读与练习</b><small>先阅读教学叙事，再到 JupyterLab 验证公式，或查看本课的内容生成源。</small>{% else %}<b>一个章节，多种模式</b><small>论文证据、实验叙事、交互执行和实现源码按章节角色提供。</small>{% endif %}{% if chapter_slug == 'generative' %}<small class="cuda-status">{{ 'CUDA 已就绪 · ' ~ cuda.name if cuda.available else '未检测到 CUDA · 交互执行已禁用' }}</small>{% endif %}<a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">{{ '在 IDE 中查看课程生成源' if notebook.kind == 'curriculum' else '在独立 IDE 中打开' }} ↗</a></div></div>
     </section>
 
-    {% set default_mode = 'paper' if show_paper_guide else 'preview' %}
+    {% set default_mode = 'preview' if embedded else ('paper' if show_paper_guide else 'preview') %}
     <nav class="mode-tabs" role="tablist" aria-label="章节查看模式">
       {% if show_paper_guide %}<button class="{{ 'active' if default_mode == 'paper' else '' }}" role="tab" aria-selected="{{ 'true' if default_mode == 'paper' else 'false' }}" data-mode="paper">论文导读</button>{% endif %}
       <button class="{{ 'active' if default_mode == 'preview' else '' }}" role="tab" aria-selected="{{ 'true' if default_mode == 'preview' else 'false' }}" data-mode="preview">实验预览</button>
@@ -80,7 +85,7 @@
     {% endif %}
     <section class="mode-panel {{ 'active' if default_mode == 'preview' else '' }}" data-panel="preview" role="tabpanel" {{ '' if default_mode == 'preview' else 'hidden' }}>
       <div class="experiment-preview-pane">
-        <div class="embedded-notebook-preview"><iframe id="notebook-preview-frame" title="{{ notebook.title }} 实验预览" src="/notebooks/{{ notebook.slug }}/content" loading="eager" sandbox="allow-scripts allow-same-origin"></iframe></div>
+        <div class="embedded-notebook-preview"><iframe id="notebook-preview-frame" title="{{ notebook.title }} 实验预览" src="/notebooks/{{ notebook.slug }}/content" loading="eager" sandbox="allow-scripts allow-same-origin allow-top-navigation-by-user-activation allow-popups"></iframe></div>
       </div>
     </section>
     <section class="mode-panel" data-panel="execute" role="tabpanel" hidden>
@@ -92,7 +97,7 @@
       {% endif %}
     </section>
     <section class="mode-panel" data-panel="source" role="tabpanel" hidden>
-      <div class="mode-help"><b>本章节代码浏览器</b><span>公共数据代码、章节内模型/训练/推理/测试，以及所用框架源码均可直接切换查看。</span><a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">在 IDE 中打开章节目录 ↗</a></div>
+      <div class="mode-help"><b>{{ '本课程内容生成源' if notebook.kind == 'curriculum' else '本章节代码浏览器' }}</b><span>{{ '这里展示课程内容 spec 与 Notebook 生成入口，不虚构算法模型或训练包。' if notebook.kind == 'curriculum' else '公共数据代码、章节内模型/训练/推理/测试，以及所用框架源码均可直接切换查看。' }}</span><a href="/ide/{{ notebook.slug }}" target="_blank" rel="noreferrer">{{ '在 IDE 中查看课程生成源' if notebook.kind == 'curriculum' else '在 IDE 中打开章节目录' }} ↗</a></div>
       <div class="source-browser">
         <aside class="source-file-tree" aria-label="本章节源码文件">
           {% for group in source_groups %}<section><h3>{{ group.name }}</h3>{% for file in group.files %}<button data-source-target="{{ file.id }}"><span>PY</span><b>{{ file.label }}</b><small>{{ file.origin }}</small></button>{% endfor %}</section>{% endfor %}
@@ -106,7 +111,7 @@
       {% if next_notebook %}<a href="/notebooks/{{ next_notebook.slug }}" class="next"><span>下一篇</span><b>{{ next_notebook.title }} →</b></a>{% endif %}
     </nav>
   </main>
-  <script src="/static/app.js?v=20260717-3" defer></script>
+  <script src="/static/app.js?v=20260721-1" defer></script>
   <script>
     document.querySelectorAll('.mode-tabs button').forEach((button) => button.addEventListener('click', () => {
       if (button.disabled) return;
@@ -116,7 +121,60 @@
       const iframe = document.querySelector(`[data-panel="${mode}"] iframe[data-src]`);
       if (iframe && !iframe.getAttribute('src')) iframe.src = iframe.dataset.src;
     }));
-    if (location.hash === '#source') document.querySelector('[data-mode="source"]').click();
+    const reservedModes = new Set(['paper', 'preview', 'execute', 'source']);
+    const previewFrame = document.querySelector('#notebook-preview-frame');
+    let pendingPreviewAnchor = null;
+
+    function decodedLocationHash() {
+      if (!location.hash || location.hash === '#') return null;
+      try {
+        return decodeURIComponent(location.hash.slice(1));
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function focusPreviewAnchor(anchor) {
+      if (!anchor || !previewFrame) return false;
+      let previewDocument;
+      try {
+        previewDocument = previewFrame.contentDocument;
+      } catch (error) {
+        return false;
+      }
+      const target = previewDocument?.getElementById(anchor);
+      if (!target) return false;
+      const previewButton = document.querySelector('[data-mode="preview"]');
+      if (!previewButton || previewButton.disabled) return false;
+      previewButton.click();
+      target.scrollIntoView({ block: 'start' });
+      if (!target.hasAttribute('tabindex')) {
+        target.setAttribute('tabindex', '-1');
+        target.addEventListener('blur', () => target.removeAttribute('tabindex'), { once: true });
+      }
+      target.focus({ preventScroll: true });
+      pendingPreviewAnchor = null;
+      return true;
+    }
+
+    function applyLocationHash() {
+      const target = decodedLocationHash();
+      if (!target) return;
+      if (reservedModes.has(target)) {
+        pendingPreviewAnchor = null;
+        const modeButton = document.querySelector(`[data-mode="${target}"]`);
+        if (modeButton && !modeButton.disabled) modeButton.click();
+        return;
+      }
+      pendingPreviewAnchor = target;
+      focusPreviewAnchor(target);
+    }
+
+    previewFrame?.addEventListener('load', () => {
+      if (pendingPreviewAnchor) focusPreviewAnchor(pendingPreviewAnchor);
+    });
+    window.addEventListener('hashchange', applyLocationHash);
+    applyLocationHash();
     document.querySelectorAll('[data-source-target]').forEach((button, index) => {
       if (index === 0) button.classList.add('active');
       button.addEventListener('click', () => {

@@ -117,15 +117,19 @@ GROUPLENS = [
      "quote": "rating servers we have implemented aggregate ratings from several evaluators, based on correlation of their past ratings"},
     {"id": "system-def", "page": 3, "kind": "definition", "col": L,
      "quote": "GroupLens is a distributed system for gathering, disseminating, and using ratings"},
-    {"id": "scalability", "page": 3, "kind": "conclusion", "col": R,
-     "quote": "As the number of users grows, the quality of predictions should improve"},
+    {"id": "scalability", "page": 9, "kind": "conclusion", "col": L,
+     "quote": "We expect prediction quality to increase as the number of users increases, since more data will be available to the prediction algorithm."},
+    {"id": "worked-example", "page": 7, "kind": "method", "col": L,
+     "quote": "We illustrate one of the correlation and prediction techniques by computing Ken’s predicted score on article 6, the last row of the matrix"},
     # --- figures ---
     {"id": "fig1-netnews", "page": 4, "kind": "figure", "rect": (140, 40, 480, 245)},
     {"id": "fig2-grouplens", "page": 4, "kind": "figure", "rect": (65, 315, 565, 655)},
 ]
 
-# matrix-factorization (Koren et al., IEEE Computer 2009). Single-column magazine
-# layout, 576x792 pt. Rects top-left origin.
+# matrix-factorization (Koren et al., IEEE Computer 2009). Two-column magazine
+# layout, 576x792 pt; body columns are ~(48, 285) and (290, 540). Embedded
+# figures/sidebars interleave the extracted word stream, so quotes are chosen
+# from clean contiguous passages. Rects top-left origin.
 MF = [
     # --- overview / conclusion ---
     {"id": "abs-superior", "page": 1, "kind": "conclusion", "col": L,
@@ -136,11 +140,11 @@ MF = [
     {"id": "sgd", "page": 4, "kind": "method", "col": L,
      "quote": "Stochastic gradient descent"},
     {"id": "als", "page": 4, "kind": "method", "col": L,
-     "quote": "Alternating least squares"},
-    {"id": "biases", "page": 4, "kind": "method", "col": L,
-     "quote": "adding biases"},
+     "quote": "Thus, ALS techniques rotate between fixing the qi’s and fixing the pu’s"},
+    {"id": "biases", "page": 4, "kind": "method", "col": (290.0, 540.0),
+     "quote": "typical collaborative filtering data exhibits large systematic tendencies for some users to give higher ratings than others"},
     {"id": "implicit-feedback", "page": 5, "kind": "method", "col": L,
-     "quote": "use implicit feedback to gain insight into user preferences"},
+     "quote": "Recommender systems can use implicit feedback to gain insight into user preferences"},
     {"id": "temporal-dynamics", "page": 5, "kind": "method", "col": L,
      "quote": "account for the temporal effects"},
     # --- results ---
@@ -218,16 +222,16 @@ DSSM = [
      "quote": "The proposed deep structured semantic models are discriminatively trained by maximizing the conditional likelihood of the clicked documents"},
     {"id": "abs-wordhash", "page": 1, "kind": "method", "col": L,
      "quote": "To make our models applicable to large-scale Web search applications, we also use a technique called word hashing"},
-    {"id": "fig1-dssm", "page": 3, "kind": "figure", "col": (50.0, 560.0),
-     "quote": "It uses a DNN to map high-dimensional sparse text features into low-dimensional dense features in a semantic space."},
+    # Figure/table annotations deliberately box the visual itself.  Highlighting
+    # only the caption made the left-hand "structure figure" link appear offset.
+    {"id": "fig1-dssm", "page": 3, "kind": "figure", "rect": (30.6, 55.4, 581.4, 277.2)},
     {"id": "eq-relevance", "page": 3, "kind": "definition", "col": L,
      "quote": "The semantic relevance score between a query and a document is then measured as:"},
     {"id": "wordhash-detail", "page": 3, "kind": "method", "col": R,
      "quote": "The word hashing method described here aim to reduce the dimensionality of the bag-of-words term vectors."},
     {"id": "table1-wordhash", "page": 4, "kind": "table", "col": L,
      "quote": "Word hashing token size and collision numbers as a function of the vocabulary size and the type of letter ngrams."},
-    {"id": "dssm-results", "page": 6, "kind": "conclusion", "col": L,
-     "quote": "Table 2: Comparative results with the previous state of the art approaches and various settings of DSSM."},
+    {"id": "dssm-results", "page": 6, "kind": "table", "rect": (50.0, 112.0, 300.0, 292.0)},
 ]
 
 # mind (Li et al., CIKM 2019). Two-column layout, ~612x792 pt.
@@ -238,16 +242,15 @@ MIND = [
      "quote": "We propose the Multi-Interest Network with Dynamic routing (MIND) for dealing with user's diverse interests in the matching stage."},
     {"id": "fig1-tmall", "page": 1, "kind": "figure", "col": R,
      "quote": "Left: The areas highlighted with dashed rectangle are personalized for billion-scale users at Tmall"},
-    {"id": "fig2-mind", "page": 3, "kind": "figure", "col": (50.0, 560.0),
-     "quote": "Figure 2: Overview of MIND. MIND takes user behaviors with user profile features as inputs, and outputs user representation vectors for item retrieval in the matching stage of recommendation."},
+    {"id": "fig2-mind", "page": 3, "kind": "figure", "rect": (18.4, 63.4, 587.5, 332.6)},
     {"id": "b2i-routing", "page": 5, "kind": "method", "col": L,
      "quote": "Algorithm 1 B2I Dynamic Routing."},
     {"id": "dynamic-interest-number", "page": 5, "kind": "method", "col": L,
      "quote": "calculate adaptive number of interest capsules K by (9)"},
     {"id": "label-aware-attention", "page": 5, "kind": "method", "col": L,
      "quote": "label-aware attention, the label is the query and the interest capsules are both keys and values"},
-    {"id": "mind-results", "page": 7, "kind": "conclusion", "col": R,
-     "quote": "MIND significantly beats the two baseline methods, item-based CF and YouTube DNN."},
+    {"id": "mind-offline-results", "page": 7, "kind": "table", "rect": (50.0, 80.0, 565.0, 232.0)},
+    {"id": "mind-online-results", "page": 7, "kind": "figure", "rect": (310.0, 245.0, 563.0, 442.0)},
 ]
 
 # sasrec (Kang & McAuley, IEEE 2018). Two-column layout, ~612x792 pt.
@@ -256,8 +259,7 @@ SASREC = [
      "quote": "Sequential dynamics are a key feature of many modern recommender systems, which seek to capture the 'context' of users' activities on the basis of actions they have performed recently."},
     {"id": "abs-self-attention", "page": 1, "kind": "method", "col": L,
      "quote": "by proposing a self-attention based sequential model (SASRec)"},
-    {"id": "fig1-sasrec", "page": 1, "kind": "figure", "col": R,
-     "quote": "SASRec), which adaptively assigns weights to previous items at each time step"},
+    {"id": "fig1-sasrec", "page": 1, "kind": "figure", "rect": (312.1, 142.6, 605.9, 332.6)},
     {"id": "notation-table", "page": 3, "kind": "definition", "col": (50.0, 560.0),
      "quote": "Table I: Notation."},
     {"id": "embedding-layer", "page": 3, "kind": "method", "col": L,
@@ -266,8 +268,7 @@ SASREC = [
      "quote": "Hence, we modify the attention by forbidding Qi Kj (j > i)."},
     {"id": "self-attention-block", "page": 3, "kind": "method", "col": R,
      "quote": "The scaled dot-product attention [3] is defined as:"},
-    {"id": "sasrec-results", "page": 7, "kind": "conclusion", "col": R,
-     "quote": "Our method SASRec outperforms all baselines on both sparse and dense datasets"},
+    {"id": "sasrec-results", "page": 7, "kind": "table", "rect": (48.0, 45.0, 565.0, 195.0)},
 ]
 
 
@@ -289,6 +290,8 @@ DEEPFM = [
      "quote": "As the best model, DeepFM outperforms LR by 0.86% and 4.18% in terms of AUC (1.15% and 5.60% in terms of Logloss) on Company* and Criteo datasets."},
     {"id": "table2-deepfm", "page": 5, "kind": "table", "col": R,
      "quote": "Table 2: Performance on CTR prediction."},
+    {"id": "deepfm-shared-win", "page": 5, "kind": "conclusion", "col": R,
+     "quote": "Compared to these two models, DeepFM achieves more than 0.48% and 0.33% in terms of AUC (0.61% and 0.66% in terms of Logloss) on Company* and Criteo datasets."},
 ]
 
 # din (Zhou et al., KDD 2018). Two-column layout, ~612x792 pt.
@@ -309,6 +312,8 @@ DIN = [
      "quote": "In CTR prediction field, AUC is a widely used metric"},
     {"id": "din-results", "page": 6, "kind": "conclusion", "col": L,
      "quote": "proposed approach which outperforms state-of-the-art methods on the CTR prediction task"},
+    {"id": "din-online-ab", "page": 8, "kind": "conclusion", "col": L,
+     "quote": "DIN trained with the proposed regularizer and activation function contributes up to 10.0% CTR and 3.8% RPM(Revenue Per Mille) promotion"},
 ]
 
 # dien (Zhou et al., AAAI 2019). Two-column layout, ~612x792 pt.
@@ -329,6 +334,8 @@ DIEN = [
      "quote": "Table 5: Results from Online A/B testing"},
     {"id": "dien-gains", "page": 7, "kind": "conclusion", "col": R,
      "quote": "mille (eCPM) by 17.1%."},
+    {"id": "dien-serving", "page": 7, "kind": "method", "col": R,
+     "quote": "latency of DIEN serving can be reduced from 38.2 ms to 6.6 ms and the QPS (Query Per Second) capacity of each worker can be improved to 360."},
 ]
 
 
@@ -350,6 +357,9 @@ MMOE = [
      "quote": "MMoE outperforms other multi-task models in all means in group 2, where the task relatedness is even smaller than group 1."},
     {"id": "mmoe-google", "page": 8, "kind": "conclusion", "col": R,
      "quote": "MMoE outperforms other models in terms of both metrics."},
+    {"id": "fig4-mmoe", "page": 5, "kind": "figure", "rect": (50, 45, 560, 236)},
+    {"id": "table3-mmoe", "page": 9, "kind": "table", "rect": (50, 80, 560, 180)},
+    {"id": "table4-mmoe", "page": 9, "kind": "table", "rect": (305, 190, 560, 322)},
 ]
 
 # ple (Tang et al., RecSys 2020). Two-column layout, ~612x792 pt.
@@ -370,6 +380,10 @@ PLE = [
      "quote": "PLE converges with similar pace and achieves significant improvement over the above models with the best VCR MSE and one of the best VTR AUCs."},
     {"id": "ple-online", "page": 8, "kind": "table", "col": L,
      "quote": "Table 3: Improvement over Single-task Model on Online A/B Test"},
+    {"id": "fig3-ple", "page": 4, "kind": "figure", "rect": (345, 460, 525, 576)},
+    {"id": "table1-ple", "page": 7, "kind": "table", "rect": (305, 390, 560, 550)},
+    {"id": "fig8-ple", "page": 9, "kind": "figure", "rect": (48, 512, 302, 709)},
+    {"id": "table5-ple", "page": 10, "kind": "table", "rect": (50, 80, 562, 172)},
 ]
 
 
@@ -385,6 +399,14 @@ TIGER = [
      "quote": "based encoder-decoder setup for building"},
     {"id": "tiger-results", "page": 1, "kind": "conclusion", "col": (50.0, 560.0),
      "quote": "outperform the current SOTA models on various datasets"},
+    {"id": "tiger-rqvae", "page": 4, "kind": "method", "col": (50.0, 560.0),
+     "quote": "is a multi-level vector quantizer that applies quantization on residuals"},
+    {"id": "tiger-collision", "page": 5, "kind": "method", "col": (50.0, 560.0),
+     "quote": "we append an extra token at the end of the ordered semantic codes to make them unique"},
+    {"id": "tiger-table1", "page": 7, "kind": "table", "col": (50.0, 560.0),
+     "quote": "Table 1: Performance comparison on sequential recommendation."},
+    {"id": "tiger-table2", "page": 8, "kind": "table", "col": (50.0, 560.0),
+     "quote": "Table 2: Ablation study for different ID generation techniques"},
 ]
 
 # onerec (Deng et al., arXiv 2025). Two-column layout, ~612x792 pt.
@@ -403,8 +425,14 @@ ONEREC = [
      "quote": "an Iterative Preference Alignment module combined with Direct Preference Optimization (DPO) to enhance the quality of the generated results."},
     {"id": "onerec-results", "page": 1, "kind": "conclusion", "col": R,
      "quote": "16 increase in watch time"},
+    {"id": "onerec-balanced-kmeans", "page": 3, "kind": "method", "col": R,
+     "quote": "We apply a multi-level balanced quantitative mechanism to transform the"},
     {"id": "onerec-table1", "page": 6, "kind": "table", "col": L,
      "quote": "Table 1: Offline performance of our proposed OneRec"},
+    {"id": "onerec-deploy", "page": 6, "kind": "method", "col": L,
+     "quote": "during inference only 13% of the parameters are activated"},
+    {"id": "onerec-table2", "page": 8, "kind": "table", "col": R,
+     "quote": "Table 2: The absolute improvement of OneRec compared"},
 ]
 
 # hstu (Zhai et al., ICML 2024). Two-column layout, ~612x792 pt.
@@ -421,9 +449,20 @@ HSTU = [
      "quote": "Table 4. Evaluations of methods on public"},
     {"id": "hstu-online", "page": 7, "kind": "table", "col": R,
      "quote": "Table 7. Offline/Online Comparison of Ranking Models."},
+    {"id": "hstu-ablation", "page": 7, "kind": "table", "col": L,
+     "quote": "Table 5. Evaluation of HSTU, ablated HSTU, and Transformers"},
+    {"id": "hstu-efficiency", "page": 7, "kind": "conclusion", "col": L,
+     "quote": "HSTU is up to 15.2x and 5.6x more efficient"},
+    {"id": "hstu-scaling", "page": 8, "kind": "conclusion", "col": R,
+     "quote": "GRs leading to 1.5 trillion parameter models, whereas DLRMs performance saturate at about 200 billion parameters"},
 ]
 
 SPECS = {"he2014": HE2014, "grouplens": GROUPLENS, "matrix-factorization": MF, "fm": FM, "word2vec": WORD2VEC, "dssm": DSSM, "mind": MIND, "sasrec": SASREC, "deepfm": DEEPFM, "din": DIN, "dien": DIEN, "mmoe": MMOE, "ple": PLE, "tiger": TIGER, "onerec": ONEREC, "hstu": HSTU}
+
+# Some SPECS keys name the PDF file while the runtime paper id (resources.json,
+# evidence items, /papers/{id} routes) uses a shorter alias. Build/verify read
+# the PDF by SPECS key; the JSON is written under the runtime id.
+OUTPUT_ALIASES = {"matrix-factorization": "mf"}
 
 
 def _key(t: str) -> str:
@@ -559,8 +598,9 @@ def main() -> None:
         if built["status"] != "ok":
             print(built)
             continue
-        result[pid] = {"page_height": built["page_height"], "annotations": built["annotations"]}
-        print(f"{pid}: {len(built['annotations'])} annotations, unresolved={built['unresolved']}")
+        out_id = OUTPUT_ALIASES.get(pid, pid)
+        result[out_id] = {"page_height": built["page_height"], "annotations": built["annotations"]}
+        print(f"{out_id}: {len(built['annotations'])} annotations, unresolved={built['unresolved']}")
         if args.verify:
             verify(pid, built["annotations"])
             print(f"  overlays -> {OVERLAYS}")

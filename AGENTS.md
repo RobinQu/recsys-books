@@ -2,20 +2,20 @@
 
 ## Product structure
 
-Keep exactly two information levels: the home page and an algorithm/notebook detail page. Do not add category landing pages. The global top bar and left navigation are shared templates; a detail page only changes active state. The home page ends with one Appendix chapter containing paper, dataset, and Notebook subchapters; do not restore a framework-selection section. Every detail page has exactly four core tabs: **论文导读**, **实验预览**, **可交互执行**, and **代码实现**.
+Keep exactly two information levels: the home page and an algorithm/notebook detail page. Do not add category landing pages. The global top bar and left navigation are shared templates; a detail page only changes active state. The home page ends with one Appendix chapter containing paper, dataset, Notebook, and math-knowledge-map (A.4) subchapters; do not restore a framework-selection section. Every detail page has exactly four core tabs: **论文导读**, **实验预览**, **可交互执行**, and **代码实现**.
 
 ### Detail-page tab layout and behavior
 
 The four tabs live in a single tab bar under the page header (`app/templates/notebook_shell.html`).
 
 1. **论文导读 (Paper Evidence)**
-   - Shown only when `show_paper_guide` is true. `app/content.py:notebook_has_paper_guide` returns `False` for the foundations chapter (3.0) and every chapter opening/导读 page; all algorithm detail pages and summary pages keep it.
+   - Shown only when `show_paper_guide` is true. `app/content.py:notebook_has_paper_guide` returns `False` for the foundations chapter (3.0), every chapter opening/导读 page, and every summary page (3_x_summary / 4_1_generative_overview); only algorithm detail pages keep it. Summary pages do their cross-paper comparison (论文关联关系, 实验数据审计, 未来发展) inside the summary notebook instead.
    - Default active tab when available; otherwise the default falls back to 实验预览.
    - Split-pane layout on desktop: left prose, right embedded PDF viewer.
    - **Left pane (prose):**
      - Heading with `paper_guide.intro`.
      - `quick_index`: clickable cards labeled by `kind` (definition / method / conclusion / figure / table) that jump the right PDF to the matching page/annotation.
-     - `guide`: a 七字段 schema (`background`, `problem`, `innovation`, `method`, `findings`, `contribution`, `limitations`, `one_liner`). Prose may contain inline `[[term|page|evidence_id]]` links parsed by `app/evidence.py:_parse_prose_links`; each link renders as an underlined button that opens the PDF at that evidence.
+     - `guide`: an eight-field schema (`background`, `problem`, `innovation`, `method`, `findings`, `contribution`, `limitations`, `one_liner`). Prose may contain inline `[[term|page|evidence_id]]` links parsed by `app/evidence.py:_parse_prose_links`; each link renders as an underlined button that opens the PDF at that evidence.
      - `structure_figure`: the cropped paper figure from `config/paper_figures.json` if present; clicking it jumps to the matching architecture evidence.
      - `layers`: key-module cards from `config/model_layers.json`, each linked to the architecture evidence.
      - For chapters still on the legacy flat-list format (no `innovation` field), the older E01… evidence cards are also rendered below the summary.
@@ -29,6 +29,8 @@ The four tabs live in a single tab bar under the page header (`app/templates/not
    - Always present.
    - Loads `/notebooks/{slug}/content`, which returns an nbconvert HTML export of `notebooks/{slug}.ipynb`.
    - On-demand regeneration: if `notebook_previews/{slug}.html` is missing or older than the `.ipynb`, the endpoint regenerates it with `HTMLExporter(template_name="lab")` and `polish_preview`.
+   - `polish_preview` also injects a link-retargeting script: same-origin links to a different path get `target="_top"` (the whole detail page navigates and its hash logic focuses the anchor), external links get `target="_blank"`. The preview iframe sandbox therefore includes `allow-top-navigation-by-user-activation allow-popups`; never let a site-internal link load the application shell inside the iframe.
+   - The detail page supports `?embedded=1` (and auto-detects `window.self !== window.top`) to degrade to a content-only view: topbar, sidebar, tabs and pager hidden, only the preview panel fills the viewport — the same convention as the embedded paper reader.
    - Rendered inside a white card with a fixed viewport height.
 
 3. **可交互执行 (Executable Jupyter)**
@@ -52,13 +54,19 @@ The four tabs live in a single tab bar under the page header (`app/templates/not
 - Mobile (`<=680px`): tab buttons compact, source browser stacks vertically, frames use viewport height.
 - When CUDA is unavailable for generative notebooks, the execute tab button is disabled and shows a tooltip.
 
+### 3.0 curriculum and Appendix math map (A.4)
+
+The first eight registered notebooks are the contiguous 3.0 foundation sequence: the overview, six `kind="curriculum"` lessons (`3_0_1` through `3_0_6`), and the `3_0_7` data/experiment pipeline. The lessons teach reusable concepts at high-school-graduate level; algorithm notebooks link to their stable anchors and derive only paper-specific mathematics.
+
+`app/content.py:MATH_PREREQUISITES` is the tracked list behind the home page's A.4 数学知识地图. Each entry includes a plain-language intuition, a valid 3.0 curriculum notebook and anchor, prerequisite topic ids, and the algorithms/models that use it. A.4 is a bounded graph projection, not another course hierarchy: its default view contains the six chapters; focused views contain at most 16 nodes and expand at most two relationship steps. The list must cover every algorithm.
+
 ## Tutorial contract
 
 Every algorithm is a separate notebook. A major chapter has an opening/math notebook, algorithm notebooks, and a result summary that reads the recorded experiment JSON. Each algorithm notebook must include paper context, prerequisite math, model structure and formulas, a small Python demonstration, real dataset provenance, training/inference/testing code, metrics, baseline and result discussion. Explain new symbols before using them and keep the prose compact, but never replace a derivation with a framework call.
 
 Classic algorithms may use deterministic MovieLens/Amazon teaching subsets. Deep retrieval, ranking, multitask, Transformer and generative chapters use complete official datasets under `RECSYS_PROFILE=full`; `smoke` is reserved for deterministic CPU/CI validation and must be labeled as such. Never fabricate interactions, exposures, labels or sequences.
 
-Generative notebooks are CUDA-first. Their default runners must reject a host without CUDA; the Web detail page disables interactive execution when CUDA is unavailable. CPU CI may call the explicit `cpu_smoke=True` path only for data contracts, tensor shapes, a bounded forward/backward pass and constrained decoding. Accuracy/effect thresholds for OpenOneRec and HSTU belong in CUDA-gated tests. Use `docker-compose.cuda.yml` to pass NVIDIA devices into containers.
+Generative notebooks are CUDA-first. Their default runners must reject a host without CUDA; the Web detail page disables interactive execution when CUDA is unavailable. CPU CI may call the explicit `cpu_smoke=True` path only for data contracts, tensor shapes, a bounded forward/backward pass and constrained decoding. Accuracy/effect thresholds for OpenOneRec and HSTU belong in CUDA-gated tests. `Dockerfile` builds the CPU image (CPU-only torch from the locked pytorch-cpu index); `Dockerfile.cuda` builds the CUDA image by swapping in the CUDA-enabled torch wheel from PyPI. `docker-compose.cuda.yml` is an override that switches the affected services to `Dockerfile.cuda` (tagged `recsys-atlas-cuda`) and passes NVIDIA devices into the containers. GitHub Actions builds and publishes both web images plus the IDE image.
 
 ## Code ownership
 
@@ -86,7 +94,7 @@ Top-level orchestrator that:
 4. Writes all `notebooks/*.ipynb` files.
 5. Sets notebook metadata: `kernelspec`, `language_info`, and `recsys.profile="full"`, `recsys.requires_cuda=true` for chapter 4.
 
-The `notebook(title, goal, source, cells)` helper chooses the dataset based on the title (`dataset_for_title`) and prepends a standard setup cell that loads the real dataset and asserts `randomly_fabricated_rows == 0`.
+The `notebook(title, goal, source, cells)` helper chooses the dataset based on the title (`dataset_for_title`) and prepends a standard setup cell that loads the real dataset and asserts `randomly_fabricated_rows == 0`. `curriculum_notebook` builds the six 3.0 concept lessons without pretending their labeled teaching arrays are user behavior. Curriculum setup cells end with `CURRICULUM_FONT_SETUP`: matplotlib's default DejaVu Sans has no CJK glyphs, so charts pick the first available font from Noto CJK (installed via `fonts-noto-cjk` in the images) or common host Chinese fonts — fix the font, never silence missing-glyph warnings with `warnings.filterwarnings`.
 
 ### Opening specs (`scripts/tutorial_opening_specs.py`)
 
@@ -165,7 +173,9 @@ Each chapter key maps to either a legacy list of anchors or an enriched object:
 }
 ```
 
-Guide prose may contain inline links `[[term|page|evidence_id]]`. The `evidence_id` must exist in the same chapter's `items`. Legacy flat-list chapters still render as E01… evidence cards and do not show the summary/guide blocks.
+Guide prose may contain inline links `[[term|page|evidence_id]]`. The `evidence_id` must exist in the same chapter's `items` or in that paper's `paper_annotations.json` ids. Legacy flat-list chapters still render as E01… evidence cards and do not show the summary/guide blocks.
+
+`tests/test_evidence_consistency.py` guards this join: every `quick_index` entry and every prose link must resolve to an item id or an annotation id of the resolved paper (quick_index without an explicit `paper_id` falls back to the chapter's first item's paper, matching `app/evidence.py:paper_guide`), each item's `paper_id` must have an annotations key, and an id present as both item and annotation must agree on `page`. Historical violations are pinned in `KNOWN_ISSUES`; shrink that set when cleaning a chapter, never grow it.
 
 ### Runtime annotations (`scripts/build_pdf_annotations.py`)
 
@@ -175,6 +185,8 @@ Guide prose may contain inline links `[[term|page|evidence_id]]`. The `evidence_
 - `rect`: a manually chosen figure/table box in PyMuPDF points (top-left origin).
 
 For two-column papers, constants `L = (50.0, 295.0)` and `R = (305.0, 560.0)` restrict the search to one column. Always run with `--verify` before committing to produce overlay images in `tmp/annotation_overlays/`; the script reports `unresolved=[]` for each paper.
+
+When a SPECS key names the PDF file but the runtime paper id differs (e.g. `matrix-factorization.pdf` vs paper id `mf`), `OUTPUT_ALIASES` maps the SPECS key to the runtime id so the JSON key matches `resources.json` and the `/papers/{id}` routes.
 
 ### Paper figures (`config/paper_figures.json`)
 

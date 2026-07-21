@@ -9,7 +9,7 @@ import json
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from app.content import NOTEBOOKS
+from app.content import CHAPTER_CODE_NOTEBOOK_KINDS, NOTEBOOKS
 
 OUTPUT = ROOT / "chapter_code"
 
@@ -379,14 +379,20 @@ def test_training_pipeline_returns_observed_results():
     (directory / "pyrightconfig.json").write_text(json.dumps(pyright, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def select_chapter_code_notebooks(notebooks: list[dict]) -> list[dict]:
+    """Return notebook records that own an algorithm-style companion package."""
+    return [notebook for notebook in notebooks if notebook.get("kind") in CHAPTER_CODE_NOTEBOOK_KINDS]
+
+
 def main() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     package = OUTPUT / "__init__.py"
     if not package.exists():
         package.write_text('"""Executable, chapter-local recommendation examples."""\n', encoding="utf-8")
-    for notebook in NOTEBOOKS:
+    eligible_notebooks = select_chapter_code_notebooks(NOTEBOOKS)
+    for notebook in eligible_notebooks:
         write_chapter(notebook["slug"], notebook["title"])
-    print(f"generated {len(NOTEBOOKS)} chapter packages in {OUTPUT}")
+    print(f"generated {len(eligible_notebooks)} chapter packages in {OUTPUT}")
 
 
 if __name__ == "__main__":

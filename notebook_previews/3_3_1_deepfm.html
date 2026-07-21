@@ -7517,7 +7517,7 @@ window.MathJax = {
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=65c1d316">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f063695">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7530,7 +7530,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ef31f603">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e637b362">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7540,7 +7540,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b0fdf48d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d9dc85c8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7550,8 +7550,9 @@ window.MathJax = {
 <div class="highlight hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+<span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="n">ARTIFACT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"RECSYS_ARTIFACT_ROOT"</span><span class="p">,</span> <span class="n">PROJECT_ROOT</span><span class="p">))</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">))</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
 <span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
@@ -7594,7 +7595,7 @@ window.MathJax = {
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"project_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">),</span> <span class="s2">"artifact_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
        <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
        <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
@@ -7604,7 +7605,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9eb226dc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6ef69a11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7618,25 +7619,25 @@ window.MathJax = {
 <li>用实际输出讨论失败边界。</li>
 </ol>
 <p><strong>本节问题：</strong> 如何在不手工枚举所有组合的情况下，同时学习一阶、二阶和高阶稀疏特征交互？</p>
-<p><strong>先修知识：</strong> 3.0 的向量、概率与损失函数。第一次阅读无需推导梯度，只要能解释输入、输出和形状。</p>
+<p><strong>阅读约定：</strong> 通用数学通过 3.0 基础课程链接回看；本页只详细推导论文引入或改造的数学。第一次阅读先追踪输入、输出和形状，再看梯度。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=23967d9b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2e3b5e14">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Paper-&amp;-Context">Paper &amp; Context<a class="anchor-link" href="#Paper-&amp;-Context">¶</a></h2><p>DeepFM 让 FM 与 DNN 共享 embedding：FM 显式承担低阶交互，DNN 隐式组合高阶模式。相对 Wide&amp;Deep，它减少宽侧人工交叉，但没有自动解决序列、曝光偏差或概率校准。</p>
+<h2 id="Paper-&amp;-Context">Paper &amp; Context<a class="anchor-link" href="#Paper-&amp;-Context">¶</a></h2><p>DeepFM（IJCAI 2017，华为诺亚方舟实验室）针对 CTR 预估中低阶与高阶交互难以兼得的问题：FNN 要先拿 FM 预训练 embedding 才能用，PNN 只学高阶，Wide &amp; Deep 的 wide 侧仍要人工叉乘特征。论文让 FM 与 DNN 共享同一份输入与 embedding，端到端联合训练，离线在 Criteo 与公司数据上同时报告最优 AUC 与 LogLoss。它没有做的：没有自己的在线 A/B（只引用 Wide &amp; Deep 的线上经验），不建模行为序列，不处理曝光偏差与概率校准；Criteo 用随机 9:1 切分，比时间切分宽松。</p>
 <p><strong>来源：</strong> <a href="https://arxiv.org/abs/1703.04247">Guo et al., 2017, DeepFM</a></p>
-<h3 id="%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">原文实验设计与关键结论<a class="anchor-link" href="#%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">¶</a></h3><p>原文在 Criteo 和公司数据上同时报告 AUC、LogLoss，Table 2 中 DeepFM 优于所列基线。教程使用 KuaiRand 完整曝光重新测量，并保留 LR 对照，不能把公司数据上的相对提升搬到新数据。</p>
+<h3 id="%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">原文实验设计与关键结论<a class="anchor-link" href="#%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">¶</a></h3><p>原文 Table 2：Criteo（约 4,500 万条点击记录，13 连续 + 26 离散特征，随机 9:1 切分）上 DeepFM AUC 0.8007、LogLoss 0.45083，优于 FM（0.7892/0.46077）与最佳 PNN 变体（0.7987/0.45214）；Company*（约 10 亿条记录，7 天训练 + 次日测试）上 AUC 0.8715、LogLoss 0.02618。相对 LR，AUC 提升 0.86%/4.18%（Company*/Criteo），LogLoss 降低 1.15%/5.60%；相对用独立 embedding 的 LR&amp;DNN/FM&amp;DNN 仍高 0.48%/0.33%。深度模型统一 400-400-400、dropout 0.5，FM 隐向量维度 10。教程使用 KuaiRand 完整曝光重新测量并保留 LR 对照，两套数值不能相减。</p>
 <p>请区分三层证据：论文中的离线实验、本 Notebook 验证的代码链路、生产系统尚需验证的在线收益。三者不能互相替代。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=86d1ffa2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e3628851">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7646,12 +7647,12 @@ window.MathJax = {
 <strong>切分：</strong> 7:2:1 fixed split from Criteo_x1<br/>
 <strong>指标：</strong> AUC, LogLoss<br/>
 <strong>与论文比较边界：</strong> 按配置中的 paper_targets 逐指标对照</p>
-<p><code>full</code> 是论文对照唯一有效的效果模式：它不截断用户、物品或测试行。<code>smoke</code> 只做张量、损失和推理链路回归，不进入论文数值比较。</p>
+<p><code>full</code> 只有在运行输出证明数据、切分、候选集、模型配置与指标均对齐时，才可能进入论文数值比较；它不是把教学适配器自动变成论文复现的开关。<code>smoke</code> 只做张量、损失和推理链路回归。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4a6fa200">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7600cb2b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7665,28 +7666,67 @@ window.MathJax = {
 <li><strong>FM 二阶分支</strong>：用隐向量内积自动学任意两个特征的二阶交互，O(nd) 展开避免枚举所有特征对。</li>
 <li><strong>DNN 高阶分支</strong>：把 embedding 拼接送入多层全连接，学习三阶及以上的组合模式；三路 logit（一阶 + FM + DNN）相加后 Sigmoid 出 CTR。</li>
 </ul>
-<h3 id="%E7%BB%93%E6%9E%84%EF%BC%9ALinear%E3%80%81FM-%E4%B8%8E-DNN-%E4%B8%89%E8%B7%AF%E7%9B%B8%E5%8A%A0">结构：Linear、FM 与 DNN 三路相加<a class="anchor-link" href="#%E7%BB%93%E6%9E%84%EF%BC%9ALinear%E3%80%81FM-%E4%B8%8E-DNN-%E4%B8%89%E8%B7%AF%E7%9B%B8%E5%8A%A0">¶</a></h3><p>对稀疏输入 $x$，一阶分支记忆单特征贡献；FM 分支显式计算二阶交互；DNN 分支从共享 embedding 学高阶组合：</p>
-<p>$$z=w_0+\sum_iw_ix_i+\sum_{i&lt;j}\langle v_i,v_j\rangle x_ix_j+\mathrm{MLP}([v_ix_i]_i),\quad p=\sigma(z).$$</p>
-<p>直接枚举二阶组合要 $O(n^2d)$。展开平方后可化成</p>
-<p>$$\frac12\sum_f\left[\left(\sum_i v_{i,f}x_i\right)^2-\sum_i(v_{i,f}x_i)^2\right],$$</p>
-<p>只需 $O(nd)$。最后用二元交叉熵 $L=-y\log p-(1-y)\log(1-p)$。共享 embedding 意味着低阶和高阶分支共同修改同一组表示，而不是训练两套互不相干的特征。</p>
+<h3 id="%E7%BB%93%E6%9E%84%EF%BC%9ALinear%E3%80%81FM-%E4%B8%8E-DNN-%E4%B8%89%E8%B7%AF%E7%9B%B8%E5%8A%A0">结构：Linear、FM 与 DNN 三路相加<a class="anchor-link" href="#%E7%BB%93%E6%9E%84%EF%BC%9ALinear%E3%80%81FM-%E4%B8%8E-DNN-%E4%B8%89%E8%B7%AF%E7%9B%B8%E5%8A%A0">¶</a></h3><p>一条样本是 m 个 field 的稀疏向量 $x$。field 就是特征分组：性别是一个 field，视频类别是一个 field，小时是一个 field。每个特征 $i$ 同时拥有一阶权重 $w_i$（标量）和隐向量 $V_i\in\mathbb R^k$。</p>
+<p>最终 logit 分三路：一阶线性项记住单特征分量，FM 二阶项显式算特征对交互，DNN 从同一组 embedding 学高阶组合：</p>
+<p>$$z=w_0+\sum_iw_ix_i+\sum_{i&lt;j}\langle V_i,V_j\rangle x_ix_j+\mathrm{MLP}([V_ix_i]_i),\quad p=\sigma(z).$$</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$x_i$</td>
+<td>特征 $i$ 的取值（one-hot 中为 0/1）</td>
+</tr>
+<tr>
+<td>$w_i$</td>
+<td>特征 $i$ 的一阶权重</td>
+</tr>
+<tr>
+<td>$V_i$</td>
+<td>特征 $i$ 的 $k$ 维隐向量</td>
+</tr>
+<tr>
+<td>$\langle V_i,V_j\rangle$</td>
+<td>内积 $\sum_f V_{i,f}V_{j,f}$，即二阶交互强度</td>
+</tr>
+<tr>
+<td>$\sigma$</td>
+<td>Sigmoid，把 logit 压成 0～1 的点击概率</td>
+</tr>
+</tbody>
+</table>
+<h3 id="%E4%B8%BA%E4%BB%80%E4%B9%88-FM-%E4%B8%8D%E7%94%A8%E7%9C%9F%E7%9A%84%E6%9E%9A%E4%B8%BE%E7%89%B9%E5%BE%81%E5%AF%B9">为什么 FM 不用真的枚举特征对<a class="anchor-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-FM-%E4%B8%8D%E7%94%A8%E7%9C%9F%E7%9A%84%E6%9E%9A%E4%B8%BE%E7%89%B9%E5%BE%81%E5%AF%B9">¶</a></h3><p>直接算二阶项要枚举所有特征对：$n$ 个非零特征有 $n(n-1)/2$ 对，每对一次 $k$ 维内积，共 $O(n^2k)$。把内积按维度展开并交换求和顺序，可得恒等式</p>
+<p>$$\sum_{i&lt;j}\langle V_i,V_j\rangle x_ix_j=\frac12\sum_{f=1}^{k}\left[\left(\sum_i V_{i,f}x_i\right)^2-\sum_i (V_{i,f}x_i)^2\right],$$</p>
+<p>右边每个维度 $f$ 只做 $n$ 次乘加，总共 $O(nk)$（实现按非零特征计，常写作 $O(nd)$，$d$ 即隐向量维度 $k$）。手算验证：取 $k=2$、两个特征 $V_1=(1,2)$、$V_2=(3,4)$、$x_1=x_2=1$。左边 $\langle V_1,V_2\rangle=1\times3+2\times4=11$；右边 $f=1$ 时 $(1+3)^2-(1^2+3^2)=16-10=6$，$f=2$ 时 $(2+4)^2-(2^2+4^2)=36-20=16$，$\tfrac12(6+16)=11$，两边相等。直觉：$(\sum_i a_i)^2$ 展开后包含所有两两乘积 $2a_ia_j$ 和平方项 $a_i^2$，减掉平方项再除以 2 正好留下 $i&lt;j$ 的配对。</p>
+<h3 id="%E5%85%B1%E4%BA%AB-embedding-%E4%B8%8E%E6%8D%9F%E5%A4%B1">共享 embedding 与损失<a class="anchor-link" href="#%E5%85%B1%E4%BA%AB-embedding-%E4%B8%8E%E6%8D%9F%E5%A4%B1">¶</a></h3><p>共享 embedding 指同一组 $V_i$ 同时喂给 FM 分支和 DNN 分支：反向传播时，低阶交互和高阶组合的梯度落在同一组表示上，而不是各练一套互不相干的特征——论文表 2 里它因此优于使用独立 embedding 的 LR&amp;DNN 与 FM&amp;DNN。输出 $p=\sigma(z)$ 后用二元交叉熵 $L=-y\log p-(1-y)\log(1-p)$：$y=1$ 时只留 $-\log p$，预测越接近 1 损失越小。例：$y=1$、$p=0.9$ 时 $L\approx0.105$；$p=0.1$ 时 $L\approx2.303$。</p>
 <h3 id="%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81">公式到代码<a class="anchor-link" href="#%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81">¶</a></h3><p><code>run_deepfm</code> 将 KuaiRand 的 user、video、场景和时段编码为 field，Torch-RecHub DeepFM 内部实现三路 logit，并在真实点击标签上优化 BCE。</p>
 <p>阅读源码时按“张量形状 → 前向计算 → score → loss → metric”五步追踪，不需要一次读完整个工程文件。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f1b47e5d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=af870c85">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Math-by-Hand">Math by Hand<a class="anchor-link" href="#Math-by-Hand">¶</a></h2><p>FM 二阶项是 $\sum_{i&lt;j}\langle v_i,v_j\rangle x_ix_j$；Deep 分支把同一组 embedding 展平送入 MLP。最终 logit 为 linear + FM + DNN，再经 Sigmoid 得点击概率。当前样本只有非零 field 参与交互。</p>
+<h2 id="Math-by-Hand">Math by Hand<a class="anchor-link" href="#Math-by-Hand">¶</a></h2><h3 id="%E9%80%9A%E7%94%A8%E5%85%88%E4%BF%AE%EF%BC%88%E5%85%88%E5%9B%9E%E7%9C%8B-3.0-%E5%9F%BA%E7%A1%80%E8%AF%BE%E7%A8%8B%EF%BC%89">通用先修（先回看 3.0 基础课程）<a class="anchor-link" href="#%E9%80%9A%E7%94%A8%E5%85%88%E4%BF%AE%EF%BC%88%E5%85%88%E5%9B%9E%E7%9C%8B-3.0-%E5%9F%BA%E7%A1%80%E8%AF%BE%E7%A8%8B%EF%BC%89">¶</a></h3><ul>
+<li><a href="/notebooks/3_0_1_data_ml_basics#observation-label">样本、特征与点击标签</a></li>
+<li><a href="/notebooks/3_0_2_linear_algebra#elementwise-dot">向量点积</a></li>
+<li><a href="/notebooks/3_0_3_calculus#functions">函数复合与激活</a></li>
+<li><a href="/notebooks/3_0_5_information_theory#cross-entropy-kl">二元交叉熵</a></li>
+</ul>
+<h3 id="%E6%9C%AC%E8%AE%BA%E6%96%87%E6%96%B0%E5%A2%9E%E6%95%B0%E5%AD%A6%EF%BC%88%E6%9C%AC%E8%8A%82%E8%AF%A6%E7%BB%86%E6%8E%A8%E5%AF%BC%EF%BC%89">本论文新增数学（本节详细推导）<a class="anchor-link" href="#%E6%9C%AC%E8%AE%BA%E6%96%87%E6%96%B0%E5%A2%9E%E6%95%B0%E5%AD%A6%EF%BC%88%E6%9C%AC%E8%8A%82%E8%AF%A6%E7%BB%86%E6%8E%A8%E5%AF%BC%EF%BC%89">¶</a></h3><p>FM 二阶项从枚举特征对化简到 O(nd)，以及 FM 与 DNN 共享同一组 embedding。</p>
+<p>FM 二阶项是 $\sum_{i&lt;j}\langle v_i,v_j\rangle x_ix_j$：每对非零特征贡献一次隐向量内积；Deep 分支把同一组 embedding 展平送入 MLP；最终 logit 为 linear + FM + DNN 三路相加，再经 Sigmoid 得点击概率。下面的代码用三个二维 embedding（user、item、hour）手算：user·item $=1\times0.8+0\times0.2=0.8$，user·hour $=0.2$，item·hour $=0.8\times0.2+0.2\times0.9=0.34$，三项相加约 $1.34$，就是这条样本的全部二阶交互分。</p>
 <p>下面用 NumPy/Matplotlib 验证直觉。二维图只是教学投影，工业 embedding 虽有更多维，计算规则相同。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fb20ff72">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=78377e05">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7707,18 +7747,24 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3f2aecde">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=32dd5fd2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Data">Data<a class="anchor-link" href="#Data">¶</a></h2><p>KuaiRand-Pure 真实短视频曝光：user、video、场景 tab、hour、视频时长桶为特征，标签直接使用日志中的 <code>is_click</code>，按时间切分。</p>
+<h2 id="Data">Data<a class="anchor-link" href="#Data">¶</a></h2><h3 id="%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">权威 full 协议（效果验收目标）<a class="anchor-link" href="#%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">¶</a></h3><p><strong>正式数据：</strong> Criteo Display Ads<br/>
+<strong>资源 ID：</strong> <code>criteo-x1-full</code><br/>
+<strong>切分：</strong> 7:2:1 fixed split from Criteo_x1<br/>
+<strong>指标：</strong> AUC, LogLoss<br/>
+<strong>与论文比较边界：</strong> 按配置中的 paper_targets 逐指标对照</p>
+<h3 id="smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">smoke 教学适配器（默认 runner 实际读取）<a class="anchor-link" href="#smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">¶</a></h3><p>KuaiRand-Pure 的真实短视频曝光教学子集：user、video、场景 tab、hour、视频时长桶为特征，标签直接读取 <code>is_click</code>，按日志顺序切分。它不是 full 协议指定的 Criteo。</p>
+<p>下方运行结果打印的 provenance 才是本次执行事实；若资源、统计或切分与 full 协议不一致，就必须标记为不可比较。</p>
 <p>**防泄漏清单：**按时间切分；item 映射只表达已知目录，不读取测试标签；低评分或未点击负反馈均来自数据中的已观察行；序列只看预测时刻以前；测试集只在最后评价。CPU 档使用真实数据的确定性子集，<strong>不是统一 benchmark 成绩</strong>。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bc8d09c9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7a830149">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7728,7 +7774,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=768a1538">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8319f5ef">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7755,7 +7801,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cbc8eb7a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=86010b7c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7764,7 +7810,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c85ce992">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bdb2fb15">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7782,7 +7828,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ec5228a5">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=64992010">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7801,7 +7847,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fdfc6b8e">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ebc68552">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7835,7 +7881,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=232ecb5e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=31717eb7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7844,7 +7890,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1f822463">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bbacc222">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7870,7 +7916,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9ff34fae">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c13b7ecf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7888,14 +7934,14 @@ window.MathJax = {
     <span class="s1">'dataset'</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s1">'dataset'</span><span class="p">][</span><span class="s1">'dataset'</span><span class="p">],</span>
     <span class="s1">'randomly_fabricated_rows'</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'dataset'</span><span class="p">][</span><span class="s1">'randomly_fabricated_rows'</span><span class="p">])</span>
 <span class="p">}</span>
-<span class="n">path</span><span class="o">=</span><span class="n">save_records</span><span class="p">(</span><span class="s1">'chapter_3_3'</span><span class="p">,</span><span class="s1">'3_3_1_deepfm'</span><span class="p">,[</span><span class="n">record</span><span class="p">]);</span> <span class="nb">print</span><span class="p">(</span><span class="s1">'saved:'</span><span class="p">,</span><span class="n">path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+<span class="n">path</span><span class="o">=</span><span class="n">save_records</span><span class="p">(</span><span class="s1">'chapter_3_3'</span><span class="p">,</span><span class="s1">'3_3_1_deepfm'</span><span class="p">,[</span><span class="n">record</span><span class="p">]);</span> <span class="nb">print</span><span class="p">(</span><span class="s1">'saved:'</span><span class="p">,</span><span class="n">path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4f9f84f2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=154f4555">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7904,7 +7950,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=69898160">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=425fbfa4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7921,7 +7967,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c3b5d87a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=47a1bbf8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7934,5 +7980,24 @@ window.MathJax = {
 </div>
 </div>
 </main>
-</body>
+<script id="recsys-preview-link-targets">
+(function () {
+  function retarget() {
+    document.querySelectorAll('a[href]').forEach(function (anchor) {
+      var href = anchor.getAttribute('href');
+      if (!href || href.charAt(0) === '#') return;
+      var url;
+      try { url = new URL(href, document.baseURI); } catch (error) { return; }
+      if (url.origin === location.origin) {
+        if (url.pathname !== location.pathname) anchor.target = '_top';
+      } else {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', retarget);
+  else retarget();
+})();
+</script></body>
 </html>

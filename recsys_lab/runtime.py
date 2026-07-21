@@ -45,7 +45,8 @@ def seed_everything(seed: int = 2026) -> None:
 
 
 def save_records(chapter: str, name: str, records: list[dict]) -> Path:
-    path = ROOT / "results" / chapter / f"{name}.json"
+    artifact_root = Path(os.environ.get("RECSYS_ARTIFACT_ROOT", ROOT)).expanduser().resolve()
+    path = artifact_root / "results" / chapter / f"{name}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"records": records}, ensure_ascii=False, indent=2), encoding="utf-8")
     return path

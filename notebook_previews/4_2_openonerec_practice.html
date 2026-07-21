@@ -7517,7 +7517,7 @@ window.MathJax = {
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=64e69564">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a9c38ce6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7530,7 +7530,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9fe3f96f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f76a31b5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7540,7 +7540,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d384b071">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8a8b2765">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7550,8 +7550,9 @@ window.MathJax = {
 <div class="highlight hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+<span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="n">ARTIFACT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"RECSYS_ARTIFACT_ROOT"</span><span class="p">,</span> <span class="n">PROJECT_ROOT</span><span class="p">))</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">))</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
 <span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
@@ -7594,7 +7595,7 @@ window.MathJax = {
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"project_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">),</span> <span class="s2">"artifact_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
        <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
        <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
@@ -7604,7 +7605,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1df1619e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a4c1c560">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7618,36 +7619,36 @@ window.MathJax = {
 <li>用实际输出讨论失败边界。</li>
 </ol>
 <p><strong>本节问题：</strong> 如何把推荐列表变成 token 序列，同时保证解码结果属于真实目录、没有重复并可接受奖励对齐？</p>
-<p><strong>先修知识：</strong> 3.0 的向量、概率与损失函数。第一次阅读无需推导梯度，只要能解释输入、输出和形状。</p>
+<p><strong>阅读约定：</strong> 通用数学通过 3.0 基础课程链接回看；本页只详细推导论文引入或改造的数学。第一次阅读先追踪输入、输出和形状，再看梯度。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=340b7129">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cd10921c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Paper-&amp;-Context">Paper &amp; Context<a class="anchor-link" href="#Paper-&amp;-Context">¶</a></h2><p>OpenOneRec 展示列表生成、奖励模型和偏好优化的开放流程。smoke 档不冒充官方大模型训练，而是复现最关键的数据契约：item 到 Semantic ID、teacher forcing、trie 约束和合法性压力测试。</p>
+<h2 id="Paper-&amp;-Context">Paper &amp; Context<a class="anchor-link" href="#Paper-&amp;-Context">¶</a></h2><p>OneRec（快手，2025）把召回、粗排、精排的级联流水线替换成单一 encoder-decoder 生成模型：内容 embedding 经均衡 K-Means 残差量化成 Semantic ID，decoder 自回归生成整屏 session，再用 IPA（自采样 + reward 模型 + 迭代 DPO）对齐偏好。OpenOneRec 展示这一流程的开放实现。smoke 档不冒充官方大模型训练，而是复现最关键的数据契约：item 到 Semantic ID、teacher forcing、trie 约束和合法性压力测试。</p>
 <p><strong>来源：</strong> <a href="https://github.com/Kuaishou-OneRec/OpenOneRec">Kuaishou OpenOneRec</a></p>
-<h3 id="%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">原文实验设计与关键结论<a class="anchor-link" href="#%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">¶</a></h3><p>OneRec 的离线表同时比较 pointwise、listwise 与 preference alignment，并把召回、粗排到精排的级联压成生成任务。教程重点复现 Semantic ID、受约束解码与列表指标契约。</p>
+<h3 id="%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">原文实验设计与关键结论<a class="anchor-link" href="#%E5%8E%9F%E6%96%87%E5%AE%9E%E9%AA%8C%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%85%B3%E9%94%AE%E7%BB%93%E8%AE%BA">¶</a></h3><p>原文 Table 1（离线，指标由 reward 模型估计而非真实行为）：OneRec-1B+IPA 的 swt mean/max 为 0.1025/0.1933，OneRec-1B 为 0.0991/0.1529，TIGER-1B 为 0.0873/0.1368，SASRec 仅 0.0375/0.0803；IPA 优于 DPO/IPO/cDPO/rDPO/CPO/simPO/S-DPO 全部对比变体。Table 2（快手主页面 1% 流量在线 A/B）：OneRec-1B+IPA 总观看时长 +1.68%、平均观看时长 +6.56%（摘要约写作 1.6%）。实现细节：Semantic ID 3 层、每层 8192 簇，历史 n=256、session m=5，MoE 24 专家每 token 激活 2 个，beam size 128，推理仅 13% 参数激活；0.05B→1B 规模消融持续提升。以上是快手业务口径，教程在 KuaiRand 上复现 Semantic ID、trie 约束与列表指标契约，数值不可相减。</p>
 <p>请区分三层证据：论文中的离线实验、本 Notebook 验证的代码链路、生产系统尚需验证的在线收益。三者不能互相替代。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4d620278">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bed957e0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Reproduction-Contract">Reproduction Contract<a class="anchor-link" href="#Reproduction-Contract">¶</a></h2><p>本节暂无可公开取得且与论文完全等价的数据；报告只验证代码契约，不生成伪复现结论。</p>
-<p><code>full</code> 是论文对照唯一有效的效果模式：它不截断用户、物品或测试行。<code>smoke</code> 只做张量、损失和推理链路回归，不进入论文数值比较。</p>
+<p><code>full</code> 只有在运行输出证明数据、切分、候选集、模型配置与指标均对齐时，才可能进入论文数值比较；它不是把教学适配器自动变成论文复现的开关。<code>smoke</code> 只做张量、损失和推理链路回归。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=609ea156">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10753e8f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7661,28 +7662,76 @@ window.MathJax = {
 <li><strong>MoE + 双重注意力</strong>：解码器中堆叠 Casual Self-Attention、Cross-Attention（读编码器 key/value）和 MoE 前馈层，增大容量。</li>
 <li><strong>IPA 偏好对齐</strong>：每轮用 beam search 采样多个列表，按 reward 模型选 chosen / rejected，再用 DPO 更新，循环自我提升。</li>
 </ul>
-<h3 id="%E7%BB%93%E6%9E%84%EF%BC%9A%E6%8A%8A-item-%E5%8F%98%E6%88%90%E5%8F%AF%E7%94%9F%E6%88%90%E7%9A%84-Semantic-ID">结构：把 item 变成可生成的 Semantic ID<a class="anchor-link" href="#%E7%BB%93%E6%9E%84%EF%BC%9A%E6%8A%8A-item-%E5%8F%98%E6%88%90%E5%8F%AF%E7%94%9F%E6%88%90%E7%9A%84-Semantic-ID">¶</a></h3><p>量化器把 item embedding 映射为多级 token $s(i)=(c_1,\ldots,c_m)$。生成器对列表做自回归分解：</p>
+<h3 id="%E7%BB%93%E6%9E%84%EF%BC%9A%E6%8A%8A%E7%89%A9%E5%93%81%E5%8F%98%E6%88%90%E5%8F%AF%E4%BB%A5%E2%80%9C%E5%86%99%E2%80%9D%E5%87%BA%E6%9D%A5%E7%9A%84-Semantic-ID">结构：把物品变成可以“写”出来的 Semantic ID<a class="anchor-link" href="#%E7%BB%93%E6%9E%84%EF%BC%9A%E6%8A%8A%E7%89%A9%E5%93%81%E5%8F%98%E6%88%90%E5%8F%AF%E4%BB%A5%E2%80%9C%E5%86%99%E2%80%9D%E5%87%BA%E6%9D%A5%E7%9A%84-Semantic-ID">¶</a></h3><p>先定记号：物品 $i$ 的内容 embedding（标题、标签等文本经预训练编码器得到）记为 $x_i$；量化器把它映射为 $m$ 级 token 元组 $s(i)=(c_1,\ldots,c_m)$，每个 $c_j$ 是第 $j$ 层码本里的一个编号。</p>
+<p>RQ-VAE 的“残差”就是上一层还没解释掉的部分。令编码器输出 $z_i=E(x_i)$、初始残差 $r_i^{(0)}=z_i$；第 $\ell$ 层从码本 $C_\ell$ 选最近码字，再把它扣掉：</p>
+<p>$$c_\ell=\arg\min_c\|r_i^{(\ell-1)}-C_\ell[c]\|_2^2,\qquad r_i^{(\ell)}=r_i^{(\ell-1)}-C_\ell[c_\ell],$$
+$$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
+<p>例如 $z=(0.9,0.7)$，第一层选 $(0.8,0.4)$ 后残差是 $(0.1,0.3)$；第二层再选 $(0.1,0.25)$，重建为 $(0.9,0.65)$，只剩 $(0,0.05)$ 未解释。RQ-VAE 用重建误差让 $\hat z$ 接近 $z$，并用 codebook/commitment 项让编码器输出和码字彼此靠近；这些损失训练的是“如何编码物品”，不是推荐点击损失。</p>
+<p>OneRec 指出普通残差量化可能形成 hourglass：少数码点挤满物品，多数闲置，热门前缀导致 trie 分支失衡。它改用逐层均衡 K-Means，并约束每个簇的分配数近似 $|V|/K$（论文 Algorithm 1，每层 8192 簇、共 3 层）。两种方法的<strong>接口相同</strong>：都把物品交给生成器一个固定长度 token 元组；内部目标不同：RQ-VAE 优先重建，均衡量化还显式控制 token 使用率。于是不能把“使用 Semantic ID”自动写成“运行了 RQ-VAE”。</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$H^u$</td>
+<td>用户 $u$ 的历史行为序列（OneRec 取 $n=256$ 条）</td>
+</tr>
+<tr>
+<td>$S$</td>
+<td>一个 session：一次请求返回的列表（训练取 $m=5$ 个物品）</td>
+</tr>
+<tr>
+<td>$s_i^j$</td>
+<td>第 $i$ 个物品第 $j$ 层 Semantic ID token</td>
+</tr>
+<tr>
+<td>$y_t$</td>
+<td>生成序列第 $t$ 步的 token</td>
+</tr>
+<tr>
+<td>$x$</td>
+<td>编码器对用户历史的表示（条件上下文）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="%E9%93%BE%E5%BC%8F%E5%88%86%E8%A7%A3%EF%BC%9A%E4%B8%80%E4%B8%AA%E5%88%97%E8%A1%A8%E7%9A%84%E6%A6%82%E7%8E%87%E6%98%AF%E4%B8%80%E4%B8%B2%E6%9D%A1%E4%BB%B6%E6%A6%82%E7%8E%87%E7%9A%84%E4%B9%98%E7%A7%AF">链式分解：一个列表的概率是一串条件概率的乘积<a class="anchor-link" href="#%E9%93%BE%E5%BC%8F%E5%88%86%E8%A7%A3%EF%BC%9A%E4%B8%80%E4%B8%AA%E5%88%97%E8%A1%A8%E7%9A%84%E6%A6%82%E7%8E%87%E6%98%AF%E4%B8%80%E4%B8%B2%E6%9D%A1%E4%BB%B6%E6%A6%82%E7%8E%87%E7%9A%84%E4%B9%98%E7%A7%AF">¶</a></h3><p>自回归生成把“生成整个 session”分解成一步步“接龙”：</p>
 <p>$$P(y|x)=\prod_{t=1}^{T}P(y_t\mid y_{&lt;t},x),\qquad L_{CE}=-\sum_t\log P(y_t^*|y_{&lt;t}^*,x).$$</p>
-<p>teacher forcing 训练时给真实前缀，推理时给模型自己刚生成的前缀，因此必须用 trie 把下一 token 限制在真实目录分支中。偏好阶段可使用 DPO：</p>
+<p>手算一步：词表只有 $\{a,b,c\}$，某步模型给出 $P(a|x)=0.5,\ P(b|x)=0.3,\ P(c|x)=0.2$。若正确 token 是 $a$，该步损失 $-\log 0.5\approx0.693$；若模型把概率押错，比如 $P(a|x)=0.1$，损失变成 $2.303$，约 3.3 倍。整个列表的损失是各步相加，所以模型必须步步都把概率质量放在真实 token 上。再算一条两步链：$P(y_1=a|x)=0.5$、$P(y_2=b|y_1=a,x)=0.4$，则 $P(a,b|x)=0.5\times0.4=0.2$，链越长概率越小，$-\log$ 把它们变成可相加的损失。</p>
+<p>teacher forcing 是训练时的“提示许可”：第 $t$ 步的输入不是模型自己上一步的输出，而是真实前缀 $y_{&lt;t}^*$。好处是误差不会逐步放大；代价是训练与推理不一致——推理时模型只能看到自己刚生成的（可能出错的）前缀。</p>
+<h3 id="trie%EF%BC%9A%E6%8A%8A%E2%80%9C%E4%B8%8D%E8%AE%B8%E7%BC%96%E9%80%A0%E7%89%A9%E5%93%81%E2%80%9D%E5%8F%98%E6%88%90%E6%9F%A5%E6%A0%91">trie：把“不许编造物品”变成查树<a class="anchor-link" href="#trie%EF%BC%9A%E6%8A%8A%E2%80%9C%E4%B8%8D%E8%AE%B8%E7%BC%96%E9%80%A0%E7%89%A9%E5%93%81%E2%80%9D%E5%8F%98%E6%88%90%E6%9F%A5%E6%A0%91">¶</a></h3><p>自回归模型可能生成目录里不存在的 token 组合。trie（前缀树）把全部合法 Semantic ID 存成一棵树：从根到叶子的一条路径就是一个真实物品。解码第 $t$ 步时，已生成前缀 $y_{&lt;t}$ 定位到树上某个节点，logits 里只保留该节点的子节点，其余置 $-\infty$ 再 softmax。</p>
+<p>走一遍小例子：目录里有 4 个物品，Semantic ID 为 $(1,3)$、$(1,4)$、$(2,3)$、$(2,5)$。根节点的合法后继是 $\{1,2\}$；若第一步生成 $1$，第二步只允许 $\{3,4\}$——即使模型给 $5$ 打了 0.9 的概率也会被屏蔽。约束生成因此保证非法率为 0，但合法不等于相关：模型仍要把最高的合法概率给对物品。</p>
+<h3 id="DPO%EF%BC%9A%E5%8F%AA%E6%8B%89%E5%BC%80%E2%80%9C%E5%A5%BD%E5%88%97%E8%A1%A8%E2%80%9D%E5%92%8C%E2%80%9C%E5%B7%AE%E5%88%97%E8%A1%A8%E2%80%9D%E7%9A%84%E5%B7%AE%E8%B7%9D">DPO：只拉开“好列表”和“差列表”的差距<a class="anchor-link" href="#DPO%EF%BC%9A%E5%8F%AA%E6%8B%89%E5%BC%80%E2%80%9C%E5%A5%BD%E5%88%97%E8%A1%A8%E2%80%9D%E5%92%8C%E2%80%9C%E5%B7%AE%E5%88%97%E8%A1%A8%E2%80%9D%E7%9A%84%E5%B7%AE%E8%B7%9D">¶</a></h3><p>偏好对齐阶段不教模型“什么是标准答案”，只教它“哪个列表更好”。记号：$y^+$ 是 chosen（reward 模型打分最高的采样列表），$y^-$ 是 rejected（打分最低），$\pi$ 是当前模型，$\pi_{ref}$ 是冻结的参考模型（防止跑偏），$\beta$ 控制偏离参考模型的惩罚强度：</p>
 <p>$$L_{DPO}=-\log\sigma\{\beta[(\log\pi(y^+|x)-\log\pi_{ref}(y^+|x))-(\log\pi(y^-|x)-\log\pi_{ref}(y^-|x))]\}.$$</p>
-<p>它鼓励偏好列表 $y^+$ 相对 $y^-$ 的优势超过参考模型。smoke 实验验证 token、约束与指标契约，不把小模型冒充官方大规模复现。</p>
-<h3 id="%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81">公式到代码<a class="anchor-link" href="#%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81">¶</a></h3><p><code>run_openonerec</code> 展开 Semantic ID、teacher forcing 与 trie 解码；完整 OpenOneRec 训练配置保留在官方框架，教程明确区分接口复现和规模复现。</p>
+<p>直觉来自大括号的符号：它是“chosen 相对参考模型的对数概率增量”减去“rejected 的”。若 chosen 被抬高 $+0.3$、rejected 变化 $-0.1$，差值为 $0.4$，$\sigma(0.4)\approx0.60$，损失 $-\log0.60\approx0.51$；若方向反了，差值 $-0.4$，损失 $-\log0.40\approx0.92$。梯度只做一件事——把 chosen 与 rejected 的差距拉大。OneRec 的 IPA 把差距来源换成“自己 beam search 采样 128 个列表、reward 模型打分、最好当 chosen 最差当 rejected”，每轮用新模型重新采样，且只用 1% 训练数据做对齐（论文 Figure 4 显示比例提到 5% 收益有限，GPU 成本却线性上升）。</p>
+<h3 id="Reward-%E7%9A%84%E8%AF%81%E6%8D%AE%E8%BE%B9%E7%95%8C">Reward 的证据边界<a class="anchor-link" href="#Reward-%E7%9A%84%E8%AF%81%E6%8D%AE%E8%BE%B9%E7%95%8C">¶</a></h3><p>reward 模型 $R(x,y)$ 只是用历史反馈训练出的代理评分器，不是真实用户满意度，也不是线上因果收益。IPA 在模型自己采样的 128 个列表中按 $R$ 选 best/worst；DPO 随后只学习这对相对顺序，既不会直接优化真实观看时长，也无法修复 reward 模型没见过的偏差。trie 又只保证“目录合法”，不保证相关、多样或公平。因此三层验收必须分开：token 交叉熵检验模仿数据，reward/DPO 检验代理偏好，真正业务收益只能由同口径离线标签和线上 A/B 验证。smoke 实验只覆盖第一层与约束接口。</p>
+<h3 id="%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81">公式到代码<a class="anchor-link" href="#%E5%85%AC%E5%BC%8F%E5%88%B0%E4%BB%A3%E7%A0%81">¶</a></h3><p><code>run_openonerec</code> 展开教学 Semantic ID、teacher forcing 与 trie 解码；它没有训练官方 RQ-VAE/均衡量化器或 reward 模型。完整 OpenOneRec 配置留在官方框架，教程明确区分接口、代理 reward 和线上效果。</p>
 <p>阅读源码时按“张量形状 → 前向计算 → score → loss → metric”五步追踪，不需要一次读完整个工程文件。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9b76437a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b47d379c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Math-by-Hand">Math by Hand<a class="anchor-link" href="#Math-by-Hand">¶</a></h2><p>自回归分解 $P(y_1,\ldots,y_T|x)=\prod_tP(y_t|y_{&lt;t},x)$，表示每一步根据上下文和已生成 token 预测下一 token。trie 像目录树：前缀 $(1,2)$ 下只允许真实后继 $\{3,4\}$。</p>
+<h2 id="Math-by-Hand">Math by Hand<a class="anchor-link" href="#Math-by-Hand">¶</a></h2><h3 id="%E9%80%9A%E7%94%A8%E5%85%88%E4%BF%AE%EF%BC%88%E5%85%88%E5%9B%9E%E7%9C%8B-3.0-%E5%9F%BA%E7%A1%80%E8%AF%BE%E7%A8%8B%EF%BC%89">通用先修（先回看 3.0 基础课程）<a class="anchor-link" href="#%E9%80%9A%E7%94%A8%E5%85%88%E4%BF%AE%EF%BC%88%E5%85%88%E5%9B%9E%E7%9C%8B-3.0-%E5%9F%BA%E7%A1%80%E8%AF%BE%E7%A8%8B%EF%BC%89">¶</a></h3><ul>
+<li><a href="/notebooks/3_0_1_data_ml_basics#observation-label">序列、标签与反馈</a></li>
+<li><a href="/notebooks/3_0_2_linear_algebra#matmul-embedding">embedding 与向量量化接口</a></li>
+<li><a href="/notebooks/3_0_4_probability_statistics#conditional-chain">条件概率链式法则</a></li>
+<li><a href="/notebooks/3_0_5_information_theory#sequence-nll-dpo">序列 NLL 与 DPO</a></li>
+</ul>
+<h3 id="%E6%9C%AC%E8%AE%BA%E6%96%87%E6%96%B0%E5%A2%9E%E6%95%B0%E5%AD%A6%EF%BC%88%E6%9C%AC%E8%8A%82%E8%AF%A6%E7%BB%86%E6%8E%A8%E5%AF%BC%EF%BC%89">本论文新增数学（本节详细推导）<a class="anchor-link" href="#%E6%9C%AC%E8%AE%BA%E6%96%87%E6%96%B0%E5%A2%9E%E6%95%B0%E5%AD%A6%EF%BC%88%E6%9C%AC%E8%8A%82%E8%AF%A6%E7%BB%86%E6%8E%A8%E5%AF%BC%EF%BC%89">¶</a></h3><p>残差量化到均衡 Semantic ID 的接口、trie 约束列表解码，以及 reward 模型边界内的迭代偏好对齐。</p>
+<p>自回归分解 $P(y_1,\ldots,y_T|x)=\prod_tP(y_t|y_{&lt;t},x)$，表示每一步根据上下文和已生成 token 预测下一 token。trie 像目录树：前缀 $(1,2)$ 下只允许真实后继 $\{3,4\}$。DPO 只需要 $\sigma$ 与 $\log$ 的直觉：$-\log\sigma(z)$ 在 $z$ 增大时减小，因此损失鼓励 chosen 列表相对参考模型的对数概率增量高于 rejected。</p>
 <p>下面用 NumPy/Matplotlib 验证直觉。二维图只是教学投影，工业 embedding 虽有更多维，计算规则相同。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0c056d2c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9e071dbe">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7701,18 +7750,20 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=54d8c0ca">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=93a73dbb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Data">Data<a class="anchor-link" href="#Data">¶</a></h2><p>KuaiRand-Pure 的真实视频 tag、music type 与 item 分区形成可约束代码；真实点击/长播和未点击曝光构成训练及 chosen/rejected。官方 RecIF-Bench 当前为 gated 数据，full profile 需授权访问。</p>
+<h2 id="Data">Data<a class="anchor-link" href="#Data">¶</a></h2><h3 id="%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">权威 full 协议（效果验收目标）<a class="anchor-link" href="#%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">¶</a></h3><p>本节暂无可公开取得且与论文完全等价的数据；报告只验证代码契约，不生成伪复现结论。</p>
+<h3 id="smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">smoke 教学适配器（默认 runner 实际读取）<a class="anchor-link" href="#smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">¶</a></h3><p>KuaiRand-Pure 的真实视频 tag、music type 与 item 分区形成教学 Semantic ID；真实反馈只用于小型 token/约束链路。CUDA 与 CPU 都不自动获得 gated 的 RecIF-Bench，也不把本地 chosen/rejected 当成官方 reward 数据。</p>
+<p>下方运行结果打印的 provenance 才是本次执行事实；若资源、统计或切分与 full 协议不一致，就必须标记为不可比较。</p>
 <p>**防泄漏清单：**按时间切分；item 映射只表达已知目录，不读取测试标签；低评分或未点击负反馈均来自数据中的已观察行；序列只看预测时刻以前；测试集只在最后评价。无 CUDA 时的 CPU basic smoke 只验证基本功能，不产出精度结论。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9e6fa2ee">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9938552b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7722,7 +7773,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ab340367">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a3281d72">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7749,7 +7800,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=850fe889">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=eb68bee0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7758,7 +7809,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2e48da58">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a523c7c0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7776,7 +7827,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=90e53d91">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0f4bea34">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7795,7 +7846,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fd5e1b94">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=371fea46">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7829,7 +7880,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8baeb755">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=87b85911">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7838,7 +7889,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=464bca18">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b84531af">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7864,7 +7915,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ebd767c8">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=477c8f30">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7882,14 +7933,14 @@ window.MathJax = {
     <span class="s1">'dataset'</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s1">'dataset'</span><span class="p">][</span><span class="s1">'dataset'</span><span class="p">],</span>
     <span class="s1">'randomly_fabricated_rows'</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">'dataset'</span><span class="p">][</span><span class="s1">'randomly_fabricated_rows'</span><span class="p">])</span>
 <span class="p">}</span>
-<span class="n">path</span><span class="o">=</span><span class="n">save_records</span><span class="p">(</span><span class="s1">'chapter_4'</span><span class="p">,</span><span class="s1">'4_2_openonerec_practice'</span><span class="p">,[</span><span class="n">record</span><span class="p">]);</span> <span class="nb">print</span><span class="p">(</span><span class="s1">'saved:'</span><span class="p">,</span><span class="n">path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+<span class="n">path</span><span class="o">=</span><span class="n">save_records</span><span class="p">(</span><span class="s1">'chapter_4'</span><span class="p">,</span><span class="s1">'4_2_openonerec_practice'</span><span class="p">,[</span><span class="n">record</span><span class="p">]);</span> <span class="nb">print</span><span class="p">(</span><span class="s1">'saved:'</span><span class="p">,</span><span class="n">path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=efb526f4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=26f7a201">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7898,7 +7949,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=34edc30d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cff74a79">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7915,7 +7966,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=690151c6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9048cac6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7928,5 +7979,24 @@ window.MathJax = {
 </div>
 </div>
 </main>
-</body>
+<script id="recsys-preview-link-targets">
+(function () {
+  function retarget() {
+    document.querySelectorAll('a[href]').forEach(function (anchor) {
+      var href = anchor.getAttribute('href');
+      if (!href || href.charAt(0) === '#') return;
+      var url;
+      try { url = new URL(href, document.baseURI); } catch (error) { return; }
+      if (url.origin === location.origin) {
+        if (url.pathname !== location.pathname) anchor.target = '_top';
+      } else {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', retarget);
+  else retarget();
+})();
+</script></body>
 </html>

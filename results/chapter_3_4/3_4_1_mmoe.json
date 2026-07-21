@@ -3,9 +3,9 @@
     {
       "algorithm": "MMoE 多目标学习",
       "primary_metric": "click_auc",
-      "primary_value": 0.665979034086345,
+      "primary_value": 0.6623798409482412,
       "secondary_metric": "long_view_auc",
-      "secondary_value": 0.6596157087476824,
+      "secondary_value": 0.6454505871116355,
       "baseline_metric": null,
       "baseline_value": null,
       "framework": "torch_rechub.models.multi_task.MMOE",

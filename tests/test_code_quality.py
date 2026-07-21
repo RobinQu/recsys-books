@@ -23,3 +23,16 @@ def test_algorithm_python_sources_pass_ruff() -> None:
         [sys.executable, "-m", "ruff", "check", *(str(root) for root in ALGORITHM_ROOTS)],
         check=True,
     )
+
+
+def test_chapter_code_generator_filters_notebook_kinds() -> None:
+    from scripts.generate_chapter_code import select_chapter_code_notebooks
+
+    notebooks = [
+        {"slug": "foundation", "kind": "foundation"},
+        {"slug": "algorithm", "kind": "algorithm"},
+        {"slug": "summary", "kind": "summary"},
+        {"slug": "curriculum", "kind": "curriculum"},
+    ]
+    selected = select_chapter_code_notebooks(notebooks)
+    assert [notebook["slug"] for notebook in selected] == ["foundation", "algorithm", "summary"]

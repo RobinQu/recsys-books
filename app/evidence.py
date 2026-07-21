@@ -157,7 +157,7 @@ def paper_guide(slug: str) -> dict:
     diagram_path = ROOT / "app" / "static" / "diagrams" / f"{diagram_id}.svg"
     figure = load_figures().get(diagram_id or "")
     architecture_item = next(
-        (item for item in rows if any(token in item["id"] for token in ("architecture", "model", "equation", "unification"))),
+        (item for item in rows if any(token in item["id"] for token in ("fig", "architecture", "model", "equation", "unification"))),
         rows[0] if rows else None,
     )
     layers = [

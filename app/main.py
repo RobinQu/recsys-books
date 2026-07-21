@@ -13,10 +13,22 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
-from app.content import CHAPTERS, DATASETS, EVOLUTION, MODELS, NOTEBOOKS, PRACTICES, SOURCES, notebook_has_paper_guide
+from app.content import (
+    CHAPTERS,
+    DATASETS,
+    EVOLUTION,
+    MATH_PREREQUISITES,
+    MODELS,
+    NOTEBOOK_KIND_LABELS,
+    NOTEBOOKS,
+    PRACTICES,
+    SOURCES,
+    notebook_has_paper_guide,
+)
 from app.evidence import paper_guide, paper_payload, source_paper_links
+from app.knowledge_graph import build_knowledge_graph
 from app.notebook_preview import polish_preview
-from app.source_browser import source_files
+from app.source_browser import chapter_source_slug, source_files
 from recsys_lab.resources import RESOURCE_ROOT, ensure_resources
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,10 +38,17 @@ LEGACY_NOTEBOOKS = {
     "3_2_retrieval_dssm_mind": "3_2_summary",
     "3_3_ranking_deepfm_din_dien": "3_3_summary",
     "3_4_multitask_mmoe_ple": "3_4_summary",
-    "3_0_1_data_and_experiment_pipeline": "3_0_data_pipeline",
+    "3_0_1_data_and_experiment_pipeline": "3_0_7_data_pipeline",
     "3_5_0_transformer_foundations": "3_2_0_retrieval_foundations",
     "3_5_1_sasrec": "3_2_3_sasrec",
     "3_5_summary": "3_2_summary",
+    "3_0_data_pipeline": "3_0_7_data_pipeline",
+    "a_4_1_data_ml_basics": "3_0_1_data_ml_basics",
+    "a_4_2_linear_algebra": "3_0_2_linear_algebra",
+    "a_4_3_calculus": "3_0_3_calculus",
+    "a_4_4_probability_statistics": "3_0_4_probability_statistics",
+    "a_4_5_optimization": "3_0_6_optimization",
+    "a_4_6_information_theory": "3_0_5_information_theory",
 }
 @asynccontextmanager
 async def lifespan(application: FastAPI):
@@ -77,6 +96,15 @@ def page_context(request: Request, active: str = "overview") -> dict:
             "title": chapter["title"],
             "items": [item for slug in ordered_slugs for item in NOTEBOOKS if item["slug"] == slug],
         })
+    knowledge_graph = {
+        "default": build_knowledge_graph(CHAPTERS, MODELS, MATH_PREREQUISITES),
+        "views": {
+            f"chapter:{key}": build_knowledge_graph(
+                CHAPTERS, MODELS, MATH_PREREQUISITES, focus_id=f"chapter:{key}"
+            )
+            for key in CHAPTERS
+        },
+    }
     return {
         "request": request,
         "active": active,
@@ -85,6 +113,9 @@ def page_context(request: Request, active: str = "overview") -> dict:
         "datasets": DATASETS,
         "practices": PRACTICES,
         "notebooks": NOTEBOOKS,
+        "notebook_kind_labels": NOTEBOOK_KIND_LABELS,
+        "math_prerequisites": MATH_PREREQUISITES,
+        "knowledge_graph": knowledge_graph,
         "chapters": CHAPTERS,
         "sources": SOURCES,
         "source_paper_links": source_paper_links(),
@@ -171,7 +202,7 @@ def search(q: str = Query(min_length=1, max_length=80)):
 
 
 @app.get("/notebooks/{slug}", response_class=HTMLResponse)
-def notebook_preview(request: Request, slug: str):
+def notebook_preview(request: Request, slug: str, embedded: bool = False):
     if slug in LEGACY_NOTEBOOKS:
         return RedirectResponse(f"/notebooks/{LEGACY_NOTEBOOKS[slug]}", status_code=307)
     notebook_index = next((index for index, item in enumerate(NOTEBOOKS) if item["slug"] == slug), None)
@@ -199,6 +230,7 @@ def notebook_preview(request: Request, slug: str):
         "source_groups": source_files(slug),
         "paper_guide": paper_guide(slug),
         "show_paper_guide": notebook_has_paper_guide(slug),
+        "embedded": embedded,
     })
     return templates.TemplateResponse(request, "notebook_shell.html", context)
 
@@ -230,10 +262,15 @@ def notebook_preview_content(slug: str):
 def open_source_in_ide(slug: str):
     if slug in LEGACY_NOTEBOOKS:
         slug = LEGACY_NOTEBOOKS[slug]
-    if slug not in {item["slug"] for item in NOTEBOOKS}:
+    notebook = next((item for item in NOTEBOOKS if item["slug"] == slug), None)
+    if notebook is None:
         raise HTTPException(404, "Unknown notebook")
     ide_url = os.getenv("IDE_PUBLIC_URL", "http://localhost:8090").rstrip("/")
-    folder = f"/home/coder/project/chapter_code/{slug}"
+    if notebook["kind"] == "curriculum":
+        folder = "/home/coder/project"
+        entry = f"{folder}/scripts/tutorial_math_specs.py:1:1"
+        return RedirectResponse(f"{ide_url}/?folder={folder}&goto={entry}", status_code=303)
+    folder = f"/home/coder/project/chapter_code/{chapter_source_slug(slug)}"
     entry = f"{folder}/train.py:1:1"
     return RedirectResponse(f"{ide_url}/?folder={folder}&goto={entry}", status_code=303)
 
@@ -241,7 +278,10 @@ def open_source_in_ide(slug: str):
 @app.get("/source/{slug}", response_class=HTMLResponse)
 def legacy_source_redirect(slug: str):
     """Source is a tab on the chapter detail page, never a separate information page."""
-    if slug not in {item["slug"] for item in NOTEBOOKS}:
+    if slug in LEGACY_NOTEBOOKS:
+        slug = LEGACY_NOTEBOOKS[slug]
+    notebook = next((item for item in NOTEBOOKS if item["slug"] == slug), None)
+    if notebook is None:
         raise HTTPException(404, "Unknown notebook")
     return RedirectResponse(f"/notebooks/{slug}#source", status_code=307)
 

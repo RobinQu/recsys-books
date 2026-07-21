@@ -1,11 +1,33 @@
+# GPU variant: rebuilds the services from Dockerfile.cuda (CUDA-enabled
+# PyTorch, tagged recsys-atlas-cuda) and passes all NVIDIA devices into the
+# containers. Usage: docker compose -f docker-compose.yml -f docker-compose.cuda.yml up --build web jupyter ide
 services:
   web:
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    image: recsys-atlas-cuda:latest
     gpus: all
     environment:
       RECSYS_CUDA_AVAILABLE: "1"
 
   jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    image: recsys-atlas-cuda:latest
     gpus: all
 
   test:
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    image: recsys-atlas-cuda:latest
+    gpus: all
+
+  test-full:
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    image: recsys-atlas-cuda:latest
     gpus: all

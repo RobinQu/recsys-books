@@ -19,3 +19,11 @@
 .mode-tabs button:disabled{cursor:not-allowed;opacity:.48;box-shadow:none}.mode-tabs button:disabled:hover{background:transparent;color:var(--muted)}
 .cuda-unavailable{min-height:280px;display:grid;place-items:center;text-align:center}.cuda-unavailable>div{max-width:680px;padding:34px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}.cuda-unavailable h2{margin:0 0 12px}.cuda-unavailable p{color:var(--muted);line-height:1.7}.cuda-status{color:var(--orange)!important;font-weight:700}
 @media(min-width:1500px){.paper-guide-split{grid-template-columns:minmax(360px,1fr) minmax(0,2fr)}.paper-guide-prose{padding:clamp(24px,2vw,40px)}}
+/* Embedded mode (?embedded=1, or auto-detected when the page is iframed):
+   content-only degradation — same convention as the embedded paper reader. */
+.notebook-shell-page.embedded .topbar,.notebook-shell-page.embedded .sidebar,.notebook-shell-page.embedded .notebook-reader-head,.notebook-shell-page.embedded .mode-tabs,.notebook-shell-page.embedded .notebook-pager{display:none}
+.notebook-shell-page.embedded .notebook-shell-main{margin-left:0;padding:0}
+.notebook-shell-page.embedded .mode-panel{display:none!important}
+.notebook-shell-page.embedded .mode-panel[data-panel="preview"]{display:block!important}
+.notebook-shell-page.embedded .experiment-preview-pane{padding:0;border:0;border-radius:0;box-shadow:none}
+.notebook-shell-page.embedded .embedded-notebook-preview{height:100vh;min-height:0;border:0;border-radius:0}

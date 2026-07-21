@@ -18,6 +18,8 @@ jobs:
         include:
           - name: recsys-atlas
             dockerfile: Dockerfile
+          - name: recsys-atlas-cuda
+            dockerfile: Dockerfile.cuda
           - name: recsys-atlas-ide
             dockerfile: Dockerfile.ide
     steps:

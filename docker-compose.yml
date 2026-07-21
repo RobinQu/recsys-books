@@ -1,6 +1,7 @@
 services:
   web:
     build: .
+    image: recsys-atlas:latest
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     environment:
       JUPYTER_PUBLIC_URL: http://localhost:8889
@@ -19,6 +20,7 @@ services:
 
   jupyter:
     build: .
+    image: recsys-atlas:latest
     command: >-
       jupyter lab --ip=0.0.0.0 --port=8888 --no-browser
       --allow-root
@@ -49,12 +51,14 @@ services:
 
   test:
     build: .
+    image: recsys-atlas:latest
     command: >-
       sh -c "python scripts/generate_chapter_code.py &&
       python scripts/generate_notebooks.py &&
       pytest -q &&
       python scripts/execute_notebooks.py --profile smoke &&
-      python scripts/build_previews.py"
+      python scripts/build_previews.py &&
+      python scripts/verify_published_notebooks.py"
     environment:
       RECSYS_PROFILE: smoke
       PYTHONPATH: /workspace
@@ -64,6 +68,7 @@ services:
   test-full:
     profiles: ["full"]
     build: .
+    image: recsys-atlas:latest
     command: >-
       sh -c "python scripts/init_resources.py --include-optional --strict --kind datasets
       --id movielens-1m-full --id amazon-books-5core --id amazon-books-2014-ratings

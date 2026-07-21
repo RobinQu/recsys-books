@@ -29,8 +29,12 @@ MODELS = [
 
 DATASETS = [
     {"name":"MovieLens latest-small","year":"2018 固定版本","scale":"100,836 ratings · 610 users · 9,742 movies","fit":"3.0—3.1 的 CF、MF、FM、GBDT+LR 教学","note":"结构简单，适合手算和经典基线；不再承担深度 CTR/序列实验","url":"https://files.grouplens.org/datasets/movielens/ml-latest-small-README.html"},
-    {"name":"Amazon Reviews 2023 / Video Games","year":"2023","scale":"5-core rating-only: 284,120 reviews · 13,926 users · 24,276 items","fit":"DSSM、MIND、SASRec 电商召回与序列","note":"full 档读取官方完整文件与毫秒时间戳；smoke 档只保留确定性真实行为切片","url":"https://amazon-reviews-2023.github.io/data_processing/5core.html"},
-    {"name":"KuaiRand-Pure","year":"2022","scale":"1.44M standard + 1.19M random-policy interactions","fit":"DeepFM、DIN/DIEN、MMoE/PLE、HSTU","note":"真实短视频曝光与 12 类反馈；包含随机干预，适合排序和多目标","url":"https://github.com/chongminggao/KuaiRand"},
+    {"name":"Amazon Reviews 2014 / Books & Electronics","year":"2014","scale":"Books / Electronics 5-core 与逐条时间戳","fit":"DSSM 完整迁移、MIND 10-core、DIN/DIEN 公开复现","note":"各算法使用的品类、过滤与切分协议不同；不能把同属 Amazon 的结果直接横比","url":"https://cseweb.ucsd.edu/~jmcauley/datasets/amazon/links.html"},
+    {"name":"MovieLens 1M","year":"2003 固定版本","scale":"1,000,209 ratings · 6,040 users · 3,952 movies","fit":"SASRec 论文协议；HSTU 官方 debug 路径之一","note":"SASRec full 使用 leave-two-out 与 100 个未观察负例；与 latest-small 教学集不是同一口径","url":"https://grouplens.org/datasets/movielens/1m/"},
+    {"name":"Criteo Display Advertising Challenge","year":"2014","scale":"约 4,500 万条点击记录 · 13 连续 + 26 离散特征","fit":"DeepFM full 论文复现","note":"按论文使用随机 9:1 切分；不把 KuaiRand smoke 指标与论文表格相减","url":"https://www.kaggle.com/c/criteo-display-ad-challenge"},
+    {"name":"Census-Income KDD","year":"1996","scale":"199,523 train + 99,762 test · 40 features","fit":"MMoE / PLE full 多任务协议","note":"使用官方 train/test 与论文任务定义；KuaiRand 仅承担 smoke 路由验证","url":"https://archive.ics.uci.edu/dataset/117/census+income+kdd"},
+    {"name":"Amazon Reviews 2023 / Video Games","year":"2023","scale":"5-core rating-only: 284,120 reviews · 13,926 users · 24,276 items","fit":"3.2 的确定性 smoke 适配器与结果汇总","note":"只验证真实行为上的数据、形状和训练链路；不冒充 Books 2014、Electronics 或 MovieLens-1M 的 full 协议","url":"https://amazon-reviews-2023.github.io/data_processing/5core.html"},
+    {"name":"KuaiRand-Pure","year":"2022","scale":"1.44M standard + 1.19M random-policy interactions","fit":"排序、多任务、OpenOneRec 与 HSTU 的 smoke 适配器","note":"真实短视频曝光与多反馈用于可复现链路验证；full 档仍按各论文指定的 Criteo、Amazon、Census、RecIF 或 Meta 协议运行","url":"https://github.com/chongminggao/KuaiRand"},
     {"name":"MerRec","year":"2024","scale":"6 months, millions of C2C users/items","fit":"多动作、会话、电商多目标","note":"含 taxonomy、文本和买卖双重角色","url":"https://github.com/mercari/mercari-ml-merrec-pub-us"},
     {"name":"EB-NeRD","year":"2024","scale":"2.3M+ news users","fit":"新闻曝光、排序、多样性","note":"提供 demo/small/full，适合曝光偏差研究","url":"https://recsys.eb.dk/"},
     {"name":"Yambda-5B","year":"2025","scale":"4.79B events, 1M users, 9.39M tracks","fit":"工业级召回/排序/序列基础模型","note":"50M/500M/5B 三档；含 organic 标记和音频 embedding","url":"https://huggingface.co/datasets/yandex/yambda"},
@@ -48,43 +52,255 @@ PRACTICES = [
     {"company":"腾讯","system":"PLE 多任务渐进式抽取","evidence":"A","lesson":"共享与专属专家分离可缓解任务负迁移。","url":"https://dl.acm.org/doi/10.1145/3383313.3412236"},
 ]
 
+NOTEBOOK_KIND_LABELS = {
+    "foundation": "基础导读",
+    "algorithm": "算法实验",
+    "summary": "结果总结",
+    "curriculum": "数学课程",
+}
+
+# Only these notebook roles own a chapter-local implementation package. The 3.0
+# curriculum notebooks remain executable in Jupyter, but teach reusable concepts
+# rather than pretending to have an algorithm-specific model/train/IDE surface.
+CHAPTER_CODE_NOTEBOOK_KINDS = frozenset({"foundation", "algorithm", "summary"})
+
 NOTEBOOKS = [
-    {"slug":"3_0_math_foundations","title":"3.0A 数学基础：从矩阵到梯度下降","framework":"NumPy / Matplotlib","dataset":"MovieLens latest-small + 手算投影","runtime":"约 15 秒 CPU"},
-    {"slug":"3_0_data_pipeline","title":"3.0B 数据与实验基础：从 import 到训练循环","framework":"pandas / PyTorch / inspect","dataset":"MovieLens latest-small 真实行为","runtime":"约 20 秒 CPU"},
-    {"slug":"3_1_0_classic_foundations","title":"3.1 导读与数学基础：经典算法","framework":"NumPy / Matplotlib","dataset":"MovieLens latest-small","runtime":"约 10 秒 CPU"},
-    {"slug":"3_1_1_collaborative_filtering","title":"3.1.1 协同过滤：UserCF / ItemCF","framework":"NumPy","dataset":"MovieLens latest-small","runtime":"约 20 秒 CPU"},
-    {"slug":"3_1_2_matrix_factorization","title":"3.1.2 矩阵分解：BiasMF","framework":"PyTorch","dataset":"MovieLens latest-small","runtime":"约 30 秒 CPU"},
-    {"slug":"3_1_3_factorization_machine","title":"3.1.3 因子分解机：FM","framework":"PyTorch / scikit-learn","dataset":"MovieLens latest-small 评分偏好任务","runtime":"约 30 秒 CPU"},
-    {"slug":"3_1_4_gbdt_lr","title":"3.1.4 GBDT+LR","framework":"XGBoost / scikit-learn","dataset":"MovieLens latest-small 评分偏好任务","runtime":"约 30 秒 CPU"},
-    {"slug":"3_1_5_word2vec","title":"3.1.5 word2vec / Item2Vec","framework":"PyTorch","dataset":"MovieLens latest-small 行为序列","runtime":"约 25 秒 CPU"},
-    {"slug":"3_1_summary","title":"3.1 总结：经典算法横向对比","framework":"结果聚合与选型","dataset":"MovieLens 真实实验 JSON","runtime":"约 10 秒 CPU"},
-    {"slug":"3_2_0_retrieval_foundations","title":"3.2 导读与数学基础：向量召回","framework":"NumPy / Matplotlib","dataset":"Amazon Reviews 2023 Video Games","runtime":"约 10 秒 CPU"},
-    {"slug":"3_2_1_dssm","title":"3.2.1 DSSM 双塔召回","framework":"Torch-RecHub DSSM","dataset":"Amazon Reviews 2023 电商行为","runtime":"约 20 秒 CPU"},
-    {"slug":"3_2_2_mind","title":"3.2.2 MIND 多兴趣召回","framework":"Torch-RecHub MIND","dataset":"Amazon Reviews 2023 商品序列","runtime":"约 20 秒 CPU"},
-    {"slug":"3_2_3_sasrec","title":"3.2.3 SASRec 序列召回","framework":"Torch-RecHub SASRec","dataset":"Amazon Reviews 2023 Video Games","runtime":"约 35 秒 CPU"},
-    {"slug":"3_2_summary","title":"3.2 总结：DSSM、MIND 与 SASRec","framework":"结果聚合与选型","dataset":"Amazon Reviews 2023 实验 JSON","runtime":"约 5 秒 CPU"},
-    {"slug":"3_3_0_ranking_foundations","title":"3.3 导读与数学基础：CTR 排序","framework":"NumPy / Matplotlib","dataset":"KuaiRand-Pure 真实曝光","runtime":"约 10 秒 CPU"},
-    {"slug":"3_3_1_deepfm","title":"3.3.1 DeepFM 排序","framework":"Torch-RecHub DeepFM","dataset":"KuaiRand-Pure is_click","runtime":"约 20 秒 CPU"},
-    {"slug":"3_3_2_din","title":"3.3.2 DIN 候选感知排序","framework":"Torch-RecHub DIN","dataset":"KuaiRand-Pure feed 序列","runtime":"约 25 秒 CPU"},
-    {"slug":"3_3_3_dien","title":"3.3.3 DIEN 兴趣演化排序","framework":"Torch-RecHub DIEN","dataset":"KuaiRand-Pure feed 序列","runtime":"约 40 秒 CPU"},
-    {"slug":"3_3_summary","title":"3.3 总结：DeepFM、DIN 与 DIEN","framework":"结果聚合与选型","dataset":"KuaiRand 实验 JSON","runtime":"约 5 秒 CPU"},
-    {"slug":"3_4_0_multitask_foundations","title":"3.4 导读与数学基础：多目标学习","framework":"NumPy / Matplotlib","dataset":"KuaiRand-Pure 多反馈","runtime":"约 10 秒 CPU"},
-    {"slug":"3_4_1_mmoe","title":"3.4.1 MMoE 多目标学习","framework":"Torch-RecHub MMOE","dataset":"KuaiRand is_click + long_view","runtime":"约 20 秒 CPU"},
-    {"slug":"3_4_2_ple","title":"3.4.2 PLE 渐进式专家抽取","framework":"Torch-RecHub PLE","dataset":"KuaiRand is_click + long_view","runtime":"约 25 秒 CPU"},
-    {"slug":"3_4_summary","title":"3.4 总结：MMoE 与 PLE","framework":"结果聚合与选型","dataset":"KuaiRand 实验 JSON","runtime":"约 5 秒 CPU"},
-    {"slug":"4_0_generative_foundations","title":"4.0 导读与数学基础：生成式推荐","framework":"NumPy / Matplotlib","dataset":"KuaiRand-Pure","runtime":"默认 CUDA；CPU 仅基础检查"},
-    {"slug":"4_1_generative_overview","title":"4.1 总结：生成式召回、排序与融合","framework":"结果聚合与工业选型","dataset":"KuaiRand 实验 JSON","runtime":"默认 CUDA；CPU 仅阅读"},
-    {"slug":"4_2_openonerec_practice","title":"4.2 OpenOneRec 实战","framework":"OpenOneRec 契约 + PyTorch 约束生成器","dataset":"KuaiRand taxonomy adapter；RecIF full 需授权","runtime":"CUDA 混合精度；CPU basic smoke"},
-    {"slug":"4_3_dlrm_hstu_practice","title":"4.3 DLRM HSTU 实战","framework":"Torch-RecHub HSTU + Meta DLRM-v3 配置","dataset":"KuaiRand-Pure 真实 feed 序列","runtime":"CUDA 混合精度；官方配置需 4×24GB GPU"},
+    {"slug":"3_0_math_foundations","title":"3.0 基础课程总览：从数据语义到模型训练","kind":"foundation","framework":"NumPy / Matplotlib","dataset":"MovieLens latest-small + 手算投影","runtime":"约 15 秒 CPU"},
+    {"slug":"3_0_1_data_ml_basics","title":"3.0.1 数据与机器学习基础：一行数据到底代表什么","kind":"curriculum","framework":"pandas / NumPy","dataset":"MovieLens latest-small 真实行为 + 教学拆分","runtime":"约 15 秒 CPU"},
+    {"slug":"3_0_2_linear_algebra","title":"3.0.2 线性代数：把推荐数据放进有形状的盒子","kind":"curriculum","framework":"NumPy / Matplotlib","dataset":"明确标注的数学教学数字","runtime":"约 15 秒 CPU"},
+    {"slug":"3_0_3_calculus","title":"3.0.3 微积分：参数动一点，损失会怎样","kind":"curriculum","framework":"NumPy / Matplotlib","dataset":"明确标注的数学教学数字","runtime":"约 15 秒 CPU"},
+    {"slug":"3_0_4_probability_statistics","title":"3.0.4 概率与统计：把不确定性说清楚","kind":"curriculum","framework":"NumPy / Matplotlib","dataset":"明确标注的数学教学数字","runtime":"约 15 秒 CPU"},
+    {"slug":"3_0_5_information_theory","title":"3.0.5 信息论：一次意外有多少信息","kind":"curriculum","framework":"NumPy / Matplotlib","dataset":"明确标注的数学教学数字","runtime":"约 15 秒 CPU"},
+    {"slug":"3_0_6_optimization","title":"3.0.6 优化：怎样让模型稳定地下山","kind":"curriculum","framework":"NumPy / Matplotlib","dataset":"明确标注的数学教学数字","runtime":"约 15 秒 CPU"},
+    {"slug":"3_0_7_data_pipeline","title":"3.0.7 数据与实验基础：从 import 到训练循环","kind":"foundation","framework":"pandas / PyTorch / inspect","dataset":"MovieLens latest-small 真实行为","runtime":"约 20 秒 CPU"},
+    {"slug":"3_1_0_classic_foundations","title":"3.1 导读与数学基础：经典算法","kind":"foundation","framework":"NumPy / Matplotlib","dataset":"MovieLens latest-small","runtime":"约 10 秒 CPU"},
+    {"slug":"3_1_1_collaborative_filtering","title":"3.1.1 协同过滤：UserCF / ItemCF","kind":"algorithm","framework":"NumPy","dataset":"MovieLens latest-small","runtime":"约 20 秒 CPU"},
+    {"slug":"3_1_2_matrix_factorization","title":"3.1.2 矩阵分解：BiasMF","kind":"algorithm","framework":"PyTorch","dataset":"MovieLens latest-small","runtime":"约 30 秒 CPU"},
+    {"slug":"3_1_3_factorization_machine","title":"3.1.3 因子分解机：FM","kind":"algorithm","framework":"PyTorch / scikit-learn","dataset":"MovieLens latest-small 评分偏好任务","runtime":"约 30 秒 CPU"},
+    {"slug":"3_1_4_gbdt_lr","title":"3.1.4 GBDT+LR","kind":"algorithm","framework":"XGBoost / scikit-learn","dataset":"MovieLens latest-small 评分偏好任务","runtime":"约 30 秒 CPU"},
+    {"slug":"3_1_5_word2vec","title":"3.1.5 word2vec / Item2Vec","kind":"algorithm","framework":"PyTorch","dataset":"MovieLens latest-small 行为序列","runtime":"约 25 秒 CPU"},
+    {"slug":"3_1_summary","title":"3.1 总结：经典算法横向对比","kind":"summary","framework":"结果聚合与选型","dataset":"MovieLens 真实实验 JSON","runtime":"约 10 秒 CPU"},
+    {"slug":"3_2_0_retrieval_foundations","title":"3.2 导读与数学基础：向量召回","kind":"foundation","framework":"NumPy / Matplotlib","dataset":"full：各论文公开协议；smoke：Amazon Reviews 2023","runtime":"约 10 秒 CPU"},
+    {"slug":"3_2_1_dssm","title":"3.2.1 DSSM 双塔召回","kind":"algorithm","framework":"Torch-RecHub DSSM","dataset":"full：Amazon Books 5-core 迁移；smoke：Amazon 真实切片","runtime":"约 20 秒 CPU"},
+    {"slug":"3_2_2_mind","title":"3.2.2 MIND 多兴趣召回","kind":"algorithm","framework":"Torch-RecHub MIND","dataset":"full：Amazon Books 2014 10-core；smoke：Amazon 真实切片","runtime":"约 20 秒 CPU"},
+    {"slug":"3_2_3_sasrec","title":"3.2.3 SASRec 序列召回","kind":"algorithm","framework":"Torch-RecHub SASRec","dataset":"full：MovieLens-1M 论文协议；smoke：Amazon 真实切片","runtime":"约 35 秒 CPU"},
+    {"slug":"3_2_summary","title":"3.2 总结：DSSM、MIND 与 SASRec","kind":"summary","framework":"结果聚合与选型","dataset":"full：按算法分别审计；smoke：Amazon 2023 实验 JSON","runtime":"约 5 秒 CPU"},
+    {"slug":"3_3_0_ranking_foundations","title":"3.3 导读与数学基础：CTR 排序","kind":"foundation","framework":"NumPy / Matplotlib","dataset":"full：Criteo / Amazon Electronics；smoke：KuaiRand","runtime":"约 10 秒 CPU"},
+    {"slug":"3_3_1_deepfm","title":"3.3.1 DeepFM 排序","kind":"algorithm","framework":"Torch-RecHub DeepFM","dataset":"full：Criteo；smoke：KuaiRand-Pure is_click","runtime":"约 20 秒 CPU"},
+    {"slug":"3_3_2_din","title":"3.3.2 DIN 候选感知排序","kind":"algorithm","framework":"Torch-RecHub DIN","dataset":"full：Amazon Electronics；smoke：KuaiRand feed 序列","runtime":"约 25 秒 CPU"},
+    {"slug":"3_3_3_dien","title":"3.3.3 DIEN 兴趣演化排序","kind":"algorithm","framework":"Torch-RecHub DIEN","dataset":"full：Amazon Electronics；smoke：KuaiRand feed 序列","runtime":"约 40 秒 CPU"},
+    {"slug":"3_3_summary","title":"3.3 总结：DeepFM、DIN 与 DIEN","kind":"summary","framework":"结果聚合与选型","dataset":"full：按算法分别审计；smoke：KuaiRand 实验 JSON","runtime":"约 5 秒 CPU"},
+    {"slug":"3_4_0_multitask_foundations","title":"3.4 导读与数学基础：多目标学习","kind":"foundation","framework":"NumPy / Matplotlib","dataset":"full：Census-Income；smoke：KuaiRand 多反馈","runtime":"约 10 秒 CPU"},
+    {"slug":"3_4_1_mmoe","title":"3.4.1 MMoE 多目标学习","kind":"algorithm","framework":"Torch-RecHub MMOE","dataset":"full：Census-Income；smoke：KuaiRand 双目标","runtime":"约 20 秒 CPU"},
+    {"slug":"3_4_2_ple","title":"3.4.2 PLE 渐进式专家抽取","kind":"algorithm","framework":"Torch-RecHub PLE","dataset":"full：Census-Income；smoke：KuaiRand 双目标","runtime":"约 25 秒 CPU"},
+    {"slug":"3_4_summary","title":"3.4 总结：MMoE 与 PLE","kind":"summary","framework":"结果聚合与选型","dataset":"full：Census-Income；smoke：KuaiRand 实验 JSON","runtime":"约 5 秒 CPU"},
+    {"slug":"4_0_generative_foundations","title":"4.0 导读与数学基础：生成式推荐","kind":"foundation","framework":"NumPy / Matplotlib","dataset":"full：按算法官方协议；smoke：KuaiRand 适配器","runtime":"默认 CUDA；CPU 仅基础检查"},
+    {"slug":"4_1_generative_overview","title":"4.1 总结：生成式召回、排序与融合","kind":"summary","framework":"结果聚合与工业选型","dataset":"full：按算法分别审计；smoke：KuaiRand 实验 JSON","runtime":"默认 CUDA；CPU 仅阅读"},
+    {"slug":"4_2_openonerec_practice","title":"4.2 OpenOneRec 实战","kind":"algorithm","framework":"OpenOneRec 契约 + PyTorch 约束生成器","dataset":"KuaiRand taxonomy adapter；RecIF full 需授权","runtime":"CUDA 混合精度；CPU basic smoke"},
+    {"slug":"4_3_dlrm_hstu_practice","title":"4.3 DLRM HSTU 实战","kind":"algorithm","framework":"Torch-RecHub HSTU + Meta DLRM-v3 配置","dataset":"full：Meta MovieLens-20M + Amazon Books；smoke：KuaiRand feed 序列","runtime":"CUDA 混合精度；官方配置需 4×24GB GPU"},
+]
+
+# The six-course curriculum lives contiguously inside 3.0. Appendix A.4 is only
+# a bounded knowledge-graph projection of these concepts, not another hierarchy.
+# Each concept points at an exact course heading and carries explicit model and
+# algorithm-notebook joins for coverage tests and graph navigation.
+_MODEL_NOTEBOOK_BY_ID = {model["id"]: model["notebook"] for model in MODELS}
+
+
+def _math_topic(
+    topic_id: str,
+    area: str,
+    topic: str,
+    intuition: str,
+    used_by: str,
+    notebook: str,
+    anchor: str,
+    prerequisites: tuple[str, ...],
+    model_ids: tuple[str, ...],
+) -> dict:
+    return {
+        "id": topic_id,
+        "area": area,
+        "topic": topic,
+        "intuition": intuition,
+        "used_by": used_by,
+        "notebook": notebook,
+        "anchor": anchor,
+        "prerequisites": list(prerequisites),
+        "model_ids": list(model_ids),
+        "notebook_slugs": [_MODEL_NOTEBOOK_BY_ID[model_id] for model_id in model_ids],
+    }
+
+
+MATH_PREREQUISITES = [
+    # 3.0.1 数据与机器学习基础
+    _math_topic(
+        "data-observation-label", "数据与机器学习", "样本、实体、特征与标签",
+        "一行数据不是现实本身，而是对一次用户—物品事件的记录；特征是答题线索，标签是希望模型学会预测的答案。",
+        "全部算法的数据入口与训练目标", "3_0_1_data_ml_basics", "observation-label", (),
+        tuple(_MODEL_NOTEBOOK_BY_ID),
+    ),
+    _math_topic(
+        "data-implicit-feedback", "数据与机器学习", "显式反馈、隐式反馈与未知样本",
+        "评分直接说出偏好；点击和停留只留下行为痕迹。没有点击通常表示未知，不能不加条件地当成负例。",
+        "CF/MF、序列召回、CTR、多任务与生成式推荐", "3_0_1_data_ml_basics", "implicit-feedback",
+        ("data-observation-label",),
+        ("cf", "mf", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "data-split-leakage", "数据与机器学习", "数据切分、泄漏、基线与泛化",
+        "训练集像练习题，测试集像没见过的考试题；若把未来行为或答案偷偷放进训练，分数再高也不能说明模型会泛化。",
+        "全部算法的实验协议与结果比较", "3_0_1_data_ml_basics", "split-leakage",
+        ("data-observation-label", "data-implicit-feedback"), tuple(_MODEL_NOTEBOOK_BY_ID),
+    ),
+    # 3.0.2 线性代数
+    _math_topic(
+        "linear-tensors-shapes", "线性代数", "标量、向量、矩阵、张量与形状",
+        "它们只是把数字按零维、一维、二维或更多维摆放；先写清每条轴表示什么，就能避免多数维度错误。",
+        "embedding、行为序列、多兴趣与多任务批次", "3_0_2_linear_algebra", "tensors-shapes", (),
+        ("mf", "fm", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "linear-elementwise-dot", "线性代数", "逐元素运算、点积、范数与余弦",
+        "逐元素运算是同位置配对，点积则把配对乘积再相加；除以两边长度后，余弦只比较方向。",
+        "CF 相似度、MF/FM 交互、双塔与候选匹配", "3_0_2_linear_algebra", "elementwise-dot",
+        ("linear-tensors-shapes",),
+        ("cf", "mf", "fm", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "hstu"),
+    ),
+    _math_topic(
+        "linear-matmul-embedding", "线性代数", "矩阵乘法、转置与 embedding 查表",
+        "矩阵乘法是批量完成许多次点积；one-hot 乘 embedding 矩阵等价于按编号取出其中一行。",
+        "MF/FM、word2vec、双塔、排序网络与生成模型", "3_0_2_linear_algebra", "matmul-embedding",
+        ("linear-elementwise-dot",),
+        ("mf", "fm", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "linear-low-rank-attention", "线性代数", "低秩表示、加权和与 Q/K/V 注意力",
+        "低秩表示用少量坐标概括大表格；注意力让一个查询给历史内容分配票数，再把值向量加权汇总。",
+        "MF、多兴趣路由、SASRec、DIN/DIEN 与 HSTU", "3_0_2_linear_algebra", "low-rank-attention",
+        ("linear-matmul-embedding",), ("mf", "dssm", "mind", "sasrec", "din", "dien", "openonerec", "hstu"),
+    ),
+    # 3.0.3 微积分
+    _math_topic(
+        "calculus-functions", "微积分", "函数、复合函数与激活函数",
+        "模型是函数套函数：前一层输出成为后一层输入；激活函数负责把简单直线组合变成能表达弯曲规律的映射。",
+        "LR、FM、深度排序、序列与生成模型", "3_0_3_calculus", "functions", (),
+        ("fm", "gbdtlr", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "calculus-derivative-gradient", "微积分", "导数、偏导、梯度与方向",
+        "导数测量一个量轻微改变时结果怎样变；多个参数各有一个偏导，把它们排成向量就是梯度。",
+        "除邻域 CF 外所有可训练参数的更新", "3_0_3_calculus", "derivative-gradient",
+        ("calculus-functions",),
+        ("mf", "fm", "gbdtlr", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "calculus-chain-rule", "微积分", "链式法则、计算图与反向传播",
+        "复合函数的变化要沿计算路径逐段相乘；反向传播只是从损失出发，把这条规则有次序地重复应用。",
+        "FM 与全部神经网络的自动求导", "3_0_3_calculus", "chain-rule",
+        ("calculus-derivative-gradient",),
+        ("mf", "fm", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    # 3.0.4 概率与统计
+    _math_topic(
+        "probability-random-variable", "概率与统计", "随机事件、随机变量与分布",
+        "随机变量是给不确定结果贴上的数字标签，分布则说明每种结果有多大可能；推荐分数由此才能解释成概率。",
+        "反馈建模、负采样、CTR 与序列预测", "3_0_4_probability_statistics", "random-variable", (),
+        tuple(_MODEL_NOTEBOOK_BY_ID),
+    ),
+    _math_topic(
+        "probability-conditional-chain", "概率与统计", "联合、边缘、条件概率与链式分解",
+        "条件概率是在已知用户或历史之后重新计算可能性；一段序列的联合概率可拆成从左到右的一串条件概率。",
+        "召回条件概率、多任务漏斗与自回归生成", "3_0_4_probability_statistics", "conditional-chain",
+        ("probability-random-variable",),
+        ("cf", "word2vec", "dssm", "mind", "sasrec", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "probability-expectation-variance", "概率与统计", "期望、方差与抽样估计",
+        "期望是按概率加权的长期平均，方差表示结果围绕平均值的波动；小批次梯度就是用样本平均估计总体方向。",
+        "指标汇总、mini-batch 训练与稳定性判断", "3_0_4_probability_statistics", "expectation-variance",
+        ("probability-random-variable",), tuple(_MODEL_NOTEBOOK_BY_ID),
+    ),
+    _math_topic(
+        "probability-likelihood-calibration", "概率与统计", "odds、logit、似然、采样偏差与校准",
+        "似然问参数对已观察数据解释得多好；校准则检查预测 0.7 的样本是否真的约有七成发生。",
+        "GBDT+LR、CTR 模型、负采样召回与多任务概率", "3_0_4_probability_statistics", "likelihood-calibration",
+        ("probability-conditional-chain", "probability-expectation-variance"),
+        ("gbdtlr", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    # 3.0.5 信息论与损失
+    _math_topic(
+        "information-entropy", "信息论", "信息量与熵",
+        "越意外的事件带来的信息越多；熵是把所有结果的信息量按概率加权，衡量整个分布有多不确定。",
+        "分类不确定性、推荐分布与归一化指标", "3_0_5_information_theory", "information-entropy",
+        ("probability-random-variable",),
+        ("word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "information-cross-entropy-kl", "信息论", "二元/多类交叉熵与 KL 散度",
+        "交叉熵衡量模型分布给正确答案的代价；KL 衡量用一个分布近似另一个分布时多付出的信息成本，而且方向不能互换。",
+        "CTR LogLoss、sampled softmax、分类与分布对齐", "3_0_5_information_theory", "cross-entropy-kl",
+        ("information-entropy", "probability-conditional-chain"),
+        ("gbdtlr", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "information-softmax-temperature", "信息论", "Softmax、温度与 Normalized Entropy",
+        "Softmax 把一组分数变成总和为 1 的比例；温度调节分布尖锐程度，归一化熵让不同候选规模更容易比较。",
+        "召回分类、多兴趣路由、注意力与受控采样", "3_0_5_information_theory", "softmax-temperature",
+        ("information-cross-entropy-kl", "calculus-functions"),
+        ("word2vec", "dssm", "mind", "sasrec", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "information-sequence-nll-dpo", "信息论", "序列 NLL、困惑度与 DPO log-ratio",
+        "序列 NLL 把每一步正确 token 的负对数相加；DPO 比较偏好答案与非偏好答案相对参考模型的对数概率差。",
+        "SASRec/HSTU 的逐位置目标与 OpenOneRec 偏好优化", "3_0_5_information_theory", "sequence-nll-dpo",
+        ("information-softmax-temperature", "probability-conditional-chain"),
+        ("sasrec", "openonerec", "hstu"),
+    ),
+    # 3.0.6 优化
+    _math_topic(
+        "optimization-sgd", "优化", "目标函数、GD、SGD 与 mini-batch",
+        "优化就是寻找让训练损失更小的参数；SGD 用一小批样本估计下坡方向，以较低成本反复修正。",
+        "MF/FM、embedding、深度与生成模型训练", "3_0_6_optimization", "sgd",
+        ("calculus-derivative-gradient", "probability-expectation-variance"),
+        ("mf", "fm", "gbdtlr", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "optimization-learning-rate", "优化", "学习率、Momentum、Adam 与初始化",
+        "学习率是每步迈多远；Momentum 记住近期方向，Adam 还会按参数缩放步长，而初始化决定从哪处开始下山。",
+        "全部梯度训练算法的收敛速度与稳定性", "3_0_6_optimization", "learning-rate",
+        ("optimization-sgd",),
+        ("mf", "fm", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "optimization-regularization", "优化", "L1/L2、过拟合、早停与梯度裁剪",
+        "模型若只背训练题就会过拟合；正则化限制参数，早停限制训练轮数，裁剪限制一次更新的极端幅度。",
+        "MF/FM、深度排序、序列与生成模型", "3_0_6_optimization", "regularization",
+        ("optimization-learning-rate", "data-split-leakage"),
+        ("mf", "fm", "word2vec", "dssm", "mind", "sasrec", "deepfm", "din", "dien", "mmoe", "ple", "openonerec", "hstu"),
+    ),
+    _math_topic(
+        "optimization-gradient-conflict", "优化", "多任务梯度冲突与负迁移",
+        "若两个任务希望共享参数朝相反方向移动，一个任务进步时另一个可能退步；专家分工用结构限制这种拉扯。",
+        "MMoE 与 PLE 的共享边界和跷跷板现象", "3_0_6_optimization", "gradient-conflict",
+        ("calculus-chain-rule", "optimization-sgd"), ("mmoe", "ple"),
+    ),
 ]
 
 CHAPTERS = {
     "foundations": {
-        "number": "3.0", "title": "推荐算法数学基础：从表格、向量到模型训练",
-        "intro": "为初次接触推荐算法的读者建立最低必要数学直觉：把行为写成矩阵，用向量衡量相似，用概率表达不确定性，再用损失函数和梯度下降让模型从错误中修正。",
-        "layout": "从可手算的 3×4 用户—物品矩阵开始，依次理解向量、点积、余弦相似度、矩阵乘法、Sigmoid、LogLoss、梯度下降，以及 Recall/AUC 等评价指标。每个公式都配数字例子和图。",
-        "use_cases": "这是 3.1—4.3 的共同先修课；不要求微积分或线性代数课程背景，只需掌握基础代数、函数和坐标系。",
-        "model_ids": [], "opening": "3_0_math_foundations", "notebooks": ["3_0_math_foundations", "3_0_data_pipeline"], "summary": "3_0_data_pipeline",
+        "number": "3.0", "title": "共性基础课程：从数据语义到实验管线",
+        "intro": "面向高中毕业生，从一行数据的含义开始，循序学习线性代数、微积分、概率统计、信息论损失与优化，再把这些概念接入可执行训练管线。",
+        "layout": "总览负责路线与最小直觉；3.0.1—3.0.6 各自完整讲解一组共性知识；3.0.7 打开项目代码，串起时间切分、张量化、训练、推理、测试与结果落盘。",
+        "use_cases": "这是 3.1—4.3 的共同先修课程。算法页只展开论文新增数学，其余概念精确回链到 3.0 的稳定锚点。",
+        "model_ids": [],
+        "opening": "3_0_math_foundations",
+        "notebooks": [
+            "3_0_math_foundations", "3_0_1_data_ml_basics", "3_0_2_linear_algebra",
+            "3_0_3_calculus", "3_0_4_probability_statistics", "3_0_5_information_theory",
+            "3_0_6_optimization", "3_0_7_data_pipeline",
+        ],
+        "summary": "3_0_7_data_pipeline",
         "sources": [
             ("MIT OpenCourseWare：Linear Algebra", "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/", "用于进一步理解向量、矩阵乘法与低秩表示；本章只提取推荐系统真正需要的部分。"),
             ("Google Machine Learning Crash Course：Logistic Regression", "https://developers.google.com/machine-learning/crash-course/logistic-regression", "用概率、Sigmoid 和 LogLoss 解释二分类预测，是 CTR 排序的数学起点。"),
@@ -148,14 +364,18 @@ def notebook_has_paper_guide(slug: str) -> bool:
     """Whether the detail page should render the 论文导读 tab.
 
     The foundations chapter (3.0) and every chapter opening / 导读 page focus on
-    math and intuition, so they skip the paper-evidence tab. Algorithm detail and
-    summary pages keep it.
+    math and intuition, so they skip the paper-evidence tab. Summary pages do
+    their cross-paper comparison inside the notebook and also skip this tab.
+    Algorithm detail pages keep it.
     """
+    notebook = next((item for item in NOTEBOOKS if item["slug"] == slug), None)
+    if notebook and notebook["kind"] == "curriculum":
+        return False
     foundations = CHAPTERS["foundations"]
     if slug in {foundations["opening"], *foundations["notebooks"], foundations["summary"]}:
         return False
     for key in ("classic", "retrieval", "ranking", "multitask", "generative"):
-        if CHAPTERS[key]["opening"] == slug:
+        if slug in {CHAPTERS[key]["opening"], CHAPTERS[key]["summary"]}:
             return False
     return True
 

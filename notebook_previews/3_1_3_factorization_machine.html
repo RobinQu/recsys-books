@@ -7517,7 +7517,7 @@ window.MathJax = {
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=debb3806">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f54756f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7525,12 +7525,12 @@ window.MathJax = {
 <h1 id="3.1.3-%E5%9B%A0%E5%AD%90%E5%88%86%E8%A7%A3%E6%9C%BA%EF%BC%9AFM">3.1.3 因子分解机：FM<a class="anchor-link" href="#3.1.3-%E5%9B%A0%E5%AD%90%E5%88%86%E8%A7%A3%E6%9C%BA%EF%BC%9AFM">¶</a></h1><blockquote>
 <p>阅读版与 Web 应用内容一致；实验数值来自本 Notebook 的已执行输出。</p>
 </blockquote>
-<h2 id="Goal">Goal<a class="anchor-link" href="#Goal">¶</a></h2><p>单独掌握稀疏二阶交互：从曝光—点击数据、FM 数学恒等式，到 PyTorch 训练、概率推理、AUC 与 LogLoss。</p>
+<h2 id="Goal">Goal<a class="anchor-link" href="#Goal">¶</a></h2><p>单独掌握稀疏二阶交互：从 MovieLens 评分阈值派生的高偏好标签、FM 数学恒等式，到 PyTorch 训练、概率推理、AUC 与 LogLoss；该教学任务不冒充曝光—点击日志。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5c415794">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=afb14023">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7540,18 +7540,19 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=74dec609">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ba7cad93">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+<span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="n">ARTIFACT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"RECSYS_ARTIFACT_ROOT"</span><span class="p">,</span> <span class="n">PROJECT_ROOT</span><span class="p">))</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">))</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
 <span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
@@ -7594,7 +7595,7 @@ window.MathJax = {
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"project_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">),</span> <span class="s2">"artifact_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
        <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
        <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
@@ -7603,20 +7604,8 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'profile': 'smoke', 'root': '/workspace', 'real_dataset': {'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/workspace/data/ml-latest-small/README.txt', 'profile': 'smoke', 'slice_rule': 'deterministic user/item subset', 'rows_used': 26732, 'users_used': 120, 'items_used': 600, 'time_min_utc': '1996-10-17T11:51:49+00:00', 'time_max_utc': '2018-09-13T21:38:16+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}, 'cuda_available': False, 'cuda_device': None}
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=89585823">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4667d583">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7626,14 +7615,14 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4abfcb0b">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2c351aa0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">log_loss</span>
@@ -7658,163 +7647,50 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'rows': 10487, 'users': 48, 'items': 360, 'train_rows': 10439, 'test_rows': 48, 'sparsity': 0.396, 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'fabricated_rows': 0}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>userId</th>
-<th>movieId</th>
-<th>rating</th>
-<th>timestamp</th>
-<th>title</th>
-<th>genres</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>140</td>
-<td>318</td>
-<td>4.0</td>
-<td>942840891</td>
-<td>Shawshank Redemption, The (1994)</td>
-<td>Crime|Drama</td>
-</tr>
-<tr>
-<th>1</th>
-<td>140</td>
-<td>527</td>
-<td>5.0</td>
-<td>942840891</td>
-<td>Schindler's List (1993)</td>
-<td>Drama|War</td>
-</tr>
-<tr>
-<th>2</th>
-<td>140</td>
-<td>1221</td>
-<td>3.0</td>
-<td>942840891</td>
-<td>Godfather: Part II, The (1974)</td>
-<td>Crime|Drama</td>
-</tr>
-<tr>
-<th>3</th>
-<td>140</td>
-<td>50</td>
-<td>3.0</td>
-<td>942840991</td>
-<td>Usual Suspects, The (1995)</td>
-<td>Crime|Mystery|Thriller</td>
-</tr>
-<tr>
-<th>4</th>
-<td>140</td>
-<td>595</td>
-<td>5.0</td>
-<td>942840991</td>
-<td>Beauty and the Beast (1991)</td>
-<td>Animation|Children|Fantasy|Musical|Romance|IMAX</td>
-</tr>
-<tr>
-<th>5</th>
-<td>140</td>
-<td>1198</td>
-<td>4.0</td>
-<td>942841170</td>
-<td>Raiders of the Lost Ark (Indiana Jones and the...</td>
-<td>Action|Adventure</td>
-</tr>
-<tr>
-<th>6</th>
-<td>140</td>
-<td>2028</td>
-<td>5.0</td>
-<td>942841170</td>
-<td>Saving Private Ryan (1998)</td>
-<td>Action|Drama|War</td>
-</tr>
-<tr>
-<th>7</th>
-<td>140</td>
-<td>1721</td>
-<td>4.0</td>
-<td>942841219</td>
-<td>Titanic (1997)</td>
-<td>Drama|Romance</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f246c5a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a1b10646">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="4.-%E5%9B%A0%E5%AD%90%E5%88%86%E8%A7%A3%E6%9C%BA%EF%BC%88FM%EF%BC%89%EF%BC%9A%E4%B8%BA%E7%A8%80%E7%96%8F%E7%89%B9%E5%BE%81%E5%AD%A6%E4%B9%A0%E4%BA%8C%E9%98%B6%E4%BA%A4%E4%BA%92">4. 因子分解机（FM）：为稀疏特征学习二阶交互<a class="anchor-link" href="#4.-%E5%9B%A0%E5%AD%90%E5%88%86%E8%A7%A3%E6%9C%BA%EF%BC%88FM%EF%BC%89%EF%BC%9A%E4%B8%BA%E7%A8%80%E7%96%8F%E7%89%B9%E5%BE%81%E5%AD%A6%E4%B9%A0%E4%BA%8C%E9%98%B6%E4%BA%A4%E4%BA%92">¶</a></h2><h3 id="4.1-%E4%B8%BA%E4%BB%80%E4%B9%88-MF-%E4%B8%8D%E5%A4%9F%EF%BC%9F">4.1 为什么 MF 不够？<a class="anchor-link" href="#4.1-%E4%B8%BA%E4%BB%80%E4%B9%88-MF-%E4%B8%8D%E5%A4%9F%EF%BC%9F">¶</a></h3><p>CTR 排序不只有 <code>user_id</code> 和 <code>item_id</code>，还会有设备、小时、地域、品类、价格等上下文。直接为每一对特征做 one-hot 交叉会导致参数爆炸；普通 LR 又只能做加法，无法表达“某用户群在晚间更喜欢某品类”。</p>
-<p>FM 为每个特征 $i$ 学一个隐向量 $v_i$，用内积共享所有二阶交叉统计：</p>
+<h2 id="4.-%E5%9B%A0%E5%AD%90%E5%88%86%E8%A7%A3%E6%9C%BA%EF%BC%88FM%EF%BC%89%EF%BC%9A%E4%B8%BA%E7%A8%80%E7%96%8F%E7%89%B9%E5%BE%81%E5%AD%A6%E4%B9%A0%E4%BA%8C%E9%98%B6%E4%BA%A4%E4%BA%92">4. 因子分解机（FM）：为稀疏特征学习二阶交互<a class="anchor-link" href="#4.-%E5%9B%A0%E5%AD%90%E5%88%86%E8%A7%A3%E6%9C%BA%EF%BC%88FM%EF%BC%89%EF%BC%9A%E4%B8%BA%E7%A8%80%E7%96%8F%E7%89%B9%E5%BE%81%E5%AD%A6%E4%B9%A0%E4%BA%8C%E9%98%B6%E4%BA%A4%E4%BA%92">¶</a></h2><h3 id="4.1-%E4%B8%BA%E4%BB%80%E4%B9%88-MF-%E4%B8%8D%E5%A4%9F%EF%BC%9F">4.1 为什么 MF 不够？<a class="anchor-link" href="#4.1-%E4%B8%BA%E4%BB%80%E4%B9%88-MF-%E4%B8%8D%E5%A4%9F%EF%BC%9F">¶</a></h3><p><strong>通用先修：</strong> <a href="/notebooks/3_0_1_data_ml_basics#observation-label">3.0.1 样本、特征与标签</a> · <a href="/notebooks/3_0_2_linear_algebra#elementwise-dot">3.0.2 逐元素与点积</a> · <a href="/notebooks/3_0_5_information_theory#cross-entropy-kl">3.0.5 二元交叉熵</a><br/>
+<strong>本论文新增数学：</strong> 用共享隐向量参数化任意稀疏特征的二阶交互，并把 $O(n^2k)$ 的逐对计算化成 $O(nk)$ 恒等式。</p>
+<p>CTR 排序不只有 <code>user_id</code> 和 <code>item_id</code>，还会有设备、小时、地域、品类、价格等上下文。直接为每一对特征做 one-hot 交叉会导致参数爆炸；普通 LR 又只能做加法，无法表达“某用户群在晚间更喜欢某品类”。</p>
+<p>FM 的输入是一个超长稀疏向量 $x\in\mathbb R^n$：每个特征占一格，one-hot 类别特征取 0/1，连续特征取实数值。模型为每个特征 $i$ 学一个 $k$ 维隐向量 $v_i\in\mathbb R^k$，用内积 $\langle v_i,v_j\rangle=\sum_{f=1}^{k}v_{if}v_{jf}$ 共享所有二阶交叉统计：</p>
 <p>$$
 \hat y(x)=w_0+\sum_i w_ix_i+\sum_{i&lt;j}\langle v_i,v_j\rangle x_ix_j
 $$</p>
-<p>朴素二阶项是 $O(n^2)$，利用恒等式可化为 $O(nk)$：</p>
+<p>三项分别是：$w_0$ 全局偏置；$\sum_i w_ix_i$ 一阶线性项（与 LR 相同）；$\sum_{i&lt;j}\langle v_i,v_j\rangle x_ix_j$ 二阶交叉项——只有同时“打开”（$x_i,x_j$ 都非零）的特征对才参与。关键在于稀疏性：即使某对特征从未在训练集共同出现，它们各自与其他特征的共现也已把 $v_i,v_j$ 学好，交叉强度仍能由内积给出。</p>
+<p>朴素计算二阶项要枚举全部 $\binom{n}{2}$ 对特征、每对做一次 $k$ 维内积，复杂度 $O(n^2k)$。利用“和的平方减去平方的和”恒等式可化为 $O(nk)$：</p>
 <p>$$
 \sum_{i&lt;j}\langle v_i,v_j\rangle x_ix_j
 =\frac12\sum_f\left[\left(\sum_i v_{if}x_i\right)^2-\sum_i v_{if}^2x_i^2\right]
 $$</p>
+<p>推导只需一步代数：把 $(\sum_i v_{if}x_i)^2$ 展开会得到所有有序对 $(i,j)$ 的乘积——包含 $i=j$ 的对角项，且每对 $i&lt;j$ 出现两次；减去对角项 $\sum_i v_{if}^2x_i^2$ 再乘 $\tfrac12$ 去重，正好回到左边。右侧只需对每个因子维度 $f$ 各扫一遍特征。</p>
+<p><strong>手算一遍。</strong> 取 $k=2$、两个特征 $v_1=[1,2]$、$v_2=[0.5,-1]$，且 $x_1=x_2=1$。左边：$\langle v_1,v_2\rangle=1\times0.5+2\times(-1)=-1.5$。右边逐维算：$f=1$ 时 $(1+0.5)^2-(1^2+0.5^2)=2.25-1.25=1$；$f=2$ 时 $(2+(-1))^2-(2^2+(-1)^2)=1-5=-4$；合起来 $\tfrac12[1+(-4)]=-1.5$，与左边一致。</p>
 <p>当特征只有 user one-hot 和 item one-hot 时，FM 的交叉项就退化为 MF；因此 FM 可以理解为 MF 对通用稀疏特征的扩展。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ecfed9d6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bcedfd35">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="4.2-%E6%95%B0%E6%8D%AE%EF%BC%9A%E4%BB%8E%E7%9C%9F%E5%AE%9E%E8%AF%84%E5%88%86%E6%9E%84%E9%80%A0%E5%8F%AF%E8%A7%A3%E9%87%8A%E7%9A%84%E4%BA%8C%E5%88%86%E7%B1%BB%E6%8E%92%E5%BA%8F%E4%BB%BB%E5%8A%A1">4.2 数据：从真实评分构造可解释的二分类排序任务<a class="anchor-link" href="#4.2-%E6%95%B0%E6%8D%AE%EF%BC%9A%E4%BB%8E%E7%9C%9F%E5%AE%9E%E8%AF%84%E5%88%86%E6%9E%84%E9%80%A0%E5%8F%AF%E8%A7%A3%E9%87%8A%E7%9A%84%E4%BA%8C%E5%88%86%E7%B1%BB%E6%8E%92%E5%BA%8F%E4%BB%BB%E5%8A%A1">¶</a></h3>
+<h3 id="4.2-%E6%95%B0%E6%8D%AE%EF%BC%9A%E8%AF%84%E5%88%86%E9%98%88%E5%80%BC%E6%B4%BE%E7%94%9F%E2%80%9C%E9%AB%98%E5%81%8F%E5%A5%BD%E2%80%9D%E6%A0%87%E7%AD%BE%EF%BC%88%E4%B8%8D%E6%98%AF%E6%9B%9D%E5%85%89%E2%80%94%E7%82%B9%E5%87%BB%E6%97%A5%E5%BF%97%EF%BC%89">4.2 数据：评分阈值派生“高偏好”标签（不是曝光—点击日志）<a class="anchor-link" href="#4.2-%E6%95%B0%E6%8D%AE%EF%BC%9A%E8%AF%84%E5%88%86%E9%98%88%E5%80%BC%E6%B4%BE%E7%94%9F%E2%80%9C%E9%AB%98%E5%81%8F%E5%A5%BD%E2%80%9D%E6%A0%87%E7%AD%BE%EF%BC%88%E4%B8%8D%E6%98%AF%E6%9B%9D%E5%85%89%E2%80%94%E7%82%B9%E5%87%BB%E6%97%A5%E5%BF%97%EF%BC%89">¶</a></h3><p>MovieLens 记录的是用户主动提交的星级，<strong>没有完整曝光分母</strong>。这里把真实评分 <code>rating &gt;= 4.0</code> 派生为高偏好标签、较低评分派生为 0，只用于演示 FM 的二分类、AUC 与 LogLoss 计算；变量名 <code>click</code> 是代码兼容别名，不代表真实广告点击。没有评分的 user–item 仍是未知，不能补成曝光未点击。真实 CTR 结论必须改用包含曝光与点击的日志。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f6a0416d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6eb5dc50">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">StandardScaler</span>
+<div class="highlight hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">StandardScaler</span>
 
 <span class="n">ctr</span> <span class="o">=</span> <span class="n">ratings</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"timestamp"</span><span class="p">)</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">5000</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="c1"># `click` 是任务别名；标签由真实评分 rating &gt;= 4.0 确定，不使用随机采样。</span>
@@ -7837,20 +7713,8 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'train': (4000, 437), 'test': (1000, 437), 'train_positive_rate': np.float64(0.474)}
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2795149e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7f1bf6da">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7859,14 +7723,14 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4337037f">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=68c17440">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">FactorizationMachine</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="highlight hl-python"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">FactorizationMachine</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_features</span><span class="p">,</span> <span class="n">factor_dim</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -7896,20 +7760,8 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'FM final BCE': 0.0102}
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4780492c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=aee24801">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7918,14 +7770,14 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1f0e4444">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8d5ff93b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">fm_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<div class="highlight hl-python"><pre><span></span><span class="n">fm_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
     <span class="n">fm_probability</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">fm_model</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">fm_test_x</span><span class="p">)))</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">fm_auc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">ctr_test_y</span><span class="p">,</span> <span class="n">fm_probability</span><span class="p">))</span>
@@ -7937,90 +7789,8 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>label</th>
-<th>p_click</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>0</td>
-<td>0.0028</td>
-</tr>
-<tr>
-<th>1</th>
-<td>1</td>
-<td>0.2287</td>
-</tr>
-<tr>
-<th>2</th>
-<td>0</td>
-<td>0.0021</td>
-</tr>
-<tr>
-<th>3</th>
-<td>0</td>
-<td>0.1610</td>
-</tr>
-<tr>
-<th>4</th>
-<td>0</td>
-<td>0.0002</td>
-</tr>
-<tr>
-<th>5</th>
-<td>0</td>
-<td>0.0159</td>
-</tr>
-<tr>
-<th>6</th>
-<td>0</td>
-<td>0.3017</td>
-</tr>
-<tr>
-<th>7</th>
-<td>0</td>
-<td>0.0062</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'FM AUC': 0.5964, 'FM LogLoss': 2.6061}
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=73710607">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ffe452ad">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8033,7 +7803,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=38346a94">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=756e7bd0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8042,14 +7812,14 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=33c6ea11">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d92fc2f5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">fm_probability</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">fm_probability</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">))</span>
+<div class="highlight hl-python"><pre><span></span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">fm_probability</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">fm_probability</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">))</span>
 <span class="k">assert</span> <span class="n">fm_auc</span> <span class="o">&gt;</span> <span class="mf">.55</span>
 <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">fm_logloss</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'PASS：FM 训练、概率推理和 CTR 指标均有效。'</span><span class="p">)</span>
@@ -8058,26 +7828,14 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>PASS：FM 训练、概率推理和 CTR 指标均有效。
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2eb9502c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=477a3fa4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">result_dir</span> <span class="o">=</span> <span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"results"</span> <span class="o">/</span> <span class="s2">"chapter_3_1"</span><span class="p">;</span> <span class="n">result_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight hl-python"><pre><span></span><span class="n">result_dir</span> <span class="o">=</span> <span class="n">ARTIFACT_ROOT</span> <span class="o">/</span> <span class="s2">"results"</span> <span class="o">/</span> <span class="s2">"chapter_3_1"</span><span class="p">;</span> <span class="n">result_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"records"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"algorithm"</span><span class="p">:</span><span class="s2">"FM"</span><span class="p">,</span> <span class="s2">"task"</span><span class="p">:</span><span class="s2">"CTR"</span><span class="p">,</span> <span class="s2">"metric"</span><span class="p">:</span><span class="s2">"AUC ↑"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span><span class="n">fm_auc</span><span class="p">,</span> <span class="s2">"secondary_metric"</span><span class="p">:</span><span class="s2">"LogLoss ↓"</span><span class="p">,</span> <span class="s2">"secondary_value"</span><span class="p">:</span><span class="n">fm_logloss</span><span class="p">,</span> <span class="s2">"online_inference"</span><span class="p">:</span><span class="s2">"线性项 + 二阶隐向量交互"</span><span class="p">,</span> <span class="s2">"source_notebook"</span><span class="p">:</span><span class="s2">"3_1_3_factorization_machine"</span><span class="p">}]}</span>
 <span class="p">(</span><span class="n">result_dir</span> <span class="o">/</span> <span class="s2">"factorization_machine.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"已写出章节指标：factorization_machine.json"</span><span class="p">)</span>
@@ -8086,20 +7844,8 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>已写出章节指标：factorization_machine.json
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7df61b8d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f9b81915">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8110,5 +7856,24 @@ $$</p>
 </div>
 </div>
 </main>
-</body>
+<script id="recsys-preview-link-targets">
+(function () {
+  function retarget() {
+    document.querySelectorAll('a[href]').forEach(function (anchor) {
+      var href = anchor.getAttribute('href');
+      if (!href || href.charAt(0) === '#') return;
+      var url;
+      try { url = new URL(href, document.baseURI); } catch (error) { return; }
+      if (url.origin === location.origin) {
+        if (url.pathname !== location.pathname) anchor.target = '_top';
+      } else {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', retarget);
+  else retarget();
+})();
+</script></body>
 </html>

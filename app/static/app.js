@@ -165,3 +165,209 @@ $$('.timeline-row').forEach((row) => row.addEventListener('click', () => {
   const expanded = row.classList.toggle('expanded');
   row.setAttribute('aria-expanded', String(expanded));
 }));
+
+// The home template publishes both graph hooks.  The server owns expansion and
+// limits; this renderer only displays a bounded deterministic view and never
+// creates an unbounded client-side force graph.
+(() => {
+  const dataElement = document.querySelector('#knowledge-graph-data');
+  const graphRoot = document.querySelector('#knowledge-graph');
+  if (!dataElement || !graphRoot) return;
+
+  let payload;
+  try {
+    payload = JSON.parse(dataElement.textContent);
+  } catch (error) {
+    graphRoot.hidden = true;
+    return;
+  }
+
+  const MAX_VISIBLE_NODES = 16;
+  const VISUAL_EDGE_TYPES = new Set(['contains', 'emphasizes', 'evolves', 'prerequisite']);
+  const defaultView = payload.default || payload;
+  const views = payload.views || {};
+  let currentView = defaultView;
+  let selectedId = null;
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'knowledge-graph-toolbar';
+  const selectLabel = document.createElement('label');
+  selectLabel.textContent = '聚焦章节';
+  selectLabel.htmlFor = 'knowledge-graph-chapter-select';
+  const chapterSelect = document.createElement('select');
+  chapterSelect.id = 'knowledge-graph-chapter-select';
+  const overviewOption = document.createElement('option');
+  overviewOption.value = '';
+  overviewOption.textContent = '全部章节';
+  chapterSelect.appendChild(overviewOption);
+  const resetButton = document.createElement('button');
+  resetButton.type = 'button';
+  resetButton.className = 'ghost knowledge-graph-reset';
+  resetButton.textContent = '返回总览';
+  toolbar.append(selectLabel, chapterSelect, resetButton);
+
+  const stage = document.createElement('div');
+  stage.className = 'knowledge-graph-stage';
+  stage.setAttribute('aria-label', '教程知识关系图');
+  const edgeLayer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  edgeLayer.classList.add('knowledge-graph-edges');
+  edgeLayer.setAttribute('aria-hidden', 'true');
+  const nodeLayer = document.createElement('div');
+  nodeLayer.className = 'knowledge-graph-nodes';
+  stage.append(edgeLayer, nodeLayer);
+
+  const relations = document.createElement('aside');
+  relations.className = 'knowledge-graph-relations';
+  relations.setAttribute('aria-live', 'polite');
+  relations.setAttribute('aria-atomic', 'true');
+
+  graphRoot.replaceChildren(toolbar, stage, relations);
+
+  const defaultChapters = (defaultView.nodes || []).filter((node) => node.type === 'chapter');
+  defaultChapters.forEach((chapter) => {
+    const option = document.createElement('option');
+    option.value = chapter.id;
+    option.textContent = `${chapter.number ? `${chapter.number} · ` : ''}${chapter.label}`;
+    chapterSelect.appendChild(option);
+  });
+
+  function boundedView(view) {
+    const nodes = (view?.nodes || []).slice(0, MAX_VISIBLE_NODES);
+    const ids = new Set(nodes.map((node) => node.id));
+    const edges = (view?.edges || []).filter((edge) => ids.has(edge.source) && ids.has(edge.target));
+    return { ...view, nodes, edges };
+  }
+
+  function viewFor(focusId) {
+    if (!focusId) return boundedView(defaultView);
+    return boundedView(views[focusId] || views[focusId.replace(/^chapter:/, '')] || currentView);
+  }
+
+  function nodeColumn(node) {
+    if (node.type === 'math') return 1;
+    if (node.type === 'chapter') return 2;
+    return 3;
+  }
+
+  function drawEdges() {
+    edgeLayer.replaceChildren();
+    const stageRect = stage.getBoundingClientRect();
+    edgeLayer.setAttribute('viewBox', `0 0 ${Math.max(1, stageRect.width)} ${Math.max(1, stageRect.height)}`);
+    currentView.edges.forEach((edge) => {
+      // Keep the picture scannable: detailed model→math dependencies remain
+      // available in the accessible text list after selecting either node.
+      if (!VISUAL_EDGE_TYPES.has(edge.type)) return;
+      if (edge.type === 'emphasizes' && edge.source !== currentView.state?.focus) return;
+      const source = nodeLayer.querySelector(`[data-graph-node="${CSS.escape(edge.source)}"]`);
+      const target = nodeLayer.querySelector(`[data-graph-node="${CSS.escape(edge.target)}"]`);
+      if (!source || !target) return;
+      const from = source.getBoundingClientRect();
+      const to = target.getBoundingClientRect();
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', String(from.left + from.width / 2 - stageRect.left));
+      line.setAttribute('y1', String(from.top + from.height / 2 - stageRect.top));
+      line.setAttribute('x2', String(to.left + to.width / 2 - stageRect.left));
+      line.setAttribute('y2', String(to.top + to.height / 2 - stageRect.top));
+      line.dataset.edgeType = edge.type;
+      edgeLayer.appendChild(line);
+    });
+  }
+
+  function renderRelations() {
+    relations.replaceChildren();
+    const heading = document.createElement('h4');
+    const selected = currentView.nodes.find((node) => node.id === selectedId);
+    heading.textContent = selected ? `${selected.label} · 相关关系` : `当前显示 ${currentView.nodes.length} 个节点`;
+    relations.appendChild(heading);
+    if (!selected) {
+      const hint = document.createElement('p');
+      hint.textContent = '选择章节或节点，查看可朗读的文字关系；图中连线仅作视觉辅助。';
+      relations.appendChild(hint);
+      return;
+    }
+    const list = document.createElement('ul');
+    currentView.edges.filter((edge) => edge.source === selectedId || edge.target === selectedId).forEach((edge) => {
+      const otherId = edge.source === selectedId ? edge.target : edge.source;
+      const other = currentView.nodes.find((node) => node.id === otherId);
+      if (!other) return;
+      const item = document.createElement('li');
+      item.textContent = `${edge.label}：${other.label}`;
+      list.appendChild(item);
+    });
+    if (!list.children.length) {
+      const item = document.createElement('li');
+      item.textContent = '当前视图没有展开更多关系。';
+      list.appendChild(item);
+    }
+    relations.appendChild(list);
+    if (selected.url) {
+      const link = document.createElement('a');
+      link.href = selected.url;
+      link.textContent = '打开对应教程 →';
+      relations.appendChild(link);
+    }
+  }
+
+  function selectNode(nodeId) {
+    selectedId = nodeId;
+    nodeLayer.querySelectorAll('[data-graph-node]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.graphNode === selectedId));
+    });
+    renderRelations();
+  }
+
+  function render(view, focusId = null) {
+    currentView = boundedView(view);
+    selectedId = focusId && currentView.nodes.some((node) => node.id === focusId) ? focusId : null;
+    nodeLayer.replaceChildren();
+    const rows = new Map();
+    currentView.nodes.forEach((node) => {
+      const column = nodeColumn(node);
+      const row = (rows.get(column) || 0) + 1;
+      rows.set(column, row);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `knowledge-graph-node is-${node.type}`;
+      button.dataset.graphNode = node.id;
+      button.style.setProperty('--graph-column', String(column));
+      button.style.setProperty('--graph-row', String(row));
+      button.setAttribute('aria-pressed', String(node.id === selectedId));
+      const type = document.createElement('small');
+      type.textContent = node.type === 'chapter' ? `章节 ${node.number || ''}` : node.type === 'model' ? node.stage || '算法' : node.area || '数学';
+      const label = document.createElement('b');
+      label.textContent = node.label;
+      button.append(type, label);
+      button.addEventListener('click', () => {
+        if (node.type === 'chapter' && views[node.id]) {
+          chapterSelect.value = node.id;
+          render(viewFor(node.id), node.id);
+        } else {
+          selectNode(node.id);
+        }
+      });
+      nodeLayer.appendChild(button);
+    });
+    renderRelations();
+    requestAnimationFrame(drawEdges);
+  }
+
+  function resetGraph() {
+    chapterSelect.value = '';
+    render(viewFor(null));
+  }
+
+  chapterSelect.addEventListener('change', () => {
+    const focusId = chapterSelect.value || null;
+    render(viewFor(focusId), focusId);
+  });
+  resetButton.addEventListener('click', resetGraph);
+  graphRoot.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      resetGraph();
+      chapterSelect.focus();
+    }
+  });
+  new ResizeObserver(() => requestAnimationFrame(drawEdges)).observe(stage);
+  render(viewFor(null));
+})();

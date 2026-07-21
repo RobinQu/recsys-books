@@ -7517,20 +7517,20 @@ window.MathJax = {
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0ebf3dc8">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ad5d6a22">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="3.0A-%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BB%8E%E7%9F%A9%E9%98%B5%E5%88%B0%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D">3.0A 数学基础：从矩阵到梯度下降<a class="anchor-link" href="#3.0A-%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BB%8E%E7%9F%A9%E9%98%B5%E5%88%B0%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D">¶</a></h1><blockquote>
+<h1 id="3.0-%E5%9F%BA%E7%A1%80%E8%AF%BE%E7%A8%8B%E6%80%BB%E8%A7%88%EF%BC%9A%E4%BB%8E%E6%95%B0%E6%8D%AE%E8%AF%AD%E4%B9%89%E5%88%B0%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83">3.0 基础课程总览：从数据语义到模型训练<a class="anchor-link" href="#3.0-%E5%9F%BA%E7%A1%80%E8%AF%BE%E7%A8%8B%E6%80%BB%E8%A7%88%EF%BC%9A%E4%BB%8E%E6%95%B0%E6%8D%AE%E8%AF%AD%E4%B9%89%E5%88%B0%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83">¶</a></h1><blockquote>
 <p>阅读版与 Web 应用内容一致；实验数值来自本 Notebook 的已执行输出。</p>
 </blockquote>
-<h2 id="Goal">Goal<a class="anchor-link" href="#Goal">¶</a></h2><p>面向初次接触推荐算法的读者，用可手算的小例子和图理解后续模型共同依赖的数学积木：数据表、向量、矩阵乘法、点积、余弦相似度、概率、Sigmoid、损失函数、梯度下降，以及 Recall、RMSE、AUC。</p>
+<h2 id="Goal">Goal<a class="anchor-link" href="#Goal">¶</a></h2><p>用一张循序递进的路线图串起六门数学与机器学习基础课，以及最后的数据实验管线。这里建立共同语言和最小手算直觉；完整教学沿 3.0.1—3.0.7 逐课展开。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b8e8bb79">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b844e8eb">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7540,7 +7540,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3f20aa43">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1fe155e3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7550,8 +7550,9 @@ window.MathJax = {
 <div class="highlight hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+<span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="n">ARTIFACT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"RECSYS_ARTIFACT_ROOT"</span><span class="p">,</span> <span class="n">PROJECT_ROOT</span><span class="p">))</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">))</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
 <span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
@@ -7594,7 +7595,7 @@ window.MathJax = {
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"project_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">),</span> <span class="s2">"artifact_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
        <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
        <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
@@ -7604,23 +7605,66 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=30059a79">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=58a6dcc9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Steps">Steps<a class="anchor-link" href="#Steps">¶</a></h2><h2 id="1.-%E4%BB%8E%E2%80%9C%E8%A1%8C%E4%B8%BA%E8%A1%A8%E2%80%9D%E5%88%B0%E7%9F%A9%E9%98%B5">1. 从“行为表”到矩阵<a class="anchor-link" href="#1.-%E4%BB%8E%E2%80%9C%E8%A1%8C%E4%B8%BA%E8%A1%A8%E2%80%9D%E5%88%B0%E7%9F%A9%E9%98%B5">¶</a></h2><p>推荐系统最原始的数据不是公式，而是一张行为表：谁在什么时间看了什么。为了同时观察许多用户与物品，我们把它整理成矩阵 $R$：</p>
+<h2 id="Steps">Steps<a class="anchor-link" href="#Steps">¶</a></h2><h2 id="0.-3.0-%E6%B8%90%E8%BF%9B%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E4%B8%8E%E7%AE%97%E6%B3%95%E4%BE%9D%E8%B5%96%E5%9B%BE">0. 3.0 渐进学习路线与算法依赖图<a class="anchor-link" href="#0.-3.0-%E6%B8%90%E8%BF%9B%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E4%B8%8E%E7%AE%97%E6%B3%95%E4%BE%9D%E8%B5%96%E5%9B%BE">¶</a></h2><p>3.0 负责建立所有算法共用的语言；算法页只展开论文新引入的结构与公式。建议按表格从上到下学习，遇到熟悉内容也可直接跳到对应的精确小节；六门概念课之后，再进入 <a href="/notebooks/3_0_7_data_pipeline">3.0.7 数据与实验基础</a>：</p>
+<table>
+<thead>
+<tr>
+<th>共同领域</th>
+<th>先掌握什么</th>
+<th>后续主要用在</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据与机器学习</td>
+<td><a href="/notebooks/3_0_1_data_ml_basics#observation-label">一行数据、特征与标签</a>；<a href="/notebooks/3_0_1_data_ml_basics#implicit-feedback">显式/隐式反馈、曝光、未知与假负例</a>；<a href="/notebooks/3_0_1_data_ml_basics#split-leakage">切分、泄漏与泛化</a></td>
+<td>全部章节的数据协议与结果边界</td>
+</tr>
+<tr>
+<td>线性代数</td>
+<td><a href="/notebooks/3_0_2_linear_algebra#tensors-shapes">张量形状与轴</a>；<a href="/notebooks/3_0_2_linear_algebra#elementwise-dot">逐元素运算、点积与余弦</a>；<a href="/notebooks/3_0_2_linear_algebra#matmul-embedding">矩阵乘法与 embedding</a></td>
+<td>CF、MF、FM、双塔、注意力</td>
+</tr>
+<tr>
+<td>微积分</td>
+<td><a href="/notebooks/3_0_3_calculus#functions">函数与复合</a>；<a href="/notebooks/3_0_3_calculus#derivative-gradient">偏导与梯度</a>；<a href="/notebooks/3_0_3_calculus#chain-rule">链式法则与反向传播</a></td>
+<td>所有需要训练参数的模型</td>
+</tr>
+<tr>
+<td>概率与统计</td>
+<td><a href="/notebooks/3_0_4_probability_statistics#conditional-chain">条件概率</a>；<a href="/notebooks/3_0_4_probability_statistics#expectation-variance">期望与方差</a>；<a href="/notebooks/3_0_4_probability_statistics#likelihood-calibration">odds、logit 与校准</a></td>
+<td>CTR、多任务、序列生成与实验解读</td>
+</tr>
+<tr>
+<td>信息论</td>
+<td><a href="/notebooks/3_0_5_information_theory#cross-entropy-kl">交叉熵与 KL</a>；<a href="/notebooks/3_0_5_information_theory#softmax-temperature">Softmax、温度与 NE</a>；<a href="/notebooks/3_0_5_information_theory#sequence-nll-dpo">序列 NLL</a></td>
+<td>LR/GBDT、word2vec、DSSM、Transformer</td>
+</tr>
+<tr>
+<td>优化</td>
+<td><a href="/notebooks/3_0_6_optimization#sgd">SGD 与 mini-batch</a>；<a href="/notebooks/3_0_6_optimization#learning-rate">学习率</a>；<a href="/notebooks/3_0_6_optimization#regularization">正则化、过拟合与早停</a></td>
+<td>MF、深度模型、生成式模型</td>
+</tr>
+</tbody>
+</table>
+<p>依赖顺序可以压成一句话：<strong>先说明一行数据代表什么 → 写出数组形状与运算 → 把模型看成复合函数 → 用概率定义预测与损失 → 用梯度和小批次优化 → 用指标检查泛化。</strong></p>
+<h2 id="1.-%E4%BB%8E%E2%80%9C%E8%A1%8C%E4%B8%BA%E8%A1%A8%E2%80%9D%E5%88%B0%E7%9F%A9%E9%98%B5">1. 从“行为表”到矩阵<a class="anchor-link" href="#1.-%E4%BB%8E%E2%80%9C%E8%A1%8C%E4%B8%BA%E8%A1%A8%E2%80%9D%E5%88%B0%E7%9F%A9%E9%98%B5">¶</a></h2><p>推荐系统最原始的数据不是公式，而是一张行为表：谁在什么时间看了什么。为了同时观察许多用户与物品，我们把它整理成矩阵 $R$：</p>
 <ul>
 <li>每一行是一位用户；</li>
 <li>每一列是一个物品；</li>
 <li>数字 1 表示发生过喜欢/点击，0 表示没有观察到；</li>
 <li>$R\in\mathbb R^{3\times4}$ 只是在说“这张表有 3 行、4 列”。</li>
 </ul>
-<p>注意：0 通常表示“未知”，不一定表示讨厌。把未知误当负反馈，是推荐系统常见的数据错误。</p>
+<p>注意数据语义不能混用：星级是用户主动给出的<strong>显式反馈</strong>；点击/观看是行为留下的<strong>隐式反馈</strong>；“曝光后未点击”才是有明确分母的负标签；从未曝光或日志未记录通常只能叫<strong>未知</strong>。从未知项抽作负样本会产生<strong>假负例</strong>，必须记录采样规则。完整例子见 <a href="/notebooks/3_0_1_data_ml_basics#implicit-feedback">3.0.1 显式、隐式反馈与未知项</a>。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=14b8edfa">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e6ad0f9d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7655,7 +7699,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=38e626cc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=82b4b891">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7665,7 +7709,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=921c6a38">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6f572e65">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7682,7 +7726,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b9a1ef57">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=05a7a1dc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7696,7 +7740,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=14661986">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fa6fe1bd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7721,7 +7765,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c05ab189">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6ee9cf59">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7732,10 +7776,11 @@ window.MathJax = {
 <li>$R^\top R$：每个物品与每个物品做点积，得到物品共现矩阵。</li>
 </ul>
 <p>乘法能否进行，只需检查“中间尺寸相同”。$R$ 是 $3\times4$，$R^\top$ 是 $4\times3$，所以 $(3\times4)(4\times3)$ 得到 $3\times3$。</p>
+<p>先看<strong>轴与形状</strong>再看公式：批次张量 $(B,L,d)$ 的三个轴通常是样本、序列位置、特征。<code>a * b</code> 的逐元素乘法保留每个位置，结果仍是向量；<code>a @ b</code> 的点积会把对应位置乘积求和，结果是一个数；矩阵乘法则批量做点积。程序允许广播不代表语义正确，完整手算见 <a href="/notebooks/3_0_2_linear_algebra#tensors-shapes">3.0.2 张量形状与轴</a> 和 <a href="/notebooks/3_0_2_linear_algebra#elementwise-dot">逐元素运算与点积</a>。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=da6186c2">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=855b46fa">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7763,7 +7808,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4096fee2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0d8991fc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7776,10 +7821,12 @@ window.MathJax = {
 </ul>
 <p>LogLoss 衡量概率预测有多糟。真实点击 $y=1$ 时，预测 0.9 只受很小惩罚，预测 0.01 会受到很大惩罚，因为模型“非常自信但答错了”：</p>
 <p>$$L=-[y\log p+(1-y)\log(1-p)]$$</p>
+<p>这里的指数与对数并不神秘：$e^z$ 会把加法尺度变成正的倍数尺度，$\log$ 是它的反函数，并把连乘变回相加。概率 $p$ 对应的 <strong>odds</strong> 是 $p/(1-p)$；取对数得到 $\log\frac{p}{1-p}=z$，所以 Sigmoid 正是在把 log-odds 还原成概率。若已知用户属于某人群 $B$，点击概率写成条件概率 $P(Y=1\mid B)$；许多样本的平均结果由期望 $E[Y]$ 描述。详见 <a href="/notebooks/3_0_4_probability_statistics#conditional-chain">3.0.4 条件概率</a>、<a href="/notebooks/3_0_4_probability_statistics#expectation-variance">期望与方差</a> 和 <a href="/notebooks/3_0_4_probability_statistics#likelihood-calibration">odds、logit 与校准</a>。</p>
+<p>最后要区分<strong>排序</strong>与<strong>校准</strong>：AUC 高只说明正例通常排在负例前；若模型给出 0.8 的一组样本长期只有约 50% 为正，它仍未校准。LogLoss 会惩罚这种概率误差，但上线前仍应画可靠性图。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=df609e40">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=08705c0c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7805,7 +7852,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4dbe70cc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fe1043ad">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7828,7 +7875,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3fc65327">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2932b013">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7858,7 +7905,30 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=08b0ec5c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9c81131a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="5.1-%E9%80%90%E5%85%83%E7%B4%A0%E8%BF%90%E7%AE%97%E3%80%81%E6%AE%8B%E5%B7%AE/LayerNorm-%E4%B8%8E%E5%B8%B8%E8%A7%81%E6%BF%80%E6%B4%BB">5.1 逐元素运算、残差/LayerNorm 与常见激活<a class="anchor-link" href="#5.1-%E9%80%90%E5%85%83%E7%B4%A0%E8%BF%90%E7%AE%97%E3%80%81%E6%AE%8B%E5%B7%AE/LayerNorm-%E4%B8%8E%E5%B8%B8%E8%A7%81%E6%BF%80%E6%B4%BB">¶</a></h3><p>拿到两个同形状向量 $a,b$，<strong>逐元素乘积</strong>（Hadamard 乘积，记作 $\odot$）就是对应位置分别相乘、不再求和：</p>
+<p>$$
+(a\odot b)_i=a_i b_i.
+$$</p>
+<p>DIN/DIEN/HSTU 用它表达“两个向量在每一维上共同激活多少”，和第 2 节的点积（最后求和成一个数）形成对照。把输入跳层加回输出，$H\leftarrow H+X$，叫<strong>残差连接</strong>，为深层网络保留一条直接信息与梯度路径；之后常做 <strong>LayerNorm</strong>，沿特征维标准化再缩放平移，让不同样本的数值尺度更稳定。</p>
+<p>模型本质上是函数复合：$x\rightarrow z\rightarrow h(z)\rightarrow\hat y\rightarrow L$。激活函数就是其中的 $h$：</p>
+<ul>
+<li><strong>ReLU</strong>：$\max(0,z)$，负数截为 0；</li>
+<li><strong>Sigmoid</strong>：$1/(1+e^{-z})$，输出 0～1，可作概率或门；</li>
+<li><strong>Tanh</strong>：输出 -1～1，常与循环网络的门配合；</li>
+<li><strong>Softplus</strong>：$\log(1+e^z)$，是 ReLU 的平滑版本；</li>
+<li><strong>SiLU / Swish</strong>：$z\sigma(z)$，让数值给自己加一道软门。</li>
+</ul>
+<p>这些激活通常逐元素作用，不改变张量形状；Softmax 则跨一组位置归一化并让它们竞争权重。完整的函数复合见 <a href="/notebooks/3_0_3_calculus#functions">3.0.3 函数与复合</a>，逐元素/点积对照见 <a href="/notebooks/3_0_2_linear_algebra#elementwise-dot">3.0.2</a>。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5ff5c412">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7869,11 +7939,12 @@ $$</p>
 <li>坡度为负，向右走能下降；</li>
 <li>接近 0，说明来到谷底附近。</li>
 </ul>
-<p>更新公式 $w\leftarrow w-\eta\nabla L$ 中，$\eta$ 是学习率，像每一步的步长。过大会跨过谷底甚至发散，过小则走得很慢。下面在一元二次函数 $L(w)=(w-3)^2+1$ 上亲手走 12 步。</p>
+<p>多个参数时，“暂时固定其他参数，只让一个参数变化”的坡度叫<strong>偏导</strong>；把所有偏导排在一起就是梯度。模型是复合函数，所以反向传播从损失端按<strong>链式法则</strong>逐层相乘，并在分叉处相加；它不是另一套数学。详见 <a href="/notebooks/3_0_3_calculus#derivative-gradient">3.0.3 偏导与梯度</a> 和 <a href="/notebooks/3_0_3_calculus#chain-rule">链式法则与反向传播</a>。</p>
+<p>更新公式 $w\leftarrow w-\eta\nabla L$ 中，$\eta$ 是学习率，像每一步的步长。过大会跨过谷底甚至发散，过小则走得很慢。实际训练常用 <strong>mini-batch</strong>：每次用一小批样本估计梯度，在内存、速度和噪声间折中。训练误差继续下降而验证误差上升叫<strong>过拟合</strong>；L1/L2 正则化、早停与更多可靠数据都是约束方法。详见 <a href="/notebooks/3_0_6_optimization#sgd">3.0.6 SGD 与 mini-batch</a> 和 <a href="/notebooks/3_0_6_optimization#regularization">正则化与过拟合</a>。下面在一元二次函数 $L(w)=(w-3)^2+1$ 上亲手走 12 步。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=27215ec5">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=01fdb5ea">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7902,7 +7973,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=23d4e74c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=583aefc0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7946,7 +8017,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=201b7f30">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=69041a6b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7976,7 +8047,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=971d2aa3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7e4d5bdf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8008,7 +8079,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=63bc1352">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=71673223">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8038,7 +8109,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6cf7350e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=69c0e0b9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8072,7 +8143,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=03c72eb7">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fba98e38">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8103,7 +8174,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9f164b19">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=20e77b0d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8148,7 +8219,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=227f758e">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=75b3b5ec">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8170,7 +8241,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=65b0bd4a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2af6452d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8179,7 +8250,7 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d6422dab">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1e348e15">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8202,7 +8273,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1e3c1480">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6b8442af">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8220,5 +8291,24 @@ $$</p>
 </div>
 </div>
 </main>
-</body>
+<script id="recsys-preview-link-targets">
+(function () {
+  function retarget() {
+    document.querySelectorAll('a[href]').forEach(function (anchor) {
+      var href = anchor.getAttribute('href');
+      if (!href || href.charAt(0) === '#') return;
+      var url;
+      try { url = new URL(href, document.baseURI); } catch (error) { return; }
+      if (url.origin === location.origin) {
+        if (url.pathname !== location.pathname) anchor.target = '_top';
+      } else {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', retarget);
+  else retarget();
+})();
+</script></body>
 </html>

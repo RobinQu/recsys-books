@@ -20,8 +20,8 @@
       <div class="eyebrow">RECOMMENDER SYSTEMS · 1992—2026</div>
       <h1>从相似度，到向量检索，<br><em>再到生成一个推荐列表</em></h1>
       <p class="lede">以召回与排序两条主线解释推荐系统为何演进，并把论文思想、工业架构与可执行 Notebook 放在同一张图里。</p>
-      <div class="hero-actions"><a class="button" href="#evolution">进入技术图谱 ↓</a><a class="ghost button-like" href="#labs">查看 {{ notebooks|length }} 个实验</a></div>
-      <div class="stats"><div><strong>14</strong><span>核心模型族</span></div><div><strong>{{ notebooks|length }}</strong><span>可执行 Notebook</span></div><div><strong>7</strong><span>开放数据集方案</span></div><div><strong>21+</strong><span>论文与官方资料</span></div></div>
+      <div class="hero-actions"><a class="button" href="#evolution">进入技术图谱 ↓</a><a class="ghost button-like" href="#labs">查看 {{ notebooks|length }} 个 Notebook</a></div>
+      <div class="stats"><div><strong>{{ models|length }}</strong><span>核心模型族</span></div><div><strong>{{ notebooks|length }}</strong><span>可执行 Notebook</span></div><div><strong>{{ datasets|length }}</strong><span>开放数据集方案</span></div><div><strong>21+</strong><span>论文与官方资料</span></div></div>
     </section>
 
     <section id="evolution" class="section reveal">
@@ -46,14 +46,21 @@
 
     <section id="foundations" class="section reveal">
       <div class="section-kicker">3.0 · MATH FOUNDATIONS</div><h2>先把公式翻译成可以手算的直觉</h2>
-      <p class="section-intro">后续模型反复使用的数学其实只有几块积木。这里从“3 个用户 × 4 个物品”的小表开始，不预设大学线性代数或微积分背景；每个概念都配数字、图和 Python 验证。</p>
-      <div class="foundation-flow" aria-label="推荐算法数学学习路径">
-        <article><span>01 · DATA</span><b>行为表 → 矩阵</b><p>行代表用户，列代表物品；1 表示发生过行为，0 表示没有观察到。</p><code>R ∈ ℝ<sup>用户×物品</sup></code></article>
-        <i>→</i><article><span>02 · SIMILARITY</span><b>向量 → 相似度</b><p>点积统计共同选择；除以长度后得到余弦相似度，避免活跃用户天然占优。</p><code>cos(a,b)</code></article>
-        <i>→</i><article><span>03 · LEARNING</span><b>误差 → 参数更新</b><p>损失函数给错误打分；梯度指出“往哪边改会更好”，学习率控制每一步大小。</p><code>θ ← θ − η∇L</code></article>
-        <i>→</i><article><span>04 · EVALUATION</span><b>预测 → 指标</b><p>Recall 看是否找回目标，RMSE 看数值误差，AUC 看正样本能否排在负样本之前。</p><code>Recall / RMSE / AUC</code></article>
+      <p class="section-intro">按八步从高中代数走到推荐论文常见目标：先建立共同语言和可信实验，再补齐线性代数、微积分、概率、优化与信息论。每一步都是已注册的独立课程，可手算、可运行，也可从算法章节按知识点返回复习。</p>
+      {% set foundation_steps = [
+        ('3_0_math_foundations', '01 · COMMON LANGUAGE', '先用小矩阵、向量、概率和指标建立整套教程的共同语言。'),
+        ('3_0_1_data_ml_basics', '02 · DATA & ML', '分清样本、特征、标签、显隐反馈，以及训练集与泛化。'),
+        ('3_0_2_linear_algebra', '03 · LINEAR ALGEBRA', '从张量形状、点积和矩阵乘法走到低秩表示与 Q/K/V。'),
+        ('3_0_3_calculus', '04 · CALCULUS', '从函数与斜率走到梯度、链式法则和反向传播。'),
+        ('3_0_4_probability_statistics', '05 · PROBABILITY', '理解条件概率、期望方差、似然、采样与概率校准。'),
+        ('3_0_5_information_theory', '06 · INFORMATION', '用熵、交叉熵、KL、序列 NLL 与 DPO 读懂训练目标。'),
+        ('3_0_6_optimization', '07 · OPTIMIZATION', '掌握 SGD、Adam、学习率、正则化和多任务梯度冲突。'),
+        ('3_0_7_data_pipeline', '08 · TRUSTED EXPERIMENT', '最后接入真实行为数据、时间切分、训练循环与防泄漏检查。')
+      ] %}
+      <div class="foundation-flow foundation-flow-eight" aria-label="推荐算法数学八步学习路径">
+        {% for step_slug, step_label, step_intro in foundation_steps %}{% for item in notebooks if item.slug == step_slug %}<article><span>{{ step_label }}</span><b><a href="/notebooks/{{ item.slug }}">{{ item.title }}</a></b><p>{{ step_intro }}</p><code>{{ item.framework }}</code></article>{% endfor %}{% endfor %}
       </div>
-      <div class="hero-actions"><a class="button" href="/notebooks/3_0_math_foundations">进入 3.0A 数学基础</a><a class="ghost button-like" href="/notebooks/3_0_data_pipeline">进入 3.0B 数据与实验基础</a><a class="ghost button-like" href="{{ ide_url }}/?folder=/home/coder/project" target="_blank">打开浏览器 IDE ↗</a></div>
+      <div class="hero-actions"><a class="button" href="/notebooks/3_0_math_foundations">从第 1 步开始</a><a class="ghost button-like" href="#math-map">查看知识关系图 ↓</a><a class="ghost button-like" href="{{ ide_url }}/?folder=/home/coder/project" target="_blank">打开浏览器 IDE ↗</a></div>
     </section>
 
     <section id="model-explorer" class="section reveal">
@@ -71,7 +78,7 @@
     {% set chapter_groups = [
       ('retrieval','3.2','召回模型：DSSM、MIND 与 SASRec','3_2_0_retrieval_foundations','3_2_summary','从单向量双塔、多兴趣向量到 Transformer 序列召回；三篇教程分别完成结构推导、真实训练、全库推理和 Top-K 评测。'),
       ('ranking','3.3','排序模型：DeepFM、DIN / DIEN','3_3_0_ranking_foundations','3_3_summary','DeepFM、DIN、DIEN 各自独立成篇，分别讲静态交叉、候选注意力和兴趣演化，并统一比较 AUC、LogLoss、baseline 与服务成本。'),
-      ('multitask','3.4','多目标模型：MMoE / PLE','3_4_0_multitask_foundations','3_4_summary','MMoE 与 PLE 使用同一批 KuaiRand 真实曝光以及 is_click、long_view 原生目标，汇总逐任务指标、负迁移风险与专家服务成本。')
+      ('multitask','3.4','多目标模型：MMoE / PLE','3_4_0_multitask_foundations','3_4_summary','full 档按论文的 Census-Income 任务与官方切分验收；smoke 档让 MMoE 与 PLE 共用 KuaiRand 真实曝光及原生反馈，只比较路由链路、逐任务指标与负迁移风险。')
     ] %}
     {% for anchor,num,title,opening,summary,desc in chapter_groups %}<section id="{{ anchor }}" class="section lab-section reveal"><div class="section-kicker">{{ num }} · HANDS-ON</div><div class="lab-head"><div><h2>{{ title }}</h2><p>{{ desc }}</p></div><div class="lab-actions"><a class="button" href="/notebooks/{{ opening }}">数学导读</a><a class="ghost button-like" href="/notebooks/{{ summary }}">结果总结</a></div></div><div class="direct-chapter-links">{% for model in models if model.chapter == anchor %}<a href="/notebooks/{{ model.notebook }}"><span>{{ model.stage }}</span><b>{{ model.name }}</b><small>{{ model.idea }}</small></a>{% endfor %}</div></section>{% endfor %}
 
@@ -89,15 +96,17 @@
 
     <section id="appendix" class="section appendix reveal">
       <div class="section-kicker">A · APPENDIX</div><h2>附录</h2>
-      <p class="section-intro">集中查阅论文原文、实验数据与全部可执行 Notebook。正文负责建立算法脉络，附录负责提供可核验、可复现的资源入口。</p>
+      <p class="section-intro">集中查阅论文原文、实验数据、数学知识地图与全部可执行 Notebook。正文负责建立算法脉络，附录负责提供可核验、可复现的资源入口。</p>
 
       <section id="sources" class="appendix-subsection"><div class="section-kicker">A.1 · PAPER LEDGER</div><h3>论文及官方资料清单</h3><p class="appendix-intro">优先原始论文、作者或公司官方代码与工程博客；A=生产或一手论文证据，B=官方技术说明，C=研究原型。带本地资源的论文直接进入站内阅读器，可从正文证据锚点跳页。</p><div class="source-list">{% for name,url,type in sources %}{% set local_url = source_paper_links.get(name) %}<a href="{{ local_url or url }}" target="_blank" rel="noreferrer"><span>{{ loop.index }}</span><b>{{ name }}</b><em>{{ type }}{% if local_url %} · 本地 PDF{% endif %}</em><i>↗</i></a>{% endfor %}</div><p class="footnote">完整来源注释与口径见 <a href="/research-ledger">research ledger</a>；本轮汇总的章节与内容验收标准见 <a href="/tutorial-requirements">教程编写规范</a>。旧版长报告保留在 <a href="/legacy">legacy report</a>。</p></section>
 
-      <section id="datasets" class="appendix-subsection"><div class="section-kicker">A.2 · DATASETS</div><h3>开源数据集清单</h3><p class="appendix-intro">经典算法使用便于理解的 MovieLens；深度召回与 SASRec 使用 Amazon Reviews 2023；CTR、行为序列、多目标和 HSTU 使用 KuaiRand 真实短视频曝光。CPU 档只做可复现的确定性切片，不随机制造交互、曝光或标签；所有序列评测按时间切分。</p><div class="dataset-grid">{% for d in datasets %}<a href="{{ d.url }}" target="_blank" rel="noreferrer"><span>{{ d.year }} · {{ d.scale }}</span><h3>{{ d.name }}</h3><p><b>适用：</b>{{ d.fit }}</p><p>{{ d.note }}</p></a>{% endfor %}</div></section>
+      <section id="datasets" class="appendix-subsection"><div class="section-kicker">A.2 · DATASETS</div><h3>开源数据集清单</h3><p class="appendix-intro">数据口径按“算法 × 协议”记录，不把一个数据集套给整章：full 档使用各论文指定的数据版本、过滤、切分与候选集；smoke 档只用真实数据的确定性适配器验证数据契约、张量形状和有界训练。两档结果不可直接相减，也不随机制造交互、曝光或标签；具体执行事实以 Notebook 内的 provenance 为准。</p><div class="dataset-grid">{% for d in datasets %}<a href="{{ d.url }}" target="_blank" rel="noreferrer"><span>{{ d.year }} · {{ d.scale }}</span><h3>{{ d.name }}</h3><p><b>适用：</b>{{ d.fit }}</p><p>{{ d.note }}</p></a>{% endfor %}</div></section>
 
-      <section id="labs" class="appendix-subsection"><div class="section-kicker">A.3 · NOTEBOOKS</div><h3>Notebook 实验目录</h3><p class="appendix-intro">每个条目都可进入阅读友好的实验预览，或在 JupyterLab 中重新运行训练、推理和评测代码。</p><div class="notebook-list">{% for n in notebooks %}<article id="{{ n.slug }}"><div><span>{{ n.framework }}</span><h3>{{ n.title }}</h3><p>{{ n.dataset }} · {{ n.runtime }}</p></div><div><a href="/notebooks/{{ n.slug }}" target="_blank">预览</a><a href="{{ jupyter_url }}/lab/tree/notebooks/{{ n.slug }}.ipynb?token=recsys" target="_blank">运行 ↗</a></div></article>{% endfor %}</div></section>
+      <section id="labs" class="appendix-subsection"><div class="section-kicker">A.3 · NOTEBOOKS</div><h3>Notebook 课程与实验目录</h3><p class="appendix-intro">每个条目都可进入阅读友好的预览，或在 JupyterLab 中重新运行相应示例与实验。</p><div class="notebook-list">{% for n in notebooks %}<article id="{{ n.slug }}" data-notebook-kind="{{ n.kind }}"><div><span>{{ notebook_kind_labels[n.kind] }} · {{ n.framework }}</span><h3>{{ n.title }}</h3><p>{{ n.dataset }} · {{ n.runtime }}</p></div><div><a href="/notebooks/{{ n.slug }}" target="_blank">预览</a><a href="{{ jupyter_url }}/lab/tree/notebooks/{{ n.slug }}.ipynb?token=recsys" target="_blank">{{ '练习' if n.kind == 'curriculum' else '运行' }} ↗</a></div></article>{% endfor %}</div></section>
+
+      <section id="math-map" class="appendix-subsection"><div class="section-kicker">A.4 · KNOWLEDGE GRAPH</div><h3>教程知识图谱</h3><p class="appendix-intro">从六个主章节进入，查看它依赖的模型与数学知识；点击节点可读关系并跳转到对应课程。图谱只展开当前学习路径，保持在两跳和有限节点内。</p><script id="knowledge-graph-data" type="application/json">{{ knowledge_graph | tojson }}</script><div id="knowledge-graph" aria-label="章节、模型与数学知识关系图"></div><noscript><p class="appendix-intro">启用 JavaScript 后可交互查看知识关系；全部课程仍可从上方 3.0 学习路径进入。</p></noscript></section>
     </section>
   </main>
   <footer><span>RecSys Atlas · 研究、教学与可执行实验的一体化工作台</span><a href="#overview">回到顶部 ↑</a></footer>
-  <script src="/static/app.js?v=20260717-3" defer></script>
+  <script src="/static/app.js?v=20260721-1" defer></script>
 </body></html>

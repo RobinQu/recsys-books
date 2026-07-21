@@ -1,8 +1,8 @@
 # RecSys Atlas
 
-RecSys Atlas 是一套从协同过滤到生成式推荐的中文交互式教程。它把召回与排序的技术演进、论文原文证据、26 个可执行 Notebook、章节源码、真实数据实验和工业实践放进同一个 Python Web 应用；论文、数据集与 Notebook 总目录集中收录在首页附录。
+RecSys Atlas 是一套从协同过滤到生成式推荐的中文交互式教程。它把召回与排序的技术演进、论文原文证据、33 个可执行 Notebook、章节源码、真实数据实验和工业实践放进同一个 Python Web 应用；论文、数据集与 Notebook 总目录集中收录在首页附录。
 
-第三章按“数学导读 → 独立算法 → 指标总结”组织，覆盖 CF、MF、FM、GBDT+LR，DSSM、MIND、SASRec，DeepFM、DIN、DIEN，以及 MMoE、PLE。第四章解释生成式召回、生成式排序和召排融合，并提供 OpenOneRec 与 DLRM HSTU 实战。每个详情页固定提供“论文导读、实验预览、可交互执行、代码实现”四种模式；论文导读以等宽双栏并排展示正文和本地 PDF，正文中的多处下划线标注可直接跳到模型结构、实验设计或结论所在页面。
+3.0 先以总览串起六门共性课程，再进入数据与实验管线；算法页只展开论文新增数学，其余概念精确回链到 3.0 稳定锚点。第三章随后按“章节导读 → 独立算法 → 指标总结”组织，覆盖 CF、MF、FM、GBDT+LR，DSSM、MIND、SASRec，DeepFM、DIN、DIEN，以及 MMoE、PLE。第四章解释生成式召回、生成式排序和召排融合，并提供 OpenOneRec 与 DLRM HSTU 实战。首页 Appendix A.4 只提供有界数学知识图，不重复建立课程目录。
 
 ## 1. 初始化论文与数据资源
 
@@ -30,7 +30,7 @@ Hugging Face gated 数据需先在网页接受许可并设置 `HF_TOKEN`。Googl
 docker compose up --build web jupyter ide
 ```
 
-生成式推荐默认要求 NVIDIA CUDA。GPU 主机使用 Compose 覆盖文件把设备传入 Web、Jupyter 和测试容器：
+生成式推荐默认要求 NVIDIA CUDA。GPU 主机使用 Compose 覆盖文件，把基础镜像换成 `Dockerfile.cuda` 构建的 CUDA 版 PyTorch 镜像（本地标签 `recsys-atlas-cuda`），并把设备传入 Web、Jupyter 和测试容器：
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.cuda.yml up --build web jupyter ide
@@ -99,7 +99,7 @@ docker compose --profile full run --rm test-full
 
 `smoke` 结果不得与论文表格相减；Notebook 只有在 full 数据名称与复现协议匹配时才显示数值 gap，否则明确标记 `NOT COMPARABLE`。
 
-推送 `main` 后，GitHub Actions 会构建 Web 和 IDE 镜像并推送到 GitHub Container Registry。仓库需要允许 Actions 写入 Packages；工作流使用内置 `GITHUB_TOKEN`，无需提交凭据。
+推送 `main` 后，GitHub Actions 会构建 CPU（`Dockerfile`）与 CUDA（`Dockerfile.cuda`）两套 Web 镜像以及 IDE 镜像，并推送到 GitHub Container Registry（`recsys-atlas`、`recsys-atlas-cuda`、`recsys-atlas-ide`）。仓库需要允许 Actions 写入 Packages；工作流使用内置 `GITHUB_TOKEN`，无需提交凭据。
 
 ## 6. 贡献检查表
 
@@ -108,3 +108,44 @@ docker compose --profile full run --rm test-full
 3. 深度算法默认使用适合其任务的完整新数据，不把 MovieLens 用于所有章节。
 4. 新论文先登记资源清单与证据锚点，再链接正文。
 5. 运行 Compose 测试并检查明暗主题、窄屏布局、PDF 跳页和 Jupyter/IDE 入口。
+
+---
+目前章节页面的notebook预览版本页面中，使用了 iframe 对 notebook 页面进行嵌入。但在iframe里部分链接引用了本教程的其他页面，然后导致了双重页面框架的展示。
+
+比如，[3.0章节](http://localhost:8010/notebooks/3_0_math_foundations) 点击 notebook 里 “一行数据、特征与标签” ，会打开完整版本”3.0.1“的页面，导致出现了两个侧边栏等内容。
+
+请思考优化方案，比如每个章节的页面能够感知是否处于嵌入模式，并自动隐藏sidebar、topbar 等附属模块。
+
+
+---
+
+http://localhost:8010/notebooks/3_0_1_data_ml_basics#implicit-feedback
+
+该notebook的预览结果里有大量 warning 日志，且图表上的中文字符显示未乱码。请修复。
+
+<KERNEL_TEMP>:8: UserWarning: Glyph 30495 (\N{CJK UNIFIED IDEOGRAPH-771F}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 23454 (\N{CJK UNIFIED IDEOGRAPH-5B9E}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 34892 (\N{CJK UNIFIED IDEOGRAPH-884C}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 25968 (\N{CJK UNIFIED IDEOGRAPH-6570}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 19982 (\N{CJK UNIFIED IDEOGRAPH-4E0E}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 20307 (\N{CJK UNIFIED IDEOGRAPH-4F53}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 19981 (\N{CJK UNIFIED IDEOGRAPH-4E0D}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 26159 (\N{CJK UNIFIED IDEOGRAPH-662F}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 21516 (\N{CJK UNIFIED IDEOGRAPH-540C}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 19968 (\N{CJK UNIFIED IDEOGRAPH-4E00}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 20010 (\N{CJK UNIFIED IDEOGRAPH-4E2A}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 27010 (\N{CJK UNIFIED IDEOGRAPH-6982}) missing from font(s) DejaVu Sans.
+  plt.title("真实行数与实体数不是同一个概念"); plt.tight_layout(); plt.show()
+<KERNEL_TEMP>:8: UserWarning: Glyph 24565 (\N{CJK UNIFIED IDEOGRAPH-5FF5}) missing from font(s) DejaVu Sans.
+

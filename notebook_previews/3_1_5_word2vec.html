@@ -7517,7 +7517,7 @@ window.MathJax = {
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=287edd4f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cb3fe605">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7530,7 +7530,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=96d13f4c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d4f174ac">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7540,18 +7540,19 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=54e1173c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8b1d7919">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+<span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+<span class="n">ARTIFACT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"RECSYS_ARTIFACT_ROOT"</span><span class="p">,</span> <span class="n">PROJECT_ROOT</span><span class="p">))</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">))</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
 <span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
@@ -7594,7 +7595,7 @@ window.MathJax = {
     <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
     <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
     <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"project_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">),</span> <span class="s2">"artifact_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
        <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
        <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
@@ -7603,20 +7604,8 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'profile': 'smoke', 'root': '/Users/robinqu/Documents/recsys', 'real_dataset': {'dataset': 'MovieLens latest-small (GroupLens, generated 2018-09-26)', 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'license_file': '/Users/robinqu/Documents/recsys/data/ml-latest-small/README.txt', 'profile': 'smoke', 'slice_rule': 'deterministic user/item subset', 'rows_used': 26732, 'users_used': 120, 'items_used': 600, 'time_min_utc': '1996-10-17T11:51:49+00:00', 'time_max_utc': '2018-09-13T21:38:16+00:00', 'positive_rule': 'like := observed rating &gt;= 4.0; very_like := observed rating &gt;= 4.5', 'randomly_fabricated_rows': 0}, 'cuda_available': False, 'cuda_device': None}
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e493f8d0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=734fd7cf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7627,7 +7616,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b2b418ee">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ff78aa85">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7636,14 +7625,14 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fd247e3d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bb2a5afd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
@@ -7661,101 +7650,8 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'rows': 14714, 'users': 80, 'items': 360, 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'fabricated_rows': 0}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>userId</th>
-<th>movieId</th>
-<th>rating</th>
-<th>timestamp</th>
-<th>title</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>0</th>
-<td>6</td>
-<td>590</td>
-<td>5.0</td>
-<td>845553109</td>
-<td>Dances with Wolves (1990)</td>
-</tr>
-<tr>
-<th>1</th>
-<td>6</td>
-<td>592</td>
-<td>3.0</td>
-<td>845553109</td>
-<td>Batman (1989)</td>
-</tr>
-<tr>
-<th>2</th>
-<td>6</td>
-<td>150</td>
-<td>4.0</td>
-<td>845553110</td>
-<td>Apollo 13 (1995)</td>
-</tr>
-<tr>
-<th>3</th>
-<td>6</td>
-<td>296</td>
-<td>2.0</td>
-<td>845553110</td>
-<td>Pulp Fiction (1994)</td>
-</tr>
-<tr>
-<th>4</th>
-<td>6</td>
-<td>380</td>
-<td>4.0</td>
-<td>845553110</td>
-<td>True Lies (1994)</td>
-</tr>
-<tr>
-<th>5</th>
-<td>6</td>
-<td>153</td>
-<td>3.0</td>
-<td>845553146</td>
-<td>Batman Forever (1995)</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d9e30f42">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e0840f7f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7765,22 +7661,32 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ccefc763">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=63748878">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="2.-word2vec%EF%BC%9ASkip-gram-%E4%B8%8E%E8%B4%9F%E9%87%87%E6%A0%B7">2. word2vec：Skip-gram 与负采样<a class="anchor-link" href="#2.-word2vec%EF%BC%9ASkip-gram-%E4%B8%8E%E8%B4%9F%E9%87%87%E6%A0%B7">¶</a></h2><h3 id="2.1-%E7%9B%B4%E8%A7%89">2.1 直觉<a class="anchor-link" href="#2.1-%E7%9B%B4%E8%A7%89">¶</a></h3><p>对序列 <code>[i0, i1, i2, i3]</code>、窗口 1，生成正对 <code>(i0,i1),(i1,i0),(i1,i2),(i2,i1),(i2,i3),(i3,i2)</code>。每对训练“中心预测上下文”；再为每对配几个随机负物品。训练后取中心嵌入作为物品向量。</p>
-<h3 id="2.2-%E6%95%B0%E5%AD%A6%EF%BC%9A%E8%B4%9F%E9%87%87%E6%A0%B7%E7%9B%AE%E6%A0%87">2.2 数学：负采样目标<a class="anchor-link" href="#2.2-%E6%95%B0%E5%AD%A6%EF%BC%9A%E8%B4%9F%E9%87%87%E6%A0%B7%E7%9B%AE%E6%A0%87">¶</a></h3><p>对正对 $(c,w)$ 和负样本集合 $\mathcal{N}$：</p>
+<h3 id="2.2-%E6%95%B0%E5%AD%A6%EF%BC%9A%E8%B4%9F%E9%87%87%E6%A0%B7%E7%9B%AE%E6%A0%87">2.2 数学：负采样目标<a class="anchor-link" href="#2.2-%E6%95%B0%E5%AD%A6%EF%BC%9A%E8%B4%9F%E9%87%87%E6%A0%B7%E7%9B%AE%E6%A0%87">¶</a></h3><p><strong>通用先修：</strong> <a href="/notebooks/3_0_1_data_ml_basics#implicit-feedback">3.0.1 隐式反馈与假负例</a> · <a href="/notebooks/3_0_2_linear_algebra#matmul-embedding">3.0.2 点积与 embedding</a> · <a href="/notebooks/3_0_5_information_theory#cross-entropy-kl">3.0.5 二元交叉熵</a><br/>
+<strong>本论文新增数学：</strong> Skip-gram 的中心/上下文双 embedding、负采样目标，以及按出现次数的 $0.75$ 次幂构造噪声分布。</p>
+<p>先说符号：每个物品有两套向量——作中心词时用 $v_c$，作上下文时用 $v_w$（分开学习更稳定，推理时只保留中心向量）；$\sigma(a)=1/(1+e^{-a})$ 把内积压成“会共现”的概率。对正对 $(c,w)$ 和负样本集合 $\mathcal{N}$：</p>
 <p>$$
 \mathcal{L}=-\log\sigma(v_c\cdot v_w)-\sum_{n\in\mathcal{N}}\log\sigma(-v_c\cdot v_n)
 $$</p>
+<p>第一项希望正对内积大（$\sigma(v_c\cdot v_w)$ 接近 1）；第二项希望负样本内积小（$\sigma(-v_c\cdot v_n)$ 接近 1，等价于 $\sigma(v_c\cdot v_n)$ 接近 0）。为什么不直接对整个物品表做 softmax？因为分母要遍历全部物品，代价随目录线性增长；负采样把它近似为几个二分类，训练代价与物品总数无关。</p>
+<p><strong>手算一遍。</strong> 取 $v_c=[1,0]$，正样本 $v_w=[0.8,0.2]$：内积 $=0.8$，$\sigma(0.8)\approx0.69$，$-\log0.69\approx0.37$。负样本 $v_n=[-1,1]$：内积 $=-1$，$\sigma(1)\approx0.73$，$-\log0.73\approx0.31$。合计 $\mathcal L\approx0.68$；训练会把 $v_c$ 推向 $v_w$、推离 $v_n$，两项随之变小。</p>
 <p>内积越大、Sigmoid 越接近 1；负样本希望内积小、Sigmoid 接近 0。它等价于对正负样本做带 Logits 的二元交叉熵。</p>
+<p>负物品也不是随便均匀抽。word2vec 论文实现常用 unigram 分布的 $0.75$ 次幂：若物品 $i$ 在训练上下文中出现 $c_i$ 次，</p>
+<p>$$
+P_n(i)=\frac{c_i^{0.75}}{\sum_j c_j^{0.75}}.
+$$</p>
+<p>$0.75&lt;1$ 会压平头部：热门物品仍比冷门物品更常成为负例，但不会完全支配训练。被采为负例只表示“本次窗口没有把它当正上下文”，不证明用户讨厌它，因此仍可能是假负例。</p>
+<p>还要标清迁移边界：Mikolov 论文研究的是文本词与语言上下文；<strong>Item2Vec</strong> 才把词换成物品、句子换成会话/行为篮子。可迁移的是“局部共现可学习 embedding”的结构，不能把词语的句法/语义结论直接宣称为用户偏好，也不能把未共现解释成真实负反馈。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a3ab395b">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=61dd9454">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7789,14 +7695,14 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a9105ac2">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6d2a0c73">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">toy_sequences</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
+<div class="highlight hl-python"><pre><span></span><span class="n">toy_sequences</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">skip_gram_pairs</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">pairs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -7815,20 +7721,8 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>toy 正对数: 16 示例: [(1, 2), (2, 1), (2, 3), (3, 2), (3, 2), (2, 3)]
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2213e833">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7c4b65b3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7837,14 +7731,14 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=78a1ac95">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a215ec3f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SkipGram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="highlight hl-python"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SkipGram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_items</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="c1"># 中心嵌入与上下文嵌入分离，是 word2vec 的常规做法；负采样时只更新相关行。</span>
@@ -7868,12 +7762,20 @@ $$</p>
 <span class="n">context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
 
+<span class="c1"># 论文式噪声分布：上下文出现次数的 0.75 次幂，而不是均匀采样。</span>
+<span class="n">context_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">minlength</span><span class="o">=</span><span class="n">num_items</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">negative_sampling_probability</span> <span class="o">=</span> <span class="n">context_counts</span> <span class="o">**</span> <span class="mf">0.75</span>
+<span class="n">negative_sampling_probability</span> <span class="o">/=</span> <span class="n">negative_sampling_probability</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
 <span class="n">model</span> <span class="o">=</span> <span class="n">SkipGram</span><span class="p">(</span><span class="n">num_items</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
 <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">NUM_NEG</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
-    <span class="n">neg_items</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_items</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pairs</span><span class="p">),</span> <span class="n">NUM_NEG</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+    <span class="n">neg_items</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_items</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pairs</span><span class="p">),</span> <span class="n">NUM_NEG</span><span class="p">),</span> <span class="n">p</span><span class="o">=</span><span class="n">negative_sampling_probability</span><span class="p">),</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">score_pos</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
     <span class="n">score_neg</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">center</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">NUM_NEG</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">neg_items</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">pos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">binary_cross_entropy_with_logits</span><span class="p">(</span><span class="n">score_pos</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">score_pos</span><span class="p">))</span>
@@ -7887,20 +7789,8 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'pairs': 45006, 'num_items': 361, 'loss_first': 1.3863, 'loss_last': 1.246}
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bf1bcd21">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=024a6ce7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7909,14 +7799,14 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1ffbcbcb">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2be0001a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+<div class="highlight hl-python"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
     <span class="n">embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">normed</span> <span class="o">=</span> <span class="n">embeddings</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">norms</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">)</span>
@@ -7956,33 +7846,8 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'word2vec_recall@5': 0.05, 'coverage': 0.1828, 'num_test_users': 80}
-anchor: Forrest Gump (1994)
-近邻: ['Being John Malkovich (1999)', 'Raiders of the Lost Ark (Indiana Jones and the Raiders of the Lost Ark) (1981)', 'Toy Story (1995)', 'Groundhog Day (1993)', 'Dances with Wolves (1990)']
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>/var/folders/hr/4rmk0wyj2t5f2n2j0gw7cfb80000gn/T/ipykernel_68941/3040769274.py:30: RuntimeWarning: divide by zero encountered in matmul
-  sims = normed @ normed[mode_item + 1]
-/var/folders/hr/4rmk0wyj2t5f2n2j0gw7cfb80000gn/T/ipykernel_68941/3040769274.py:30: RuntimeWarning: overflow encountered in matmul
-  sims = normed @ normed[mode_item + 1]
-/var/folders/hr/4rmk0wyj2t5f2n2j0gw7cfb80000gn/T/ipykernel_68941/3040769274.py:30: RuntimeWarning: invalid value encountered in matmul
-  sims = normed @ normed[mode_item + 1]
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6404519c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=52b95e23">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7995,7 +7860,7 @@ anchor: Forrest Gump (1994)
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f8bc8332">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6310c1c6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8004,14 +7869,14 @@ anchor: Forrest Gump (1994)
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c57b2284">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c61d1379">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<div class="highlight hl-python"><pre><span></span><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
 <span class="k">assert</span> <span class="n">losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">losses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">word2vec_recall_at_5</span> <span class="o">&lt;=</span> <span class="mi">1</span>
 <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">word2vec_coverage</span> <span class="o">&lt;=</span> <span class="mi">1</span>
@@ -8021,26 +7886,14 @@ anchor: Forrest Gump (1994)
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>PASS：word2vec / Item2Vec 序列构造、Skip-gram 训练与向量召回均有效。
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=aebd87c7">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=15f2cfcd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">result_dir</span> <span class="o">=</span> <span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"results"</span> <span class="o">/</span> <span class="s2">"chapter_3_1"</span><span class="p">;</span> <span class="n">result_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight hl-python"><pre><span></span><span class="n">result_dir</span> <span class="o">=</span> <span class="n">ARTIFACT_ROOT</span> <span class="o">/</span> <span class="s2">"results"</span> <span class="o">/</span> <span class="s2">"chapter_3_1"</span><span class="p">;</span> <span class="n">result_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"records"</span><span class="p">:</span> <span class="p">[</span>
     <span class="p">{</span><span class="s2">"algorithm"</span><span class="p">:</span> <span class="s2">"word2vec / Item2Vec"</span><span class="p">,</span> <span class="s2">"task"</span><span class="p">:</span> <span class="s2">"Top-K"</span><span class="p">,</span> <span class="s2">"metric"</span><span class="p">:</span> <span class="s2">"Recall@5 ↑"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span> <span class="n">word2vec_recall_at_5</span><span class="p">,</span>
      <span class="s2">"secondary_metric"</span><span class="p">:</span> <span class="s2">"Coverage"</span><span class="p">,</span> <span class="s2">"secondary_value"</span><span class="p">:</span> <span class="n">word2vec_coverage</span><span class="p">,</span>
@@ -8053,20 +7906,8 @@ anchor: Forrest Gump (1994)
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>已写出章节指标：word2vec.json
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=642c107c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dd051281">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8077,5 +7918,24 @@ anchor: Forrest Gump (1994)
 </div>
 </div>
 </main>
-</body>
+<script id="recsys-preview-link-targets">
+(function () {
+  function retarget() {
+    document.querySelectorAll('a[href]').forEach(function (anchor) {
+      var href = anchor.getAttribute('href');
+      if (!href || href.charAt(0) === '#') return;
+      var url;
+      try { url = new URL(href, document.baseURI); } catch (error) { return; }
+      if (url.origin === location.origin) {
+        if (url.pathname !== location.pathname) anchor.target = '_top';
+      } else {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', retarget);
+  else retarget();
+})();
+</script></body>
 </html>

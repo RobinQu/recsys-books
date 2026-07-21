@@ -48,7 +48,7 @@
         "label": "原文：相关与预测",
         "page": 2,
         "search": "correlates the ratings in order to determine",
-        "quote": "First, it correlates the ratings in order to determine which users' ratings are most similar to each other. Second, it predicts how well users will like new articles, based on ratings from similar users.",
+        "quote": "First, it correlates the ratings in order to determine which users’ ratings are most similar to each other. Second, it predicts how well users will like new articles, based on ratings from similar users.",
         "note": "协同过滤的两步：先算用户相似度，再用相似用户的评分预测目标用户偏好。"
       },
       {
@@ -99,17 +99,18 @@
         "page": 9,
         "search": "We expect prediction quality to increase as the number of users increases",
         "quote": "We expect prediction quality to increase as the number of users increases, since more data will be available to the prediction algorithm.",
-        "note": "论文认为随着用户数量增加，预测质量应提升，同时关注计算与存储的可扩展性；这是推荐系统冷启动与规模化讨论的早期来源。"
+        "note": "在 Scale Issues 一节，论文预计用户越多、可用于预测的数据越多，预测质量越高；同时指出瓶颈在评分数据的传输与存储。这是推荐系统规模化讨论的早期来源。"
       }
     ],
     "guide": {
-      "problem": "Usenet netnews 每天产生海量文章，用户只能靠编辑审核、kill file 或字符串搜索过滤，无法利用群体的主观偏好。核心问题是：如何在开放、去中心的 netnews 环境下让用户互助过滤——既聚合[[口味相近者|1|abs-heuristic]]的评分给出预测，又允许[[匿名身份|1|abs-pseudonyms]]保护隐私。",
-      "innovation": "提出“协同过滤”思想：让[[他人的主观评价|1|abs-cf-definition]]帮助个人做选择；并用[[兴趣一致性启发式|1|abs-heuristic]]把问题转化为“找相似用户、聚合其评分”。更关键的是，论文没有把方法停留在算法层面，而是设计了[[开放可互操作的系统架构|1|grouplens-architecture]]，使新闻客户端、Better Bit Bureaus（评分服务器）能独立开发并协同工作。",
-      "method": "实现上采用两步走：先[[用皮尔逊相关计算用户相似度|2|cf-twostep]]，再[[把相似用户的评分加权聚合|3|grouplens-mechanism]]为目标用户生成预测。系统层面，GroupLens 是[[分布式评分收集与预测系统|3|system-def]]；用户通过新闻客户端打分，评分服务器（Better Bit Bureaus）存储、传播并生成预测分数。",
-      "findings": "系统可运行且预测有效；用户可用[[匿名身份评分|1|abs-pseudonyms]]而不损失预测质量；开放协议允许多个独立实现互操作；随着用户增长，[[预测质量应持续提升|3|scalability]]，只在传输与存储上存在潜在瓶颈。",
-      "contribution": "首次把“协同过滤”落成可运行的开放系统，奠定 UserCF 邻域加权预测的原型，是推荐系统协同过滤的起源论文；其“开放架构+评分服务器”的设计也成为后续分布式推荐系统的参照。",
-      "limitations": "依赖显式评分；稀疏与冷启动下近邻难找；共现继承热门偏置；近邻计算随用户增长代价高；场景局限于 netnews/文本新闻；没有系统的大规模离线评测指标。",
-      "one_liner": "把“相似用户的评分加权”落成[[开放可互操作的 netnews 过滤系统|1|grouplens-architecture]]，奠定协同过滤与 UserCF 的原型。"
+      "background": "把时钟拨回 1994 年：Usenet 新闻组（netnews）每天涌入海量文章，读者只能靠订阅精选板块或手工维护 kill file 来过滤。Resnick 等人在明尼苏达大学提出一个朴素想法——既然朋友的推荐往往比编辑更懂你，为什么不让读者互相帮助？GroupLens 就是把想法做成的第一个开放系统，它后来孕育了 MovieLens 数据集和整个推荐系统研究方向。",
+      "problem": "新闻组没有中心编辑，文章量远超人工筛选能力。系统要同时回答三个问题：怎样用 1～5 分的[[主观评分|1|abs-cf-definition]]表达口味；怎样在去中心、跨站点的 netnews 架构里收集、传播评分；以及怎样让用户用[[匿名身份|1|abs-pseudonyms]]评分而不损失预测效果。",
+      "innovation": "论文第一次把协同过滤定义为[[用他人的意见帮助个人做选择|1|abs-cf-definition]]，并提出[[兴趣一致性启发式|1|abs-heuristic]]：过去评价一致的人，未来大概率也一致。同样重要的是系统设计：[[整个架构保持开放|1|grouplens-architecture]]，新闻客户端与评分服务器（Better Bit Bureaus）可以独立实现、互操作——算法与系统在同一篇论文里落地。",
+      "method": "预测分[[两步|2|cf-twostep]]：先计算用户两两之间的皮尔逊相关系数（-1 到 1 的权重，只在双方都评过的文章上计算），再把相似用户的评分按权重加权平均。论文第 7 页给出[[完整手算示例|7|worked-example]]：Ken 与 Lee 的相关系数为 -0.8、与 Meg 为 +1、与 Nan 为 0，于是 Ken 对第 6 篇文章的预测分为 4.56，而 Nan 只有 3.75。工程上，[[评分服务器聚合多个评价者的评分|3|grouplens-mechanism]]，[[GroupLens 作为分布式系统|3|system-def]]负责收集、传播和利用评分；[[图 1|4|fig1-netnews]]是底层 netnews 架构，[[图 2|4|fig2-grouplens]]是加入评分服务器后的完整结构。",
+      "findings": "这是 1994 年的系统论文，没有留出测试集上的误差数字，证据是两次试点：Schlumberger 实验室约 7 人的早期试点提示人数太少拿不到协同过滤的全部收益；明尼苏达 4 人试点中，所有参与者都报告预测分数最终与他们的兴趣相当吻合。论文还专门讨论规模问题：[[预计预测质量随用户增长而提升|9|scalability]]，瓶颈在评分数据的传输与存储。",
+      "contribution": "开创了协同过滤这一方向：邻域加权预测原型、1～5 星评分、开放架构都原样保留在今天的推荐系统里。GroupLens 小组随后发布的 MovieLens 数据集成为推荐研究的标准基准；Sarwar 2001 的 ItemCF 与 Koren 2009 的矩阵分解都能追溯到这篇论文。",
+      "limitations": "依赖显式评分，评分稀疏时找不到共同评过文章的邻居；试点规模极小（个位数用户），没有大规模离线指标；近邻计算随用户增长变贵；论文自己也承认[[规模问题仍需进一步研究|9|scalability]]。这些空白正是后续 ItemCF 与矩阵分解要回答的。",
+      "one_liner": "把『[[过去口味一致的人未来也会一致|1|abs-heuristic]]』落成[[开放可互操作的 netnews 过滤系统|1|grouplens-architecture]]，奠定协同过滤与 UserCF 的原型。"
     },
     "quick_index": [
       {
@@ -143,10 +144,28 @@
         "kind": "method"
       },
       {
+        "label": "图 1：netnews 架构",
+        "page": 4,
+        "evidence_id": "fig1-netnews",
+        "kind": "figure"
+      },
+      {
         "label": "图 2：GroupLens 架构",
         "page": 4,
         "evidence_id": "fig2-grouplens",
         "kind": "figure"
+      },
+      {
+        "label": "手算预测示例",
+        "page": 7,
+        "evidence_id": "worked-example",
+        "kind": "method"
+      },
+      {
+        "label": "规模与扩展性",
+        "page": 9,
+        "evidence_id": "scalability",
+        "kind": "conclusion"
       }
     ]
   },
@@ -188,8 +207,8 @@
         "keyword": "ALS",
         "label": "原文：交替最小二乘",
         "page": 4,
-        "search": "Alternating least squares",
-        "quote": "Because both qi and pu are unknowns, Equation 2 is not convex. However, if we fix one of the unknowns, the optimization problem becomes quadratic and can be solved optimally.",
+        "search": "ALS techniques rotate",
+        "quote": "Thus, ALS techniques rotate between fixing the qi’s and fixing the pu’s. When all pu’s are fixed, the system recomputes the qi’s by solving a least-squares problem, and vice versa.",
         "note": "固定用户向量解物品向量、再固定物品向量解用户向量，适合并行和隐反馈场景。"
       },
       {
@@ -198,9 +217,9 @@
         "keyword": "偏置项",
         "label": "原文：加入偏置",
         "page": 4,
-        "search": "adding biases",
-        "quote": "One benefit of the matrix factorization approach to collaborative filtering is its flexibility in dealing with various data aspects",
-        "note": "全局均值、用户偏置、物品偏置吸收打分尺度和物品热度，是 MF 工程化关键扩展。"
+        "search": "large systematic tendencies",
+        "quote": "For example, typical collaborative filtering data exhibits large systematic tendencies for some users to give higher ratings than others, and for some items to receive higher ratings than others.",
+        "note": "偏置吸收『有人打分偏松、有人偏紧、有些物品普遍高分』的系统性差异；全局均值、用户偏置、物品偏置是 MF 工程化的关键扩展。"
       },
       {
         "id": "implicit-feedback",
@@ -208,8 +227,8 @@
         "keyword": "隐式反馈",
         "label": "原文：隐式反馈",
         "page": 5,
-        "search": "implicit feedback",
-        "quote": "When explicit feedback is not available, recommender systems can infer user preferences using implicit feedback",
+        "search": "use implicit feedback to gain insight",
+        "quote": "Recommender systems can use implicit feedback to gain insight into user preferences.",
         "note": "将点击、浏览、购买等隐式信号纳入 MF，使模型适用于更广泛的推荐场景。"
       },
       {
@@ -221,16 +240,57 @@
         "search": "Figure 4",
         "quote": "Matrix factorization models' accuracy. The plots show the root-mean-square error of each of four individual factor models",
         "note": "图示增加偏置、隐反馈、时间动态后 RMSE 逐步下降，验证各扩展的有效性。"
+      },
+      {
+        "id": "netflix-contest",
+        "paper_id": "mf",
+        "keyword": "Netflix 大赛",
+        "label": "原文：Netflix Prize 背景",
+        "page": 6,
+        "search": "Netflix announced a contest",
+        "quote": "In 2006, the online DVD rental company Netflix announced a contest to improve the state of its recommender system.",
+        "note": "比赛开放超过 1 亿条评分、约 50 万匿名用户、超过 1.7 万部电影（1～5 星），测试集约 300 万条；把 Netflix 自家系统 RMSE 改进 10% 即可赢得 100 万美元。"
+      },
+      {
+        "id": "netflix-rmse",
+        "paper_id": "mf",
+        "keyword": "RMSE 基准线",
+        "label": "原文：Netflix 基线与大奖线",
+        "page": 7,
+        "search": "RMSE = 0.9514",
+        "quote": "For comparison, the Netflix system achieves RMSE = 0.9514 on the same dataset, while the grand prize’s required accuracy is an RMSE = 0.8563.",
+        "note": "Netflix 自家系统 RMSE 0.9514，大奖要求 0.8563（改进 10%）；矩阵分解及其扩展是逼近这条线的主力技术。"
+      },
+      {
+        "id": "temporal-dynamics",
+        "paper_id": "mf",
+        "keyword": "时间动态",
+        "label": "原文：时间动态",
+        "page": 5,
+        "search": "account for the temporal effects",
+        "quote": "Thus, the system should account for the temporal effects reflecting the dynamic, time-drifting nature of user-item interactions.",
+        "note": "物品热度与用户口味随时间漂移，MF 通过让偏置与因子随时间变化来建模，是图 4 中进一步降低 RMSE 的扩展之一。"
+      },
+      {
+        "id": "fig2-latent-axes",
+        "paper_id": "mf",
+        "keyword": "隐因子空间示意图",
+        "label": "原文图 2：隐因子空间",
+        "page": 3,
+        "search": "A simplified illustration of the latent factor approach",
+        "quote": "A simplified illustration of the latent factor approach, which characterizes both users and movies using two axes—male versus female and serious versus escapist.",
+        "note": "图 2 用两条隐轴（男性向—女性向、严肃—娱乐）示意：电影按内容定位，用户按口味定位，预测分取决于两者在图中的相对位置。"
       }
     ],
     "guide": {
-      "problem": "协同过滤的邻域方法（UserCF/ItemCF）可解释性好，但难以扩展、无法显式建模用户与物品之间的潜在关系；Netflix Prize 等大规模评分预测任务需要一种[[更准确且可扩展|1|abs-superior]]的方法。",
-      "innovation": "将用户-物品评分矩阵分解为[[两个低秩隐因子矩阵|3|mf-latent-space]]，用向量内积建模交互；并证明这种矩阵分解方法在实践上超越经典近邻，成为协同过滤的新主流。",
-      "method": "模型层面，把用户和物品映射到维度为 f 的联合隐因子空间，预测评分近似为两者内积；优化上可采用[[随机梯度下降|4|sgd]]或[[交替最小二乘|4|als]]。工程扩展包括加入[[全局/用户/物品偏置|4|biases]]、引入[[隐式反馈|5|implicit-feedback]]、建模时间动态与置信度，使 MF 能适配多种数据形态。",
-      "findings": "在 Netflix Prize 上，矩阵分解方法显著降低 RMSE；[[图 4|7|fig4-accuracy]]显示，随着加入偏置、隐反馈、时间动态等扩展，预测误差持续下降，模型容量（参数数量）增加也能带来精度提升。",
-      "contribution": "系统梳理了矩阵分解从基础模型到工程扩展的完整技术栈，确立了 MF 在协同过滤中的主导地位；其隐向量思路深刻影响了后续深度学习推荐模型中的 Embedding 层设计。",
-      "limitations": "以显式评分为主，对隐反馈场景需要额外设计（如加权 MF）；优化对超参数（学习率、正则化、隐因子维度）敏感；冷启动与新用户/新物品仍是难点；论文主要围绕 RMSE，不能直接对应 Top-K 排序指标。",
-      "one_liner": "用[[低秩隐向量内积|3|mf-latent-space]]建模用户-物品交互，在 Netflix Prize 上超越近邻方法，奠定矩阵分解在协同过滤中的主流地位。"
+      "background": "2006 年，在线 DVD 租赁公司 Netflix 悬赏 100 万美元：[[公开超过 1 亿条评分、约 50 万用户、1.7 万部电影|6|netflix-contest]]，谁把预测误差（RMSE）比 Netflix 自家系统改进 10% 谁拿奖。这场持续近三年的比赛把协同过滤从『数共同评分』的[[邻域方法|2|fig1-neighborhood]]推向『学隐向量』的模型方法。Koren 作为冠军团队 BellKor 成员，在 2009 年写下这篇综述，系统总结比赛中胜出的矩阵分解技术。",
+      "problem": "邻域方法（UserCF/ItemCF）直接比较共同评过的物品，可解释但有两个硬伤：评分矩阵极度稀疏（1 亿条评分摊在 50 万×1.7 万的矩阵里，任意两个用户共同评过的电影寥寥无几），且无法表达『用户偏爱什么类型』这类潜在结构。需要一种把用户和物品放进同一个坐标系、用少量维度概括口味的模型。",
+      "innovation": "把用户和物品映射到[[同一个 f 维隐因子空间|3|mf-latent-space]]：[[图 2|3|fig2-latent-axes]]里电影按『男性向—女性向』『严肃—娱乐』两条隐轴定位，用户按口味定位，预测评分就是两个向量的内积。论文明确指出[[矩阵分解在实践中优于经典近邻方法|1|abs-superior]]。",
+      "method": "训练即最小化已知评分上的平方误差加 L2 正则。优化有两条路：[[随机梯度下降|4|sgd]]（Simon Funk 推广，逐条评分更新，简单快速）与[[交替最小二乘|4|als]]（固定一侧解另一侧，每步变成可精确求解的二次问题，天然可并行）。工程三板斧：加[[偏置项|4|biases]]吸收打分尺度差异，引入[[隐式反馈|5|implicit-feedback]]利用浏览购买信号，建模[[时间动态|5|temporal-dynamics]]追踪口味漂移。",
+      "findings": "[[Netflix 自家系统 RMSE 为 0.9514，大奖要求 0.8563|7|netflix-rmse]]。[[图 4|7|fig4-accuracy]]显示两条规律：隐因子维度越大误差越低；在基础模型上逐步加入偏置、隐反馈、时间动态，RMSE 持续下降——每个扩展都带来真实收益。[[图 3|6|fig3-factor-vectors]]还把 Netflix 电影投影到头两个因子上，直观展示隐轴如何分隔不同受众的影片。注意这些是论文报告的比赛数据结论，不是本仓库的复现数字。",
+      "contribution": "确立了『用户/物品各学一个向量、内积打分』的范式，直接对应今天深度推荐里的 Embedding 层；偏置、隐反馈、时间动态三板斧至今仍是工业标配。本仓库 3.1.2 的 BiasMF 实验即在 MovieLens 教学子集上跑这一族模型。",
+      "limitations": "基础 MF 以显式评分为主，隐反馈需要加权改造；对维度、学习率、正则等超参数敏感；新用户/新物品冷启动依旧困难；论文只关心 RMSE 打分误差，与线上 Top-K 点击指标并不等价。",
+      "one_liner": "把用户和电影放进[[同一个低维坐标系|3|mf-latent-space]]，用内积预测评分，在 Netflix Prize 上一路把 RMSE 压向大奖线。"
     },
     "quick_index": [
       {
@@ -244,6 +304,12 @@
         "page": 3,
         "evidence_id": "mf-latent-space",
         "kind": "definition"
+      },
+      {
+        "label": "图 2：隐因子示意",
+        "page": 3,
+        "evidence_id": "fig2-latent-axes",
+        "kind": "figure"
       },
       {
         "label": "SGD 优化",
@@ -264,10 +330,22 @@
         "kind": "method"
       },
       {
+        "label": "Netflix 大赛背景",
+        "page": 6,
+        "evidence_id": "netflix-contest",
+        "kind": "definition"
+      },
+      {
         "label": "图 4：MF 精度",
         "page": 7,
         "evidence_id": "fig4-accuracy",
         "kind": "figure"
+      },
+      {
+        "label": "RMSE 0.9514→0.8563",
+        "page": 7,
+        "evidence_id": "netflix-rmse",
+        "kind": "conclusion"
       }
     ]
   },
@@ -300,7 +378,7 @@
         "label": "原文：二阶 FM 模型方程",
         "page": 2,
         "search": "degree d = 2",
-        "quote": "The model equation for a factorization machine of degree d = 2 is defined as follows.",
+        "quote": "The model equation for a factorization machine of degree d = 2 is defined as:",
         "note": "公式 1 同时包含一阶线性项与二阶交叉项；交叉项用隐向量内积，而不是独立参数。"
       },
       {
@@ -332,16 +410,37 @@
         "search": "Fig. 3",
         "quote": "Recommendation quality of a FM compared to the winning PITF model of the ECML/PKDD Discovery Challenge 2009.",
         "note": "通过适当的特征构造，FM 可以模拟专门化模型 PITF，并在 ECML/PKDD 标签推荐任务上取得可比的预测质量。"
+      },
+      {
+        "id": "abs-subsume",
+        "paper_id": "fm",
+        "keyword": "涵盖已有模型",
+        "label": "原文：FM 涵盖多种成功模型",
+        "page": 1,
+        "search": "FMs subsume many of the most successful approaches",
+        "quote": "We also show that FMs subsume many of the most successful approaches for the task of collaborative filtering including biased MF, SVD++ [2], PITF [3] and FPMC [4].",
+        "note": "通过设计合适的特征向量，FM 可以模拟 biased MF、SVD++、PITF、FPMC 等专用模型——一个模型类通吃多种任务。"
+      },
+      {
+        "id": "fig2-netflix-error",
+        "paper_id": "fm",
+        "keyword": "Netflix 误差曲线",
+        "label": "原文图 2：Netflix 上 FM vs SVM",
+        "page": 4,
+        "search": "FMs succeed in estimating 2-way variable interactions",
+        "quote": "FMs succeed in estimating 2-way variable interactions in very sparse problems where SVMs fail (see section III-A3 and IV-B for details.)",
+        "note": "图 2 横轴为隐因子维度 k（0–120），纵轴为 Netflix 评分预测 RMSE（0.90–0.98）：FM 随 k 增大误差持续下降，多项式 SVM 因稀疏无法可靠估计交互参数。"
       }
     ],
     "guide": {
-      "problem": "SVM 等核方法虽能建模特征高阶交互，但在推荐等高度稀疏场景下无法可靠估计交互参数；专门的矩阵分解模型（MF、SVD++、PITF）又只能处理特定输入格式，换一个任务就要重新推导模型与优化算法。",
-      "innovation": "提出 Factorization Machines：像 SVM 一样适用于任意实值特征向量，却像矩阵分解一样[[用因子化参数建模所有变量交互|1|abs-factorized-interactions]]，从而在稀疏数据下共享参数、估计未观测交互。",
-      "method": "二阶 FM 的预测由一阶线性项与[[二阶交叉项|2|fm-equation]]组成；交叉强度通过对应特征的隐向量内积表示。借助[[平方和减和平方的代数恒等式|3|fm-linear-complexity]]，模型方程可在 O(kn) 时间内计算，并可用 SGD 直接优化原问题，无需像非线性 SVM 那样依赖对偶形式与支持向量。",
-      "findings": "FM 在[[极度稀疏的问题上成功估计二阶交互|4|fm-sparse-success]]，而 SVM 失效；通过设计合适的特征向量，FM 可模拟 MF、SVD++、PITF、FPMC 等专用模型，例如[[在 ECML/PKDD 标签推荐任务上媲美 PITF|6|fig3-tag-rec]]。",
-      "contribution": "把 SVM 的通用性与因子化模型的参数效率统一起来，提出可处理任意实值特征、线性时间计算、直接原问题优化的通用预测器；为后续推荐模型中的显式二阶交叉（DeepFM、xDeepFM 等）奠定理论基础。",
-      "limitations": "论文主要聚焦二阶 FM 与多项式核 SVM 的理论对比；更高阶 FM 与深度网络的结合在此时尚未展开；实际工业推荐中，FM 需要配合特征工程才能充分发挥，端到端高阶自动交叉由后续深度学习模型补足。",
-      "one_liner": "用[[隐向量内积因子化所有二阶特征交互|2|fm-equation]]，在稀疏数据下以 O(kn) 线性复杂度实现通用预测，兼具 SVM 的灵活性与矩阵分解的参数效率。"
+      "background": "2010 年前后，推荐系统里流行两类模型：SVM 是通用预测器，给任意实值特征向量就能训练，但在推荐这种极度稀疏的数据上效果差；矩阵分解家族（MF、SVD++、PITF）在稀疏评分矩阵上表现出色，却各自只认一种输入格式，换个任务就要重新推导模型和学习算法。Rendle 的 Factorization Machines 想把两类模型的好处缝进同一个框架。",
+      "problem": "推荐数据极度稀疏：每个用户只和极少数物品交互，『用户 u 在场景 c 下对物品 i』这种特征组合几乎从不重复出现。SVM 的多项式核为每对特征学独立参数，某对组合没一起出现过就无从估计；模型还必须[[线性时间可计算|1|abs-linear-time]]，才能应付百万维稀疏特征。",
+      "innovation": "核心一招：不给每对特征交互学独立权重，而是给每个特征学一个 k 维隐向量，[[用隐向量内积表示交互强度|1|abs-factorized-interactions]]。从未共同出现的特征对，也能通过各自与其他特征的共现『借』到参数——这与 MF 用隐向量概括用户口味是同一种思想，只是从用户-物品推广到了任意特征。",
+      "method": "[[二阶 FM 方程|2|fm-equation]] = 全局偏置 + 一阶线性项 + 所有特征对的隐向量内积项。直接计算是 O(kn²)，但利用『和的平方减去平方的和』这一恒等式可重写为[[O(kn) 线性复杂度|3|fm-linear-complexity]]，于是可以用 SGD 直接优化原问题，无需像非线性 SVM 那样依赖对偶形式、保存支持向量。",
+      "findings": "论文证明 FM [[涵盖 biased MF、SVD++、PITF、FPMC 等成功模型|1|abs-subsume]]，只要设计合适的特征向量。[[Netflix 评分预测实验|4|fig2-netflix-error]]中，随 k 增大 FM 的 RMSE 持续下降而 SVM 失效；在 ECML/PKDD 2009 标签推荐任务上，FM 与当时的冠军模型 PITF [[预测质量相当|6|fig3-tag-rec]]。这些数字来自论文自己的实验设置，不可直接平移到其他数据集。",
+      "contribution": "FM 是『任意稀疏特征 + 二阶交叉』的通用答案，直接启发了 Wide&Deep、DeepFM（3.3 章）等把 FM 作为显式交叉层的深度模型；本仓库 3.1.3 在 MovieLens 教学子集上复现 FM 的稀疏交叉效果。",
+      "limitations": "只显式建模二阶交互，更高阶交叉要靠堆叠或深度网络；特征工程仍是必需的（论文中的特征构造均为手工设计）；实验聚焦理论对比与小规模基准，没有工业级线上验证。",
+      "one_liner": "给每个特征学一个隐向量，[[用内积表示全部二阶交叉|2|fm-equation]]，稀疏数据下以 [[O(kn)|3|fm-linear-complexity]] 实现通用预测。"
     },
     "quick_index": [
       {
@@ -355,6 +454,12 @@
         "page": 1,
         "evidence_id": "abs-factorized-interactions",
         "kind": "innovation"
+      },
+      {
+        "label": "涵盖 MF/SVD++/PITF",
+        "page": 1,
+        "evidence_id": "abs-subsume",
+        "kind": "conclusion"
       },
       {
         "label": "图 1：稀疏特征向量示例",
@@ -373,6 +478,12 @@
         "page": 3,
         "evidence_id": "fm-linear-complexity",
         "kind": "method"
+      },
+      {
+        "label": "图 2：Netflix 上优于 SVM",
+        "page": 4,
+        "evidence_id": "fig2-netflix-error",
+        "kind": "figure"
       },
       {
         "label": "稀疏场景优于 SVM",
@@ -403,16 +514,37 @@
         "search": "the most important thing is to have the right features",
         "quote": "the most important thing is to have the right features: those capturing historical information about the user or ad dominate other types of features",
         "note": "论文强调历史行为特征（用户/广告历史）主导效果，模型选型与数据新鲜度等次之；这与教程中 item_popularity、user_activity 等聚合特征呼应，也提醒工程上先抓高价值特征再调模型。"
+      },
+      {
+        "id": "eq-ne",
+        "paper_id": "he2014",
+        "keyword": "Normalized Entropy",
+        "label": "原文：NE 评测指标",
+        "page": 2,
+        "search": "Normalized Cross-Entropy",
+        "quote": "Normalized Entropy or more accurately, Normalized Cross-Entropy is equivalent to the average log loss per impression divided by what the average log loss per impression would be if a model predicted the background click through rate (CTR) for every impression.",
+        "note": "NE = 模型 log loss ÷ 背景 CTR 猜测的 log loss，越小越好；它不仅衡量排序，还惩罚概率校准误差，因此比 AUC 更贴合广告竞价。"
+      },
+      {
+        "id": "table4-features",
+        "paper_id": "he2014",
+        "keyword": "特征类型消融",
+        "label": "原文表 4：特征类型对比",
+        "page": 8,
+        "search": "Boosting model with different types of features",
+        "quote": "Table 4: Boosting model with different types of features",
+        "note": "相对纯上下文特征（100%），全量特征 NE 为 95.65%、纯历史特征为 96.32%——历史特征贡献主要增益，但上下文特征对冷启动不可或缺。"
       }
     ],
     "guide": {
-      "problem": "在线广告按点击计费，CTR 预估的准确率与校准度直接决定广告竞价的收益与效率。Facebook 面对abs-750m与上百万广告主，需要在百万级候选广告、海量稀疏特征下完成abs-challenging；模型既要输出校准良好的概率，又要满足在线服务的低延迟，并随数据分布的变化快速更新。",
-      "innovation": "提出 GBDT+LR 混合模型：[[决策树+LR 两阶段|1|abs-model]]，把 boosted 决策树当作监督式非线性特征变换、稀疏线性分类器负责概率输出（见fig1-hybrid），用eq-ne与校准度共同衡量效果；再叠加在线学习层让线性模型近实时更新，从而兼顾非线性特征组合、概率校准与数据新鲜度。",
-      "method": "特征上，把method-1ofk、取其叶子索引做 1-of-K 编码，样本于是落成method-onehot再输入 LR；训练上，线性层用 per-coordinate SGD 或 BOPR 在线更新；工程上，配套 fig4-joiner 实时拼接曝光与点击、生成流式训练数据；评测上，用eq-ne而非 AUC，同时度量排序质量与概率校准。",
-      "findings": "树特征变换带来result-3-4pct（table1-combination 中 LR+Trees 96.58% 优于单用任一模型）；top10-historical；freshness-1pct；在线学习中percoord-sgd，NE 比 per-weight 学习率还低近 5%。",
-      "contribution": "确立 GBDT+LR 作为工业 CTR 基线范式，直接影响 Wide&Deep、DeepFM 等后续工作；系统论证了disc-freshness比模型选型更关键，table4-features（fig8-historical）的经验成为推荐与广告特征设计的常识。",
-      "limitations": "两阶段非端到端、在线推理需依次经过树与 LR；叶空间随树数膨胀（trees-500，fig5-trees）；ctx-4-5-loss说明对历史特征依赖重；论文只报 Normalized Entropy 等内部口径，难以直接对标公开 benchmark。",
-      "one_liner": "把 GBDT 当特征变换器、LR 当校准器，[[NE 提升超 3%|1|abs-model]]，形成经典两阶段 CTR 管线。"
+      "background": "2014 年的 Facebook：[[日活用户超过 7.5 亿、活跃广告主超过 100 万|1|abs-750m]]，广告按点击计费，CTR（点击率）预估的每一点误差都直接换算成收入。这是一个[[有挑战性的机器学习任务|1|abs-challenging]]：样本以亿计、特征高维稀疏、数据分布每天都在变。这篇 ADKDD 论文是 Facebook 广告团队的工程经验总结。",
+      "problem": "CTR 预估要同时满足三个要求：输出校准良好的概率（竞价比价依赖绝对概率，不只是相对排序）；在百亿级样本上训练、毫秒级在线推理；并且跟上数据分布的快速变化。单一模型很难三者兼顾：LR 快、可在线更新，但不会自动组合特征；GBDT 会组合特征，却只能批量训练、难以频繁更新。",
+      "innovation": "把两个模型的长处接成两阶段：[[决策树+LR 的组合超过任一单模型 3% 以上|1|abs-model]]。GBDT 不当最终模型，而是当『监督式特征变换器』——[[每棵树视为一个类别特征，取值为样本落入的叶子编号|3|method-1ofk]]，叶子 one-hot 交给 LR 学权重；LR 再接在线学习近实时更新。评测用 [[Normalized Entropy|2|eq-ne]] 而非只看 AUC，因为竞价需要校准的概率。",
+      "method": "样本依次经过每棵树，[[落点叶子拼成稀疏二值向量|3|method-onehot]]输入 LR。树按天批量重训，线性层用在线学习追新数据；学习率方案中[[per-coordinate SGD 效果最好|4|percoord-sgd]]。工程上配套 online joiner 实时拼接曝光与点击流（[[图 4|5|fig4-joiner]]），形成流式训练数据管线。",
+      "findings": "树特征变换使 [[NE 下降超过 3.4%|3|result-3-4pct]]——[[表 1|4|table1-combination]]中 LR+Trees 为 96.58%，纯 LR 99.43%、纯树 100%（作者提醒：一次成功的特征工程通常只削掉百分之零点几的 NE）。[[训练频率从每周提高到每天|4|freshness-daily]]可[[再降约 1% NE|4|freshness-1pct]]（[[图 2|4|fig2-freshness]]）；per-coordinate SGD 的 NE 比 per-weight 方案低近 5%（[[图 3|5|fig3-lrrate]]）。树的数量上，[[前 500 棵树贡献几乎全部收益，后 1000 棵不足 0.1%|6|trees-500]]（[[图 5|6|fig5-trees]]）。特征上，[[重要性前 10 的特征全是历史特征|7|top10-historical]]（[[图 6|7|fig6-importance]]、[[图 8|7|fig8-historical]]）；[[表 4|8|table4-features]]显示只用上下文特征损失约 4.5% 精度，[[历史信息主导效果|1|abs-features]]。注意这些都是 Facebook 内部广告数据上的结论，不能平移到其他数据集。",
+      "contribution": "确立 GBDT+LR 两阶段范式，在深度学习普及前统治工业 CTR；『[[数据新鲜度值得至少按天重训|9|disc-freshness]]』『[[树变换显著提升线性分类器|9|disc-transform]]』两条经验影响了后续所有排序系统；对 NE 与校准的强调也成为工业评测标准。",
+      "limitations": "两阶段非端到端，特征仍靠人工设计；叶子 one-hot 使特征空间随树数膨胀；[[只用上下文特征会损失约 4.5% 精度|8|ctx-4-5-loss]]——模型效果严重依赖历史积累，新用户、新广告没有历史特征可用时明显吃亏；所有数字来自 Facebook 内部数据，外部不可复现。深度时代的 DeepFM（3.3 章）把手工树变换变成端到端学习的 Embedding+FM。",
+      "one_liner": "GBDT 负责把原始特征切成高维稀疏的『叶子编码』，LR 负责输出校准概率——[[组合 NE 优于任一单模型超 3%|1|abs-model]]，配上日级重训与在线学习即成经典工业 CTR 管线。"
     },
     "quick_index": [
       {
@@ -422,10 +554,16 @@
         "kind": "figure"
       },
       {
-        "label": "表 1：树+LR 组合效果",
-        "page": 4,
-        "evidence_id": "table1-combination",
-        "kind": "table"
+        "label": "NE 评测指标",
+        "page": 2,
+        "evidence_id": "eq-ne",
+        "kind": "definition"
+      },
+      {
+        "label": "叶子作为 1-of-K 特征",
+        "page": 3,
+        "evidence_id": "method-1ofk",
+        "kind": "method"
       },
       {
         "label": "NE 提升超 3.4%",
@@ -434,10 +572,28 @@
         "kind": "conclusion"
       },
       {
+        "label": "表 1：树+LR 组合效果",
+        "page": 4,
+        "evidence_id": "table1-combination",
+        "kind": "table"
+      },
+      {
         "label": "图 2：数据新鲜度影响",
         "page": 4,
         "evidence_id": "fig2-freshness",
         "kind": "figure"
+      },
+      {
+        "label": "per-coordinate SGD 最优",
+        "page": 4,
+        "evidence_id": "percoord-sgd",
+        "kind": "conclusion"
+      },
+      {
+        "label": "前 500 棵树贡献主要收益",
+        "page": 6,
+        "evidence_id": "trees-500",
+        "kind": "conclusion"
       },
       {
         "label": "历史特征主导效果",
@@ -446,10 +602,10 @@
         "kind": "conclusion"
       },
       {
-        "label": "图 4：在线学习数据流",
-        "page": 5,
-        "evidence_id": "fig4-joiner",
-        "kind": "figure"
+        "label": "表 4：特征类型消融",
+        "page": 8,
+        "evidence_id": "table4-features",
+        "kind": "table"
       }
     ]
   },
@@ -522,7 +678,7 @@
         "label": "原文：Skip-gram 语义更优",
         "page": 7,
         "search": "much better on the semantic",
-        "quote": "the Skip-gram architecture works slightly worse on the syntactic task than the CBOW model, and much better on the semantic part of the test than all the other models.",
+        "quote": "the Skip-gram architecture works slightly worse on the syntactic task than the CBOW model (but still better than the NNLM), and much better on the semantic part of the test than all the other models.",
         "note": "表 3 显示 Skip-gram 在语义类比上显著优于 CBOW 与 NNLM，是后续 Item2Vec 常选 Skip-gram 的原因之一。"
       },
       {
@@ -534,16 +690,37 @@
         "search": "Table 6",
         "quote": "Comparison of models trained using the DistBelief distributed framework.",
         "note": "在 6B 词、1000 维向量的大规模设置下，CBOW 与 Skip-gram 均显著优于 NNLM，并报告了训练所需 CPU 核·天数。"
+      },
+      {
+        "id": "skipgram-syntactic",
+        "paper_id": "word2vec",
+        "keyword": "句法任务对比",
+        "label": "原文：句法任务上 CBOW 更强",
+        "page": 7,
+        "search": "slightly worse on the syntactic task",
+        "quote": "the Skip-gram architecture works slightly worse on the syntactic task than the CBOW model (but still better than the NNLM)",
+        "note": "Table 3（640 维、3.2 亿词）：句法准确率 CBOW 64%、Skip-gram 59%、NNLM 53%、RNNLM 36%——句法上 CBOW 最强，Skip-gram 小幅落后。"
+      },
+      {
+        "id": "training-time",
+        "paper_id": "word2vec",
+        "keyword": "训练时长",
+        "label": "原文：Skip-gram 训练约三天",
+        "page": 8,
+        "search": "training time for the Skip-gram model was about three days",
+        "quote": "training time for the Skip-gram model was about three days",
+        "note": "Table 5 以天为单位列出单机训练时长：CBOW 300 维在 16 亿词上约 0.6 天，Skip-gram 300 维约 2 天——都比 NNLM 快几个数量级。"
       }
     ],
     "guide": {
-      "problem": "传统 NLP 把词当作原子索引，没有相似度概念；神经网络语言模型（NNLM）虽能学词向量，但含非线性隐层，训练代价高，难以扩展到数十亿词的语料。",
-      "innovation": "提出 CBOW 与 Skip-gram 两种[[新对数线性架构|1|abs-architectures]]：去掉非线性隐层，直接用上下文预测目标词（或反之），大幅降低训练复杂度，同时保持甚至提升向量质量。",
-      "method": "CBOW 把上下文窗口内词向量取平均后预测当前词；Skip-gram 以当前词为输入、预测周围词。两者都使用[[共享投影层|4|cbow-desc]]和分层 softmax / 负采样，可在 DistBelief 上并行训练。图 1 直观对比了两种架构的输入-投影-输出流向。",
-      "findings": "在 16 亿词语料上[[不到一天即可学到高质量词向量|1|abs-fast]]；在语义-句法相似度与类比任务上达到 SOTA；[[Skip-gram 在语义关系上显著优于 CBOW 与其他模型|7|skipgram-semantic]]；大规模 DistBelief 实验（表 6）显示 1000 维 CBOW/Skip-gram 均远超 NNLM。",
-      "contribution": "让词向量在大规模语料上可学、可扩展，开启 NLP 与推荐系统的嵌入时代；其“把序列当句子、物品当词”的思路直接启发 Item2Vec、DSSM 等向量召回方法。",
-      "limitations": "仅词级建模，不保留词序；窗口大小与负采样/分层 softmax 需调参；评估主要依赖内部类比集；对低频词效果有限；论文未涉及子词信息（后续 FastText 补足）。",
-      "one_liner": "用[[CBOW 与 Skip-gram|1|abs-architectures]]在十亿级语料上高效学习词向量，[[语义-句法类比达 SOTA|1|abs-sota]]，开启嵌入时代。"
+      "background": "在 one-hot 表示里，『猫』和『狗』的距离与『猫』和『汽车』一样远——词只是没有含义的编号。神经网络语言模型（NNLM）能为词学出向量，但带着非线性隐层，训练极慢：论文提到一个循环神经网络语言模型曾在单 CPU 上训练约 8 周。Mikolov 等人的问题很直接：能不能用更简单的模型，在更大语料上更快地学到同样甚至更好的词向量？",
+      "problem": "要在数十亿词上训练，模型必须砍掉复杂度瓶颈——非线性隐层；同时向量必须有用：不仅反映共现频率，还要能回答『king 之于 queen 相当于 man 之于谁』这类[[语义与句法类比|1|abs-sota]]问题。",
+      "innovation": "提出[[两种对数线性架构|1|abs-architectures]]：CBOW 用上下文预测中心词，Skip-gram 反过来用中心词预测上下文；两者都去掉非线性隐层、所有词共享投影层，训练复杂度大幅下降，[[16 亿词语料一天内即可学完|1|abs-fast]]。",
+      "method": "CBOW 把窗口内上下文词向量平均后预测当前词（[[图 1 左|5|cbow-predicts]]）；Skip-gram 输入当前词、预测窗口内的周围词（[[图 1 右|5|skipgram-predicts]]），[[两种结构互为镜像|5|fig1-architectures]]。配合分层 softmax 与 DistBelief 分布式框架，可扩展到 60 亿词、1000 维向量。",
+      "findings": "同数据对比（Table 3，640 维、3.2 亿词）：语义类比准确率 RNNLM 9%、NNLM 23%、CBOW 24%，[[Skip-gram 55%——语义部分远超其他模型|7|skipgram-semantic]]；句法部分 CBOW 64% 最强，[[Skip-gram 59% 略逊但仍优于 NNLM|7|skipgram-syntactic]]。单机训练时长（Table 5）：CBOW 300 维在 16 亿词上约 0.6 天，[[Skip-gram 约三天内完成|8|training-time]]。[[DistBelief 大规模实验|9|table6-distbelief]]：1000 维 Skip-gram 在 60 亿词上总准确率 65.6%（2.5 天×125 核），NNLM 100 维要 14 天×180 核且只有 50.8%。",
+      "contribution": "让词向量第一次可以廉价大规模生产；『把物品 ID 当词、把行为序列当句子』直接启发了 Item2Vec 与推荐中的嵌入召回，也是深度推荐里所有 Embedding 层的思想预演。",
+      "limitations": "窗口内不考虑词序；一词一向量，无法处理多义词与未登录词（子词信息由后来的 FastText 补足）；评估主要靠内部类比集，类比准确率高不等于下游推荐效果好。",
+      "one_liner": "用最简单的线性结构『[[上下文猜中心词、中心词猜上下文|1|abs-architectures]]』，把词向量训练从数周压到一天，开启嵌入时代。"
     },
     "quick_index": [
       {
@@ -559,6 +736,12 @@
         "kind": "conclusion"
       },
       {
+        "label": "一天内训练 16 亿词",
+        "page": 1,
+        "evidence_id": "abs-fast",
+        "kind": "conclusion"
+      },
+      {
         "label": "图 1：CBOW / Skip-gram",
         "page": 5,
         "evidence_id": "fig1-architectures",
@@ -568,6 +751,18 @@
         "label": "Skip-gram 语义优势",
         "page": 7,
         "evidence_id": "skipgram-semantic",
+        "kind": "conclusion"
+      },
+      {
+        "label": "句法上 CBOW 更强",
+        "page": 7,
+        "evidence_id": "skipgram-syntactic",
+        "kind": "conclusion"
+      },
+      {
+        "label": "训练时长（天数级）",
+        "page": 8,
+        "evidence_id": "training-time",
         "kind": "conclusion"
       },
       {
@@ -628,7 +823,7 @@
         "page": 3,
         "search": "cosine",
         "quote": "The semantic relevance score between a query and a document is then measured as:",
-        "note": "双塔只在最后做余弦相似度；物品侧向量可离线预计算并建 ANN 索引，这是 DSSM 工程价值所在。"
+        "note": "原文让 query 与 document 的两侧表示只在最后用余弦相似度相遇。把 document 换成推荐物品后，物品向量可离线计算并接 ANN；这是后续推荐工程迁移，不是原论文直接评测的系统。"
       },
       {
         "id": "wordhash-detail",
@@ -662,13 +857,14 @@
       }
     ],
     "guide": {
-      "problem": "Web 搜索中，查询与文档往往用不同词汇表达同一概念，传统基于关键词的检索会失败；而 LSA、PLSA 等潜在语义模型多采用无监督目标，与排序任务耦合松散，在真实 Web 搜索中表现有限。",
-      "innovation": "提出深度结构化语义模型 DSSM：用深度神经网络把查询与文档映射到共同语义空间，并以点击数据[[判别式训练|1|abs-discriminative]]；同时引入[[词哈希|1|abs-wordhash]]把高维词袋向量压缩为低维字母 n-gram 表示，使 DNN 能扩展到工业级大词汇表。",
-      "method": "输入为查询/文档的词袋 term vector；第一层[[词哈希|1|abs-wordhash]]将 50 万维稀疏词袋映射到约 3 万维字母三元组向量（见[[词哈希统计|4|table1-wordhash]]）；再经过[[多层非线性投影|3|fig1-dssm]]得到 128 维语义向量；查询与文档的[[相关性用余弦相似度度量|3|eq-relevance]]，训练时最大化点击文档的条件似然，同 batch 未点击文档自然充当负例。",
-      "findings": "在真实搜索点击数据上，[[DSSM 显著优于 TF-IDF、BM25、LSA、PLSA 等基线|6|dssm-results]]；词哈希使 50 万词词汇可用约 3 万维向量表示且冲突率极低，深层非线性投影比浅层线性模型带来额外收益。",
-      "contribution": "将深度学习成功应用于 Web 搜索语义匹配，开创“双塔编码+向量相似度+点击数据判别式训练”的范式；词哈希技术成为处理超大词汇表的经典技巧，也影响了后续 NLP 与推荐系统的向量化方法。",
-      "limitations": "原论文任务为 Web 文档排序，直接迁移到推荐需把查询替换为用户、文档替换为物品；单向量表示难以表达用户多兴趣；mini-batch 内负采样与全库负采样存在差异；论文使用 NDCG，教学 Notebook 改用 Recall@K。",
-      "one_liner": "用[[深度神经网络+词哈希|1|abs-wordhash]]把查询与文档映射到共同语义空间，以点击数据判别式训练，显著超越传统潜在语义模型。"
+      "background": "先想一个搜索例子：用户输入的短词和网页标题可能没有相同单词，却表达同一件事。传统关键词匹配像只检查两段话有没有相同字面；LSA/PLSA 会把词压到较少的“主题坐标”，但它们主要学习如何重建文本，并没有直接学习“哪篇文档应该排在前面”。DSSM 的出发点，就是让表示学习的目标和点击排序目标对齐。",
+      "problem": "原始词袋可能有几十万维，直接接神经网络既慢又占内存；同时，查询和文档必须被放进同一个坐标系，距离才有意义。模型还要回答一个训练问题：一次点击只告诉我们一个相对正例，怎样利用未点击文档让正确文档的分数更高？",
+      "innovation": "论文把查询和文档分别送进结构相同的深层网络，得到可以比较的低维表示，并用点击日志做[[判别式训练|1|abs-discriminative]]。它还加入[[词哈希|1|abs-wordhash]]：把单词拆成字母 n-gram，让 50 万维词表不必对应 50 万个可训练输入节点。这两点分别解决“学什么”和“算不算得动”。",
+      "method": "第一步，把 query/document 写成稀疏词袋；第二步，用[[字母三元组降维|3|wordhash-detail]]，例如 `good` 可拆成带首尾标记的若干 trigram；第三步，按[[Figure 1 的多层投影|3|fig1-dssm]]把两侧都变成 128 维向量；第四步，用[[余弦相似度|3|eq-relevance]]比较方向是否接近；第五步，把点击文档和 4 个随机未点击文档放入 softmax，最大化点击文档的条件概率。[[Table 1|4|table1-wordhash]]显示 500k 词表用 30,621 个 letter-trigram token 表示，仅出现 22 次碰撞。",
+      "findings": "论文用约 1 亿 query-title 对训练，并在 16,510 个查询、每个约 15 个带 0～4 级人工相关性标签的文档上测试。[[Table 2|6|dssm-results]]中完整 L-WH DNN 的 NDCG@1/3/10 为 0.362/0.425/0.498；TF-IDF 为 0.319/0.382/0.462。相同 40k 词表下，判别式 DNN 的 NDCG@1 比无监督 DAE 高 3.2 个百分点；三层非线性网络也比单层版本再高约 0.4～0.5 个百分点。",
+      "contribution": "DSSM 把“学习两侧表示—用相似度比较—直接优化点击排序”连成一个可训练系统，并证明大词表、监督目标和深层非线性都分别有作用。后来的推荐双塔继承了两侧独立编码和相似度学习，但把 query/document 换成 user/item，并通常再接向量索引。",
+      "limitations": "这篇论文评测的是 Web query-title 排序，不是推荐召回，也没有在论文中评测 ANN 索引；因此不能把论文 NDCG 搬成 Amazon Recall。随机未点击文档未必真不相关，点击本身也带位置偏差。单个低维向量还可能把多个兴趣平均掉，而两侧在相似度之前不能进行细粒度交互。",
+      "one_liner": "DSSM 像给查询和文档各配一台“翻译成坐标”的机器，再用[[余弦相似度|3|eq-relevance]]判断它们是否指向同一个语义方向。"
     },
     "quick_index": [
       {
@@ -782,31 +978,48 @@
         "note": "训练时用目标物品作为 query，从 K 个兴趣胶囊中加权选择最相关的兴趣；推理时去掉该层，直接用多兴趣向量分别召回。"
       },
       {
-        "id": "mind-results",
+        "id": "mind-offline-results",
         "paper_id": "mind",
-        "keyword": "多兴趣收益",
-        "label": "原文 Table 2 / 图 4：Amazon Books / 工业数据",
+        "keyword": "离线多兴趣收益",
+        "label": "原文 Table 2：Amazon Books / TmallData HitRate",
         "page": 7,
         "search": "Table 2",
-        "quote": "MIND significantly beats the two baseline methods, item-based CF and YouTube DNN.",
-        "note": "重点观察兴趣数 K 与 HitRate 的关系：K 个兴趣版本显著优于单兴趣与 YouTube DNN；线上 CTR 在 5~7 个兴趣时达到峰值。"
+        "quote": "Table 2: HitRate of different methods on the two datasets, where best performance is in boldface.",
+        "note": "离线表格只比较论文自己的随机 19:1 切分：Amazon Books 上 K=3、d=36 的 MIND-K HR@10 为 0.0309，YouTube DNN 为 0.0231；TmallData 上 K=5、d=64 时分别为 0.0972 与 0.0589。"
+      },
+      {
+        "id": "mind-online-results",
+        "paper_id": "mind",
+        "keyword": "在线兴趣数与 CTR",
+        "label": "原文 Figure 4：Tmall 一周在线 CTR",
+        "page": 7,
+        "search": "Online CTRs in a week",
+        "quote": "MIND with 5 ~7 interests performs best in all comparing methods.",
+        "note": "线上 A/B 图显示 5～7 个兴趣表现最好；动态兴趣数的 CTR 与 7 兴趣接近，论文强调它主要节省服务成本。该结果只属于 Tmall 当时的流量、排序器和实验设置。"
       }
     ],
     "guide": {
-      "problem": "工业推荐匹配阶段需要为十亿级用户/物品快速召回候选，但现有深度模型把用户表示为单一向量，难以捕捉用户多样化的兴趣；DIN 虽能候选感知，但逐候选计算历史 attention 使其计算量过大，只能用于排序阶段。",
-      "innovation": "提出多兴趣网络 MIND：用[[胶囊动态路由|1|abs-dynamic-routing]]把用户历史行为聚成多个兴趣向量，并设计[[label-aware attention|5|label-aware-attention]]在训练时从多个兴趣中选择与目标物品最相关的向量。",
-      "method": "输入包括用户画像、行为序列与目标物品；行为序列先经 embedding + pooling 得到行为向量；[[多兴趣抽取层|3|fig2-mind]]通过 B2I 动态路由（见[[Algorithm 1|5|b2i-routing]]）生成 K 个兴趣胶囊，并可根据历史长度[[自适应调整兴趣数|5|dynamic-interest-number]]；训练时用目标物品对 K 个兴趣做加权（label-aware attention），用 sampled softmax 优化；线上每个兴趣独立通过 ANN 召回再合并候选。",
-      "findings": "在 Amazon Books 和 TmallData 上，MIND 的 K 兴趣版本显著优于 YouTube DNN 与 item-based CF；Tmall 在线实验显示 5~7 个兴趣时 CTR 最佳；动态兴趣数机制可在保持效果的同时降低服务成本。",
-      "contribution": "首次将胶囊网络的多向量表示引入大规模工业推荐匹配阶段，提出“多兴趣向量 + 多路 ANN 召回”的范式，为后续 ComiRec 等多兴趣召回工作奠定基础。",
-      "limitations": "兴趣数 K 需根据数据调节；动态路由计算成本高于简单 pooling；多路 ANN 召回增加了结果合并与服务复杂度；原论文在电商场景验证，向其他领域迁移需重新评估兴趣粒度与胶囊数。",
-      "one_liner": "用[[动态路由把用户历史聚成多个兴趣胶囊|3|fig2-mind]]，线上多向量分别召回，解决单一用户向量难以表达多兴趣的问题。"
+      "background": "大型推荐系统通常先从十亿级商品中召回几千个候选，再由排序模型精细打分。[[Figure 1|1|fig1-tmall]]展示了一个直观困难：同一个人可能同时买衣服、运动用品和食品。若把这些行为平均成一个向量，结果可能落在三个兴趣之间，反而不像任何一个真实兴趣。",
+      "problem": "单用户单向量很便于一次 ANN 检索，却会混合彼此无关的意图；DIN 能针对每个候选重新关注历史，但为十亿商品逐个计算太贵。MIND 要找一个折中：用户表示仍可提前算好，同时保留多个可以独立检索的兴趣方向。",
+      "innovation": "MIND 用[[B2I 动态路由|1|abs-dynamic-routing]]把行为软聚类成多个“兴趣胶囊”，并用[[label-aware attention|5|label-aware-attention]]在训练时让目标物品选择最相关的兴趣。前者回答“历史应分成哪几组”，后者回答“这次正例应监督哪一组”。",
+      "method": "行为和用户画像先转成 embedding；[[Figure 2|3|fig2-mind]]中的多兴趣抽取层反复执行“分配权重—加权求和—squash—更新相似度”，完整步骤见[[Algorithm 1|5|b2i-routing]]。兴趣数可按历史长度[[自适应设置|5|dynamic-interest-number]]。训练时目标 item 只用于选择兴趣并计算 sampled softmax；服务时删除 label-aware 层，K 个兴趣各做一次 ANN，再合并、去重并控制每路配额。",
+      "findings": "论文把 Amazon Books 处理到 351,356 用户、393,801 商品和 6,271,511 条样本，并采用随机 19:1 切分。[[离线 Table 2|7|mind-offline-results]]显示多兴趣版本在 Amazon 与 TmallData 都优于单兴趣/YouTube DNN；[[在线 Figure 4|7|mind-online-results]]显示 Tmall 场景 5～7 个兴趣达到峰值。动态兴趣数主要降低计算和内存，并没有在该在线图中带来额外 CTR 增益。",
+      "contribution": "论文把胶囊网络的软聚类机制改造成可服务的大规模推荐匹配层，并给出从数据收集、GPU 训练到多兴趣 ANN 合并的部署流程。重要的新范式不是“胶囊”这个名称，而是一个用户可以用多个可检索向量表达。",
+      "limitations": "论文离线切分是随机目标，不保留严格时间因果；线上 CTR 只属于 Tmall 的一周 A/B 设置，不能转移为其他数据集的预期提升。K、路由次数和初始化需要调参；多路 ANN 会增加检索、合并与去重成本。目标物品参与训练期兴趣选择，也要求实现时严格保证它不会泄漏进线上用户特征。",
+      "one_liner": "MIND 不再把所有爱好搅成一个平均点，而是用[[动态路由|5|b2i-routing]]分成几组兴趣，再让每组各自去商品库找邻居。"
     },
     "quick_index": [
       {
         "label": "多兴趣动机",
         "page": 1,
         "evidence_id": "abs-multi-interest",
-        "kind": "conclusion"
+        "kind": "definition"
+      },
+      {
+        "label": "图 1：工业动机",
+        "page": 1,
+        "evidence_id": "fig1-tmall",
+        "kind": "figure"
       },
       {
         "label": "动态路由",
@@ -835,8 +1048,14 @@
       {
         "label": "表 2：离线收益",
         "page": 7,
-        "evidence_id": "mind-results",
+        "evidence_id": "mind-offline-results",
         "kind": "table"
+      },
+      {
+        "label": "图 4：在线 CTR",
+        "page": 7,
+        "evidence_id": "mind-online-results",
+        "kind": "figure"
       }
     ]
   },
@@ -920,17 +1139,18 @@
         "page": 7,
         "search": "SASRec outperforms all baselines",
         "quote": "Our method SASRec outperforms all baselines on both sparse and dense datasets",
-        "note": "论文使用 Amazon Beauty/Games、Steam 与 MovieLens；本教程 full profile 使用较新的 Amazon Reviews 2023。"
+        "note": "Table III 在 Amazon Beauty/Games、Steam 与 MovieLens-1M 上报告 Hit@10/NDCG@10；本教程 full profile 选择论文同版 MovieLens-1M 与 leave-two-out 协议，smoke 档仍不参与数值复现。"
       }
     ],
     "guide": {
-      "problem": "序列推荐需要同时捕捉长期语义与局部转移：Markov Chains 假设过强、难以泛化；RNN/CNN 训练慢且需要大量数据才能超越简单基线；Transformer 在 NLP 中已展现强大能力，但尚未针对推荐序列特性改造。",
-      "innovation": "提出基于[[自注意力|1|abs-self-attention]]的序列推荐模型 SASRec：去掉循环/卷积，用纯注意力机制在每个时间步为历史物品分配权重，并通过[[因果遮罩|3|causal-mask]]保证只使用过去信息，实现并行训练与长程依赖建模的统一。",
-      "method": "输入为固定长度物品序列；每个物品有[[物品 embedding 与位置 embedding|3|embedding-layer]]；经过若干层[[因果自注意力块|3|self-attention-block]]（scaled dot-product attention + point-wise FFN + 残差/LayerNorm）后，取最后有效位置的输出作为用户表示，与物品库做内积预测下一物品。",
-      "findings": "在 Amazon Beauty、Games、Steam 和 MovieLens-1M 上，SASRec 在稀疏与稠密数据集均优于 MC/CNN/RNN 基线；注意力权重可视化显示模型能根据数据密度自适应关注近期或远期行为；去除位置编码在稀疏数据上反而略好。",
-      "contribution": "将 Transformer 自注意力引入序列推荐，开创基于注意力的 next-item 召回研究线，深刻影响了 BERT4Rec 等后续工作；其“因果遮罩 + 位置编码 + 堆叠自注意力块”成为序列推荐的标准组件。",
-      "limitations": "注意力计算复杂度随序列长度平方增长，长序列成本显著；需要严格按时间顺序切分训练/验证/测试；仅在 next-item 任务上验证，未建模重复消费、会话边界等复杂行为；位置编码对稀疏/稠密数据影响不同，需视情况选择。",
-      "one_liner": "用[[因果自注意力编码行为序列|3|self-attention-block]]，在稀疏与稠密数据上同时超越 MC/CNN/RNN 基线，开启序列推荐的注意力时代。"
+      "background": "下一次行为既可能由刚刚发生的动作触发，也可能与更早的稳定偏好有关。Markov Chain 像只看最近一步，参数少、适合稀疏数据；RNN 像逐项读日记，能保留更长历史但难并行。论文先用[[符号表|3|notation-table]]定义用户序列、最大长度和 embedding，再寻找能在两者之间自适应取舍的结构。",
+      "problem": "模型需要在每个位置预测下一项，并自动决定该看最近一项还是更早的相关项。它还必须保证训练时看不到未来答案；否则离线指标会很好看，线上却无法复现。最后，序列长短不同，padding、截断和最后有效位置都必须有一致规则。",
+      "innovation": "SASRec 把[[自注意力|1|abs-self-attention]]作为序列模型主体：当前位置可以直接比较所有过去位置，不必像 RNN 一步步传递。它再加[[因果遮罩|3|causal-mask]]切断通往未来的连线，因此能并行训练，同时保持 next-item 的时间边界。",
+      "method": "序列过长就保留最近 n 项，过短就在左侧补零；每个输入是[[item embedding + 位置 embedding|3|embedding-layer]]。在[[Figure 1|1|fig1-sasrec]]中，Q 像当前位置提出的问题，K 像每条历史的标签，V 是要汇总的内容；[[scaled dot-product attention|3|self-attention-block]]先算 QKᵀ/√d，再只在可见历史上做 softmax。之后经过逐位置 FFN、残差、LayerNorm 和 dropout；每个位置都学习区分真实下一项与随机负项。",
+      "findings": "[[Table III|7|sasrec-results]]中 SASRec 在四个数据集都取得最佳结果：例如 Games 的 Hit@10/NDCG@10 为 0.7410/0.5360，ML-1M 为 0.8245/0.5905。论文平均比最强基线提高 6.9% Hit Rate 和 9.6% NDCG。注意力图还显示：稀疏 Beauty 更偏最近行为，稠密 ML-1M 会使用更远历史；在最稀疏的 Beauty 上去掉位置编码反而从 0.3142 小幅升到 0.3183。",
+      "contribution": "论文证明纯自注意力可以直接承担 next-item 推荐，而不只是作为 RNN 的附加模块；同时给出复杂度、消融、速度和注意力可视化。SASRec 因而成为后续 BERT4Rec 等序列推荐工作的清晰基线。",
+      "limitations": "自注意力主项复杂度为 O(n²d)，原论文也明确承认不能直接扩展到极长序列；评测为每用户 1 个真值加 100 个随机未观察负例，不等于全库排序。模型只使用交互顺序，不直接建模真实时间间隔、停留时长、动作类型或会话边界；未观察物品也不一定是真负例。",
+      "one_liner": "SASRec 让当前位置直接向所有过去行为“提问”，再用[[因果遮罩|3|causal-mask]]锁住未来答案，从而并行学习下一物品。"
     },
     "quick_index": [
       {
@@ -1052,16 +1272,27 @@
         "search": "Table 2",
         "quote": "Table 2: Performance on CTR prediction.",
         "note": "表 2 给出各模型在 Company* 与 Criteo 上的 AUC 与 LogLoss，是离线效果核心证据。"
+      },
+      {
+        "id": "deepfm-shared-win",
+        "paper_id": "deepfm",
+        "keyword": "共享 embedding 收益",
+        "label": "原文：共享 embedding 优于独立 embedding",
+        "page": 5,
+        "search": "0.48% and 0.33%",
+        "quote": "Compared to these two models, DeepFM achieves more than 0.48% and 0.33% in terms of AUC (0.61% and 0.66% in terms of Logloss) on Company* and Criteo datasets.",
+        "note": "与使用独立 embedding 的 LR&DNN、FM&DNN 相比，共享 embedding 的 DeepFM 仍稳定领先，说明共享表示本身有贡献。"
       }
     ],
     "guide": {
-      "problem": "CTR 预估需要同时建模低阶与高阶特征交互：LR 等线性模型无法自动学习特征交叉，FM 只能高效建模二阶交互，DNN 能学习高阶交互却常忽略低阶信号；Wide & Deep 虽然兼顾两者，但需要为 wide 侧手工构造交叉特征，工程成本高。",
-      "innovation": "提出 DeepFM：把 FM 与 DNN 集成到同一个神经网络架构中，二者共享输入与 [[embedding 向量|2|shared-embedding]]，无需额外特征工程即可端到端地学习低阶和高阶交互。",
-      "method": "输入为原始稀疏特征向量；FM 分支用隐向量内积建模 [[二阶交互|2|fm-component]]，DNN 分支把同一组 embedding 拼接后过多层全连接学习高阶模式；最终一阶线性项、FM 输出与 DNN 输出相加后经 Sigmoid 得到 CTR 预估（见图 1）。",
-      "findings": "在 Company* 与 Criteo 数据集上，DeepFM 同时优于只学低阶的 FM、只学高阶的 PNN，以及分别使用独立 embedding 的 Wide & Deep 变体；[[表 2|5|table2-deepfm]] 显示 DeepFM 相对 LR 在 AUC 上提升 0.86%–4.18%，在 LogLoss 上降低 1.15%–5.60%。",
-      "contribution": "统一了 FM 的二阶交互与 DNN 的高阶交互能力，提出共享输入与共享 embedding 的端到端 CTR 模型；为后续 Deep & Cross、xDeepFM 等显式交叉网络提供了基础范式。",
-      "limitations": "主要验证于公开 CTR 数据集与华为应用市场数据，未涉及超大规模在线训练细节；教学 Notebook 在 KuaiRand 上复现，数字与原论文不同；共享 embedding 对稀疏特征维度的设计仍敏感。",
-      "one_liner": "让 FM 与 DNN 共享输入与 embedding，[[同时端到端学习低阶和高阶特征交互|2|model-components]]，在 CTR 预估上超越 Wide & Deep。"
+      "background": "先看论文开头举的两个例子：用户常在饭点下载外卖 App，说明『应用类别 × 时间』这种二阶交互能预测点击；十几岁的男生偏爱射击和 RPG 游戏，说明『类别 × 性别 × 年龄』这种三阶交互也有信号。问题在于：线性模型（如工业界常用的 FTRL）只给每个特征一个权重，不会自动学交互；FM 能把二阶交互学成隐向量内积，更高阶组合却代价太大；DNN 能学高阶，又几乎丢失低阶信号。Wide & Deep 把两者拼在一起，代价是 wide 侧仍需人工设计交叉特征。",
+      "problem": "工程上的真正瓶颈是特征工程：Wide & Deep 的 wide 侧要人工构造诸如『用户已安装 App × 曝光 App』的叉乘特征，既依赖专家经验又让输入维度暴涨；FNN 必须先用 FM 预训练 embedding，效果受 FM 上限约束；PNN 只学高阶。能不能有一个模型，只吃原始稀疏特征，端到端地同时学好低阶和高阶交互？",
+      "innovation": "提出 DeepFM：把 FM 与 DNN 装进同一个网络，[[FM 分支|2|fm-component]]显式建模二阶交互，DNN 分支学习高阶组合，且两者[[共享同一份输入与 embedding 向量|2|shared-embedding]]。相对 Google 的 Wide & Deep，[[wide 侧不再需要人工特征工程|1|abs-shared-input]]；相对 FNN，不需要预训练。论文 Table 1 的对照里，DeepFM 是唯一同时做到免预训练、免特征工程、兼顾高低阶的模型。",
+      "method": "一条样本是若干 field 的稀疏向量：类别 field 做 one-hot，连续 field 直接取值或离散化。每个特征同时拥有一阶权重 wi 和 k 维隐向量 Vi。最终打分三路相加：一阶线性项、FM 二阶项 Σ⟨Vi,Vj⟩xixj、DNN 对 embedding 拼接后的多层全连接，再经 sigmoid 输出点击概率（式 1 与 [[Figure 1|1|fig1-deepfm]]）。反向传播时，FM 与 DNN 的梯度落在同一组 Vi 上，低阶与高阶信号共同塑造 embedding。实验设置上，Criteo 所有深度模型统一 400-400-400 隐藏层、dropout 0.5、Adam，FM 隐向量维度取 10。",
+      "findings": "[[Table 2|5|table2-deepfm]]（离线 AUC / LogLoss）：Criteo（约 4,500 万条点击记录，13 个连续 + 26 个离散特征，随机 9:1 切分）上 DeepFM 为 0.8007 / 0.45083，优于 FM 的 0.7892 / 0.46077 和最佳 PNN 变体的 0.7987 / 0.45214；Company*（华为应用市场游戏中心，约 10 亿条记录，连续 7 天训练 + 次日测试）上为 0.8715 / 0.02618。[[相对 LR|5|deepfm-results]]，DeepFM 在 Company* 与 Criteo 上 AUC 相对提升 0.86% 与 4.18%，LogLoss 相对降低 1.15% 与 5.60%；相对使用独立 embedding 的 LR&DNN 与 FM&DNN，AUC 仍高 0.48% 与 0.33%（[[共享 embedding 的收益|5|deepfm-shared-win]]）。效率上其训练时间与最快的深度模型相当（Figure 6）。",
+      "contribution": "确立了『共享 embedding + 低阶高阶联合学习』的 CTR 范式，后续的 Deep & Cross、xDeepFM 等显式交互网络都沿这条线展开。论文还引用 Wide & Deep 的经验提醒读者：离线 AUC 相对提升 0.275% 曾对应线上 CTR +3.9%——小 AUC 差距在商业系统里可能很值钱，但那是 Cheng et al. 的系统口径，不是本文自己的线上实验。",
+      "limitations": "论文只有离线实验，没有自己的在线 A/B；Criteo 用随机切分而非时间切分，比真实上线宽松；模型只做静态 field 交互，完全不利用用户行为序列（这正是 DIN/DIEN 要补的）；AUC 只衡量排序能力，LogLoss 与概率校准要另看。教学 Notebook 在 KuaiRand 短视频曝光上重测，数据、切分、候选都与论文不同，数值不能与上表相减。",
+      "one_liner": "让 FM 与 DNN 共享同一份输入和 embedding，[[端到端同时学习低阶与高阶特征交互|2|model-components]]，免掉 Wide & Deep 的手工交叉特征。"
     },
     "quick_index": [
       {
@@ -1111,6 +1342,12 @@
         "page": 5,
         "evidence_id": "table2-deepfm",
         "kind": "table"
+      },
+      {
+        "label": "共享 embedding 收益",
+        "page": 5,
+        "evidence_id": "deepfm-shared-win",
+        "kind": "conclusion"
       }
     ]
   },
@@ -1123,7 +1360,7 @@
         "label": "原文 Figure 2：DIN 网络结构",
         "page": 4,
         "search": "Figure 2",
-        "quote": "Figure 2: Network Architecture. The left part illustrates the proposed DIN model. It introduces a local activation unit, given different candidate ads.",
+        "quote": "Right part is our proposed DIN model. It introduces a local activation unit, with which the representation of user interests varies adaptively given different candidate ads.",
         "note": "图 2 左为 BaseModel（Embedding&MLP），右为 DIN：用户行为特征通过 local activation unit 与候选广告交互，得到候选感知的用户兴趣表示。"
       },
       {
@@ -1193,18 +1430,29 @@
         "label": "原文：公开数据集与公司数据效果",
         "page": 6,
         "search": "outperforms state-of-the-art methods",
-        "quote": "Experiments on two public datasets as well as an Alibaba real production dataset with over 2 billion samples demonstrate the effectiveness of proposed approaches, which achieve superior performance compared with state-of-the-art methods.",
+        "quote": "Experiments on two public datasets with user behaviors as well as a dataset collected from the display advertising system in Alibaba demonstrate the effectiveness of proposed approach which outperforms state-of-the-art methods on the CTR prediction task.",
         "note": "DIN 在 Amazon、MovieLens 与 20 亿样本的阿里工业数据上均超过当时的 SOTA。"
+      },
+      {
+        "id": "din-online-ab",
+        "paper_id": "din",
+        "keyword": "在线 A/B 测试",
+        "label": "原文：线上 CTR +10.0%、RPM +3.8%",
+        "page": 8,
+        "search": "10.0% CTR",
+        "quote": "DIN trained with the proposed regularizer and activation function contributes up to 10.0% CTR and 3.8% RPM(Revenue Per Mille) promotion",
+        "note": "2017-05 至 2017-06 近一个月线上 A/B，对照是线上在服的 BaseModel；这是阿里展示广告系统口径，不能外推到其他数据集。"
       }
     ],
     "guide": {
-      "problem": "Embedding&MLP 类 CTR 模型把用户历史行为压缩成固定长度的用户向量，无法表达用户兴趣的多样性；同一用户面对不同候选广告时，所有历史行为被同等对待，瓶颈在于[[固定长度表示与候选无关|1|abs-fixed-vector]]。",
-      "innovation": "提出 Deep Interest Network：引入[[局部激活单元|1|abs-din-proposed]]，让历史行为对当前候选广告自适应加权，使同一用户在不同候选下获得不同的兴趣表示。",
-      "method": "模型在 BaseModel 基础上，对用户行为特征组加入候选感知激活单元：将候选广告 vA 与每条历史行为 ej 输入小网络 a(·) 得到权重 wj，再对历史做[[加权求和池化|4|local-activation-formula]]得到 vU(A)；网络其余部分仍使用 MLP + Sigmoid。训练上还提出 mini-batch aware 正则化与 [[Dice 自适应激活|6|dice-activation]] 以支持十亿参数级工业网络。",
-      "findings": "DIN 在 Amazon、MovieLens 与超过 20 亿样本的阿里工业数据上均优于 SOTA；注意力权重可视化表明相关历史行为（如 tote bag、leather handbag）确实被高亮激活；Dice 在工业数据上优于 PReLU。",
-      "contribution": "把候选感知注意力引入 CTR 排序模型，开创“历史行为按候选动态加权”的范式，直接影响 DIEN、DSIN 等后续序列排序工作；其局部激活单元成为工业广告推荐系统的重要组件。",
-      "limitations": "激活单元需要在线计算所有历史行为与候选广告的交互，历史越长、候选越多计算量越大；长序列场景下 Attention 计算成本显著；论文未显式建模兴趣随时间的演化过程，这一缺口由 DIEN 补足。",
-      "one_liner": "用[[候选感知局部激活单元|4|local-activation]]为每条历史行为动态加权，解决固定长度用户向量无法表达多兴趣的问题。"
+      "background": "电商展示广告里没有搜索框，用户进门时不说自己要什么，系统只能从历史行为猜兴趣。论文举的例子：一位年轻妈妈最近浏览过羊毛大衣、T 恤、耳环、托特包、皮包和儿童外套——当系统给她推一款新手提包时，真正驱动点击的只有『托特包、皮包』这两段相关历史。而当时主流的 Embedding&MLP 模型会把她全部历史平均成一个固定长度向量，无论候选是什么，用户向量都一模一样。",
+      "problem": "固定长度向量两头为难：维度小了装不下多样兴趣，维度大了参数量暴涨、有限数据下过拟合，计算与存储也过不了在线系统的关。更根本的是，预测某个候选时只需要部分兴趣，没必要把全部兴趣压进同一个向量（[[瓶颈|1|abs-fixed-vector]]）。工程上还有一个拦路虎：上亿维稀疏特征下，传统 ℓ2 正则每个 mini-batch 都要对全部参数算范数，根本算不起。",
+      "innovation": "提出 [[Deep Interest Network|1|abs-din-proposed]]：引入局部激活单元（local activation unit），针对每个候选广告重新给历史行为打分、加权，让[[用户兴趣表示随候选变化|4|local-activation]]。配套两个工业训练技术：mini-batch aware 正则化——只对当前 batch 里出现过的特征算 ℓ2；以及[[自适应激活函数 Dice|6|dice-activation]]——按输入分布自动调整整流点。",
+      "method": "候选广告 vA 与每条历史行为 ej 一起送入小网络 a(·)，输出相关性权重 wj，再[[加权求和|4|local-activation-formula]]得到 vU(A)=Σwj·ej。注意论文刻意不做 softmax 归一化：权重总和被保留为『兴趣强度』的近似——历史里 90% 是衣服的用户，面对 T 恤的激活总量理应高于面对手机。其余结构保持 BaseModel：embedding、拼接、MLP、负对数似然损失。工业配置：embedding 维度 12（共 16 组特征），MLP 192×200×80×2，batch 5000，Adam。指标用[[用户加权 AUC|6|din-metrics]]（GAUC），更贴近在线广告的按用户体验。",
+      "findings": "[[公开数据集实验|6|din-results]]（各重复 5 次取平均，随机初始化影响小于 0.0002）：Amazon Electronics（192,403 用户、1,689,188 样本）上 DIN AUC 0.8818，加 Dice 后 0.8871，相对 BaseModel 0.8624 的 RelaImpr 为 6.82%；MovieLens 上 DIN+Dice 0.7348 对 BaseModel 0.7300。阿里工业数据（约 20 亿训练样本）上 DIN 0.6029，叠加 MBA 正则与 Dice 后 0.6083，RelaImpr 11.65%；论文特别注明：在该量级系统里 0.001 的绝对 AUC 提升就值得上线。[[线上 A/B|8|din-online-ab]]（2017 年 5~6 月近一个月）相对线上 BaseModel：CTR 最高 +10.0%、RPM +3.8%。",
+      "contribution": "把『目标感知注意力』引入 CTR 排序，用户表示从『一人一个固定向量』变成『一个候选一个向量』，直接启发 DIEN、DSIN 等序列兴趣模型；MBA 正则与 Dice 成为后续阿里系论文的标配组件；论文还公开了公开数据集实验代码，并把线上服务的 request batching、GPU 显存优化、并发 kernel 等加速手段（单机 QPS 翻倍）写进论文。",
+      "limitations": "论文自己试过用 LSTM 建模行为序列，没有收益，于是把序列建模留作 future work（一年后由 DIEN 补上）；每个候选都要重算全部历史的注意力，历史越长、候选越多越贵（线上要求每个访客数百个候选在 10 毫秒内打完分）；DIN 只看『哪段历史相关』，不管兴趣随时间的演化；+10.0% CTR 是 2017 年阿里展示广告的口径，不能搬到别的数据集或业务。教学 Notebook 在 KuaiRand 上重测，数值另行报告。",
+      "one_liner": "让候选广告当『提问者』，对相关历史行为[[加权求和|4|local-activation-formula]]，同一用户面对不同候选得到不同的兴趣向量。"
     },
     "quick_index": [
       {
@@ -1253,6 +1501,12 @@
         "label": "离线效果",
         "page": 6,
         "evidence_id": "din-results",
+        "kind": "conclusion"
+      },
+      {
+        "label": "在线 A/B：CTR +10%",
+        "page": 8,
+        "evidence_id": "din-online-ab",
         "kind": "conclusion"
       }
     ]
@@ -1338,16 +1592,27 @@
         "search": "17.1%",
         "quote": "mille (eCPM) by 17.1%.",
         "note": "相对 BaseModel，DIEN 在阿里展示广告系统 CTR 提升 20.7%、eCPM 提升 17.1%；这是特定业务口径的相对增益，不能直接外推为通用离线效果。"
+      },
+      {
+        "id": "dien-serving",
+        "paper_id": "dien",
+        "keyword": "在线服务优化",
+        "label": "原文：延迟 38.2→6.6 ms、QPS 360",
+        "page": 7,
+        "search": "38.2 ms",
+        "quote": "latency of DIEN serving can be reduced from 38.2 ms to 6.6 ms and the QPS (Query Per Second) capacity of each worker can be improved to 360.",
+        "note": "kernel 融合、batching 与 Rocket Launching（GRU 隐状态 108→32 维）共同把 DIEN 的服务成本降到可上线水平。"
       }
     ],
     "guide": {
-      "problem": "DIN 等模型把历史行为直接当作兴趣表示，但真实兴趣隐藏在行为背后且随时间动态演化；同一用户相邻行为可能反映完全不同的兴趣（兴趣漂移），简单的 Attention 池化无法刻画兴趣随时间演化的轨迹。",
-      "innovation": "提出 Deep Interest Evolution Network：用 [[GRU+辅助损失|1|abs-aux-loss]] 显式抽取潜在时序兴趣，再用 [[AUGRU|1|augru-intro]] 把候选注意力嵌入 GRU 更新门，建模与目标物品相关的兴趣演化过程。",
-      "method": "DIEN 由行为层、兴趣抽取层、兴趣演化层组成。行为层把物品 one-hot 转成 embedding；兴趣抽取层用 GRU 更新隐状态 ht，并通过[[辅助损失|4|aux-loss-formula]]让 ht 能预测下一次真实行为；兴趣演化层用 AUGRU 在 GRU 更新门上加入候选注意力 at，使不相关历史几乎不改变状态；最后兴趣状态与上下文特征拼接，经 MLP 预测 CTR。",
-      "findings": "在公开数据集与阿里工业数据上，DIEN 显著优于 BaseModel 与 DIN；[[在线 A/B 测试|7|dien-online]]显示相对 BaseModel，[[CTR 提升 20.7%、eCPM 提升 17.1%|7|dien-gains]]；可视化表明不同候选物品会激活不同的兴趣演化路径。",
-      "contribution": "把 CTR 排序从“表达用户兴趣”推进到“建模兴趣随时间的演化”，提出辅助损失监督序列表示与 AUGRU 目标感知演化两种关键技术，影响后续 DSIN、SIM 等长序列兴趣建模工作。",
-      "limitations": "GRU 串行计算限制长序列效率，线上服务需 kernel 融合、batching、模型压缩等工程手段；辅助损失在超大规模工业数据上收益不如公开数据明显；论文指标为阿里广告系统口径，教学 Notebook 使用 KuaiRand 公开数据复现。",
-      "one_liner": "用 GRU+辅助损失抽取潜在时序兴趣，再用 [[AUGRU 按候选注意力驱动兴趣演化|4|interest-evolving]]，在线 CTR 提升 20.7%。"
+      "background": "DIN 解决了『用户表示要随候选变化』，但它把历史行为本身当作兴趣。论文作者认为这还差一步：行为只是兴趣的外在表现，点击背后的兴趣藏在序列里，而且随时间演化。用户可能这个月迷书籍、下个月迷衣服，相邻两次访问意图完全不同（论文称之为兴趣漂移）；而每类兴趣又有自己的演化轨迹，书籍的演化过程和衣服的几乎互不干扰。",
+      "problem": "两个具体缺口：其一，GRU 的隐状态只靠最终 CTR 标签监督，长序列的中间状态学不到『兴趣』语义；其二，DIN 对所有历史一视同仁地打分，不区分先后顺序，回答不了『兴趣正在往哪走』。直接把行为序列塞进普通 RNN 又会被兴趣漂移干扰——与当前候选无关的行为不应该显著改写状态。",
+      "innovation": "提出 [[Deep Interest Evolution Network|1|abs-dien]]，两个关键模块：兴趣抽取层用 GRU 建模行为依赖，并引入[[辅助损失|1|abs-aux-loss]]——每一步用『下一次真实行为 vs 负采样行为』监督当前隐状态，让 ht 真正代表兴趣；兴趣演化层提出 [[AUGRU|1|augru-intro]]，把候选注意力乘进 GRU 更新门，只让与目标相关的兴趣参与演化。",
+      "method": "行为按时间排序、过 embedding 后进入 GRU，得到兴趣状态序列 h1…hT；[[辅助损失（式 6）|4|aux-loss-formula]]与主损失按 L = Ltarget + α·Laux 相加（公开集实验 α=1）。演化层先对每步算候选相关分 at（softmax，式 8），再用 at 缩放更新门：ũ′t = at·u′t，h′t = (1−ũ′t)◦h′t−1 + ũ′t◦h̃′t（式 11-12）——不相关的历史几乎不改写状态，[[抑制兴趣漂移|4|interest-evolving]]。最终兴趣状态与广告、用户、上下文 embedding 拼接后进 MLP。工业版为 6 层全连接 600/400/300/200/80/2，历史最长截断 50。",
+      "findings": "Table 2（公开集各重复 5 次）：Amazon Electronics 上 DIEN AUC 0.7792±0.00243（DIN 0.7603、BaseModel 0.7435），Books 上 0.8453±0.00476（DIN 0.7880）。Table 3（工业数据，70 亿样本、历史截断 50）上 DIEN 0.6541（DIN 0.6428、BaseModel 0.6350）。消融（Table 4）显示 AUGRU 优于 AIGRU 与 AGRU；辅助损失在公开集上贡献最大，在工业集上收益变小——论文归因于工业数据量已足够大，且行为来自全平台场景、与目标场景不完全同分布。[[在线 A/B|7|dien-online]]（2018-06-07 至 07-12，淘宝展示广告）：相对 BaseModel，DIEN [[CTR +20.7%、eCPM +17.1%、PPC −3.0%|7|dien-gains]]，DIN 为 +8.9%、+6.7%、−2.0%。",
+      "contribution": "把 CTR 兴趣建模从『选择相关历史』推进到『建模兴趣演化轨迹』：辅助损失监督序列表示、AUGRU 把目标注意力嵌入时序结构，影响了 DSIN、SIM 等长序列工作。论文也坦诚记录工业代价：线上要叠加 kernel 融合、batching 与 Rocket Launching 压缩（GRU 隐状态 108 维压到 32 维），才把[[单请求延迟从 38.2 ms 降到 6.6 ms|7|dien-serving]]、单 worker QPS 提到 360。",
+      "limitations": "GRU 串行计算天然限制长序列，流量高峰每秒超 100 万用户，必须靠工程手段硬扛；辅助损失在工业数据上收益不如公开集；兴趣演化的证据包含 PCA 投影的定性可视化，不是严格的因果验证；+20.7% CTR 是 2018 年淘宝展示广告相对自家 BaseModel 的口径，不能外推。教学 Notebook 在 KuaiRand 上重测，数值另行报告。",
+      "one_liner": "先用 GRU+辅助损失把行为翻译成逐步兴趣状态，再用 [[AUGRU 按候选注意力驱动兴趣演化|4|interest-evolving]]，线上 CTR 相对提升 20.7%。"
     },
     "quick_index": [
       {
@@ -1397,6 +1662,12 @@
         "page": 7,
         "evidence_id": "dien-gains",
         "kind": "conclusion"
+      },
+      {
+        "label": "在线服务优化",
+        "page": 7,
+        "evidence_id": "dien-serving",
+        "kind": "method"
       }
     ]
   },
@@ -1480,17 +1751,18 @@
         "page": 8,
         "search": "outperforms other models in terms of both metrics",
         "quote": "MMoE outperforms other models in terms of both metrics.",
-        "note": "在数十亿样本的 Google 内容推荐排序任务上，MMoE 在 engagement 子任务的 AUC 与 R² 均优于基线。"
+        "note": "在 300 亿条隐式反馈训练、100 万条留出的 Google 内容推荐排序任务上，MMoE 在 engagement 子任务的 AUC 与 R² 各训练步均优于基线。"
       }
     ],
     "guide": {
-      "problem": "多任务学习中，任务之间的数据分布与相关性差异会导致优化冲突。传统 Shared-Bottom 结构把所有任务强制共享同一组底层参数，当任务相关性低时容易出现负迁移、某些任务被其他任务拖累，模型对超参数与初始化也很敏感。",
-      "innovation": "提出 Multi-gate Mixture-of-Experts（MMoE）：把共享底层替换为一组共享专家网络，并为每个任务配置独立的门控网络，从而显式地从数据中学习任务关系，让不同任务按需组合专家表示。",
-      "method": "模型底层由多个专家子网络（通常是前馈网络）组成，所有任务共享这些专家；每个任务有一个门控网络，根据输入特征输出对专家的 softmax 权重，加权聚合专家输出后再送入该任务专属的 tower 网络。任务 k 的预测形式为 y_k = tower_k(Σ_i gate_k,i · expert_i(x))。",
-      "findings": "在可控合成任务上，MMoE 在任务相关性低时显著优于 Shared-Bottom 与单门 MoE（OMoE），且对初始化与数据随机性更鲁棒（更好的 trainability）。在 UCI Census-income 与 Google 大规模内容推荐系统上，MMoE 均优于当前多任务基线。",
-      "contribution": "提出一种参数高效的多任务结构，通过共享专家+任务专属门控显式建模任务关系；证明该方法在低相关任务上既能缓解负迁移，又能提升可训练性，被后续工业多任务排序系统广泛采用。",
-      "limitations": "专家数量与每个专家的容量需要调参；门控网络计算量虽小但仍引入额外开销；论文主要验证二分类与回归任务，教学 Notebook 在 KuaiRand 上复现多任务排序，指标与论文不同；对任务间冲突极强的场景，MMoE 仍可能受限于所有专家必须共享。",
-      "one_liner": "用共享专家网络加任务专属门控显式建模任务关系，在低相关任务上兼顾表达能力与可训练性。"
+      "background": "推荐系统很少只优化一个目标。论文开头举的例子是电影推荐：系统不仅要预测用户会购买并观看某部电影，还要预测用户看完之后会不会喜欢它——点击、观看时长、点赞这些目标共享同一份用户兴趣信号，却又彼此不同。当时工业界最常用的做法是 Shared-Bottom：所有任务共用同一个底层网络，上面各接一个任务专属的小塔，一个模型同时输出多个预测。论文先用可控的合成实验证明了这个结构的软肋：两个任务标签的相关性越低，Shared-Bottom 的平均损失越差（Figure 3），说明传统共享结构对任务间关系非常敏感。",
+      "problem": "真正的工程问题是：能不能只用一个模型服务多个任务，又不让相关性低的任务互相拖累？此前的方案各有代价：L2-Constrained 与 Cross-Stitch 给每个任务单独的参数再施加约束，参数量约为 Shared-Bottom 的两倍，约束形式本身又是对任务关系的人工假设；单任务模型则完全放弃任务间的知识迁移。需要的是一种既保留共享带来的参数与计算效率、又能按任务差异自动调节共享程度的结构。",
+      "innovation": "提出 [[Multi-gate Mixture-of-Experts（MMoE）|1|abs-mmoe]]：把共享底层换成[[一组所有任务共享的专家网络|2|mmoe-idea]]，再为[[每个任务配置一个门控网络|2|gating-network]]，让模型从数据中显式学习任务关系，而不是靠人工先验决定共享多少。相对所有任务共用一个门的 OMoE，MMoE 只多出几个轻量门控网络，参数量几乎可以忽略，因此完整保留了共享底层在训练与服务上的计算优势。",
+      "method": "任务 k 的预测分三步（[[公式 6-8|5|mmoe-formula]]）：n 个结构相同的专家网络各自把输入 x 编码为 f_i(x)；任务 k 的门控是线性变换加 softmax，g_k(x)=softmax(W_gk·x)，输出和为 1 的 n 个权重；专家输出按权重加权求和得到 f^k(x)=Σ_i g_k(x)_i·f_i(x)，再送进任务 k 自己的 tower h_k 得到预测。权重随输入变化：同一条样本，点击任务可以把权重压在专家 1 上，满意度任务可以压在专家 3 上。合成实验的设置很克制：输入 100 维、8 个专家、每个专家是 16 隐单元的单层网络、tower 为 8 隐单元，并让 Shared-Bottom 的宽度（约 113）对齐总参数量 13056，每个「模型 × 相关性」组合独立重复 200 次。",
+      "findings": "三组证据。① 合成数据（[[Figure 4|5|fig4-mmoe]]）：任务相关性从 1 降到 0.5 时，Shared-Bottom 与单门 OMoE 明显退化，MMoE 几乎不受影响——任务专属门控是低相关场景的关键。② 可训练性：200 次独立重复的最终损失直方图（Figure 5）显示 Shared-Bottom 的方差大得多、更容易陷入差的局部最小，[[MoE 结构更好训练|6|mmoe-trainability]]；三种模型的最好单次结果其实接近，差距在稳定性。③ 真实数据：UCI Census-income（299,285 条、40 个特征、199,523 训练 + 99,762 测试，两组任务标签相关性仅 0.1768 与 0.2373，每种方法调参后独立训练 400 次）上，[[MMoE 在相关性更低的第二组所有均值指标上优于其他多任务模型|8|mmoe-results]]（主任务 AUC 最佳 0.8860、均值 0.8826）；Google 内容推荐排序（300 亿条隐式反馈训练、100 万条留出）上 MMoE 的 engagement AUC 与 R² 在各训练步[[全部领先基线|8|mmoe-google]]（[[Table 3|9|table3-mmoe]]：AUC@6M 0.6908 vs Shared-Bottom 0.6900，R²@6M 0.09362 vs 0.09287），线上实验相对 Shared-Bottom engagement +0.25%、satisfaction +2.65%（[[Table 4|9|table4-mmoe]]）。",
+      "contribution": "把「任务关系」从人工假设变成可学习的门控权重：共享专家保留多任务的参数效率与知识迁移，任务专属门控按输入调节每个任务的共享程度。论文还示范了一种严谨的多任务评估方式——用合成数据控制任务相关性、用数百次独立重复把「平均更差」与「运气不好」分开。MMoE 后来成为工业多目标排序的标准组件之一，也是 PLE 等后续工作的直接起点。",
+      "limitations": "MMoE 的专家仍然被所有任务全量共享：PLE 论文后来在腾讯系统上发现，复杂相关任务下 MMoE 仍有跷跷板迹象——它对 VCR 的 MTL gain 只有 +0.0001，处于临界。本文自身的实验也有边界：Census-income 上 MMoE 未稳定超过单任务模型的辅助任务最佳 AUC（婚姻状态任务单任务最佳 0.9933）；Google 离线只报告 engagement 子任务（satisfaction 标签太稀疏、噪声大）；线上 +0.25%/+2.65% 是该系统口径，不能外推；专家数量与 tower 容量仍需按任务调参。教学 Notebook 在 Census-income 官方切分与 KuaiRand 曝光上重测，数据与目标口径不同，数值不能与上表相减。",
+      "one_liner": "一组共享专家加[[每个任务一个 softmax 门控|2|gating-network]]，让每个任务按输入决定听哪些专家，低相关任务下比共享底层更稳、[[更好训练|6|mmoe-trainability]]。"
     },
     "quick_index": [
       {
@@ -1524,6 +1796,12 @@
         "kind": "definition"
       },
       {
+        "label": "图 4：合成数据对比",
+        "page": 5,
+        "evidence_id": "fig4-mmoe",
+        "kind": "figure"
+      },
+      {
         "label": "可训练性优势",
         "page": 6,
         "evidence_id": "mmoe-trainability",
@@ -1540,6 +1818,18 @@
         "page": 8,
         "evidence_id": "mmoe-google",
         "kind": "conclusion"
+      },
+      {
+        "label": "Table 3：Google 离线",
+        "page": 9,
+        "evidence_id": "table3-mmoe",
+        "kind": "table"
+      },
+      {
+        "label": "Table 4：线上实验",
+        "page": 9,
+        "evidence_id": "table4-mmoe",
+        "kind": "table"
       }
     ]
   },
@@ -1627,13 +1917,14 @@
       }
     ],
     "guide": {
-      "problem": "工业推荐系统中多任务学习目标复杂、相关性各异，传统硬参数共享或 MMoE 把所有专家无差别共享，容易出现负迁移与[[跷跷板现象|1|seesaw]]：提升一个任务指标往往以牺牲另一个任务为代价。",
-      "innovation": "提出 Progressive Layered Extraction（PLE）：显式分离[[共享专家与任务专属专家|1|abs-ple]]，并通过[[多层渐进分离路由|6|ple-progressive]]让低层先聚合、高层再逐步分离，既保留共享知识，又避免任务间有害干扰。",
-      "method": "PLE 先定义 CGC 层：每个任务的门控只从本任务专家和共享专家中加权选择（公式 2-5）；然后堆叠多层 CGC，下层门控输出作为上层门控的输入，使共享与任务特有信息逐层提纯。训练时还采用动态损失权重处理异构样本空间。",
-      "findings": "在腾讯视频推荐的复杂相关任务组（VTR/VCR）上，PLE 同时提升两个任务，显著缓解跷跷板；[[在线 A/B 测试|8|ple-online]]显示相对单任务模型总播放量 +4.17%、总观看时长 +3.57%；在公开 Census-income、Ali-CCP 等数据集上也优于 SOTA MTL 模型。",
-      "contribution": "把多任务学习从“共享一切”推进到“显式分离 + 渐进路由”的新范式，系统论证了跷跷板现象，并提出 CGC/PLE 结构消除负迁移；已部署于腾讯在线视频推荐系统。",
-      "limitations": "多层 CGC 堆叠增加模型复杂度与超参数（每层专家数、层数）；在线收益为腾讯特定业务口径，不能直接外推；教学 Notebook 在 KuaiRand 上复现，指标与论文不同；损失权重的动态调整仍需经验调参。",
-      "one_liner": "显式分离共享与任务专属专家，通过多层渐进路由消除跷跷板现象，在线总播放量 +4.17%。"
+      "background": "承接 MMoE：多任务推荐里目标之间的关系往往比「相关 / 不相关」更微妙。腾讯新闻视频推荐的两个核心目标——VTR（是否形成一次有效观看，二分类）与 VCR（观看完成比例，回归）——就是「复杂相关」的典型：VTR 的标签本身是播放行为与 VCR 的耦合（播放且时长超过阈值才算有效观看），而播放行为又受 WiFi 自动播放等场景影响。作者在这组任务上系统测试了当时的 SOTA 多任务模型，发现[[跷跷板现象|1|seesaw]]：提升一个任务往往以牺牲另一个任务为代价，[[Figure 3|4|fig3-ple]] 里没有任何一个基线模型完整落在两个任务同时变好的象限。",
+      "problem": "为什么 MMoE 还不够？MMoE 让所有专家被所有任务无差别共享：某个任务不需要的专家输出仍会作为噪声进入它的门控，共享知识与任务专属知识也没有各自的参数空间，任务冲突无处安放。此外线上训练还有两个工程问题：用户行为有先后（先点击才可能分享、评论），不同任务的样本空间不同；各任务损失权重的重要性随训练阶段变化。要同时解决「结构上的干扰」与「训练上的错位」。",
+      "innovation": "提出 PLE（Progressive Layered Extraction），核心是[[显式分离共享组件与任务专属组件|1|abs-ple]]：在共享专家之外给每个任务独立的专属专家，[[CGC 门控只从共享专家和本任务专属专家中选取|5|cgc-gate]]，从结构上切断任务间的有害干扰；再把单层 CGC 堆叠成[[多层渐进分离路由|6|ple-progressive]]——低层允许充分混合，高层逐步分离。训练侧再用带样本掩码的逐任务损失和动态损失权重处理样本空间错位与权重敏感问题。",
+      "method": "CGC 层计算（[[公式 2-5|5|cgc-formula]]）：任务 k 的门控先算权重 w_k(x)=Softmax(W_g^k·x)，维度是「本任务专属专家数 m_k + 共享专家数 m_s」；选择矩阵 S_k(x) 只装这两类专家的输出；门控输出 g_k(x)=w_k(x)·S_k(x) 为加权和；最后 y_k(x)=t_k(g_k(x)) 过任务 k 的 tower。PLE 把它堆成多层：第 j 层任务 k 的门控以第 j-1 层门控的融合结果为输入（公式 6），共享门控的选择矩阵则包含本层全部专家，为下一层产出公共表示。联合损失 L=Σ_k ω_k·L_k（公式 8），其中 L_k 用 δ_k∈{0,1} 掩码跳过不在该任务样本空间内的样本（公式 9），ω_k 按 ω_k^(t)=ω_k,0·γ_k^t 随训练轮次动态调整（公式 10）。",
+      "findings": "离线（腾讯视频推荐，8 天日志采样：4,692.6 万用户、268.2 万视频、9.95 亿样本，前 7 天训练、最后一天测试）：复杂相关的 VTR/VCR 组（[[Table 1|7|table1-ple]]）中 PLE 取得最好的 VCR MSE 0.1307 与最好之一的 VTR AUC 0.6831，两个任务的 MTL gain 同时为正，而 MMoE 的 VCR gain 只有 +0.0001、ML-MMOE 提升 VTR 却伤害 VCR——[[PLE 是唯一显著缓解跷跷板的模型|8|ple-results]]；正常相关的 CTR/VCR 组（Table 2）上 PLE 同样最优。在线（同一系统 4 周 A/B）：[[PLE 相对单任务模型总播放量 +4.17%、总观看时长 +3.57%|8|ple-online]]，超过 CGC（+3.92%/+2.75%）与 MMoE（+1.94%/+1.73%）；论文摘要另给「相对 SOTA MTL 模型 +2.23%/+1.84%」的口径。公开数据：合成数据上 PLE 的平均 MTL gain 比 MMoE 高 87.2%（Figure 7）；[[Table 5|10|table5-ple]] 上 Census-income 两任务 AUC 0.9522/0.9945、Ali-CCP CTR/CVR 0.6112/0.6097，全部超过单任务与 MMoE（MMoE 在 Ali-CCP CVR 上出现 −0.0302 的负 gain）。机制分析（[[Figure 8|9|fig8-ple]]）：CGC 中 VTR 与 VCR 两个门控的专家权重差异显著，而 MMoE 各门控权重几乎相同且从不为 0——说明 MMoE 在实践中不会自己收敛到「分离」结构。",
+      "contribution": "系统命名并量化了多任务推荐中的跷跷板现象，给出 MTL gain 这一逐任务评估口径；提出 CGC/PLE，把共享结构从「全连接共享」（MMoE）推进到「显式分离 + 渐进路由」，并用专家利用率实验证明 MMoE 理论上能表达、实践中却学不出这种结构。PLE 已部署于腾讯在线视频推荐系统。",
+      "limitations": "结构收益需要数据与复杂度支撑：论文自己也显示正常相关任务组上各模型差距不大；多层 CGC 的专家数、层数、动态损失权重都是新增超参。实验边界同样明显：工业数据与在线数字是腾讯单一系统口径；公开集 Table 5 只对比了单任务与 MMoE，没有 Cross-Stitch 等更多基线；动态权重更新是启发式而非理论保证。教学 Notebook 在 Census-income/KuaiRand 上重测，数值不能与论文相减。",
+      "one_liner": "给每个任务[[专属专家并显式分离共享知识|1|abs-ple]]，[[逐层渐进路由|6|ple-progressive]]同时提升 VTR 与 VCR，[[在线总播放量 +4.17%|8|ple-online]]。"
     },
     "quick_index": [
       {
@@ -1655,6 +1946,12 @@
         "kind": "conclusion"
       },
       {
+        "label": "图 3：跷跷板气泡图",
+        "page": 4,
+        "evidence_id": "fig3-ple",
+        "kind": "figure"
+      },
+      {
         "label": "CGC 门控",
         "page": 5,
         "evidence_id": "cgc-gate",
@@ -1673,6 +1970,12 @@
         "kind": "method"
       },
       {
+        "label": "Table 1：VTR/VCR 离线",
+        "page": 7,
+        "evidence_id": "table1-ple",
+        "kind": "table"
+      },
+      {
         "label": "离线收益",
         "page": 8,
         "evidence_id": "ple-results",
@@ -1682,6 +1985,18 @@
         "label": "在线 A/B 测试",
         "page": 8,
         "evidence_id": "ple-online",
+        "kind": "table"
+      },
+      {
+        "label": "图 8：专家利用率",
+        "page": 9,
+        "evidence_id": "fig8-ple",
+        "kind": "figure"
+      },
+      {
+        "label": "Table 5：公开数据集",
+        "page": 10,
+        "evidence_id": "table5-ple",
         "kind": "table"
       }
     ]
@@ -1877,34 +2192,87 @@
         "search": "Table 7",
         "quote": "Table 7. Offline/Online Comparison of Ranking Models.",
         "note": "表 7 显示基于 HSTU 的生成式推荐（GR）在工业排序任务上相对 DLRM 在线 E-Task 提升 12.4%、C-Task 提升 4.4%。"
+      },
+      {
+        "id": "tiger-rqvae",
+        "paper_id": "tiger",
+        "keyword": "RQ-VAE 量化",
+        "label": "原文：RQ-VAE 多级残差量化",
+        "page": 4,
+        "search": "multi-level vector quantizer",
+        "quote": "is a multi-level vector quantizer that applies quantization on residuals to generate a tuple of codewords",
+        "note": "RQ-VAE 把内容 embedding 逐级量化：每级找最近码本向量、把残差传给下一级，得到由粗到细的层次化 Semantic ID，相似物品共享前缀。"
+      },
+      {
+        "id": "tiger-collision",
+        "paper_id": "tiger",
+        "keyword": "码碰撞处理",
+        "label": "原文：追加 token 消除碰撞",
+        "page": 5,
+        "search": "extra token",
+        "quote": "we append an extra token at the end of the ordered semantic codes to make them unique",
+        "note": "多个物品映射到同一 Semantic ID 时，在末尾追加第 4 个 token 区分，如 (12,24,52,0) 与 (12,24,52,1)；训练后只做一次即可。"
+      },
+      {
+        "id": "tiger-table1",
+        "paper_id": "tiger",
+        "keyword": "序列推荐对比",
+        "label": "原文 Table 1：序列推荐对比",
+        "page": 7,
+        "search": "Performance comparison",
+        "quote": "Table 1: Performance comparison on sequential recommendation.",
+        "note": "Beauty 上 TIGER Recall@5 0.0454、NDCG@5 0.0321，相对最佳基线最高 +29.0%（NDCG@5 对 SASRec）；Sports、Beauty、Toys 三个 Amazon 品类全面领先。"
+      },
+      {
+        "id": "tiger-table2",
+        "paper_id": "tiger",
+        "keyword": "Semantic ID 消融",
+        "label": "原文 Table 2：ID 方案消融",
+        "page": 8,
+        "search": "Ablation study",
+        "quote": "Table 2: Ablation study for different ID generation techniques for generative retrieval.",
+        "note": "Beauty Recall@5：Random ID 0.0296、LSH 语义 ID 0.0379、RQ-VAE 语义 ID 0.0454——内容语义 ID 显著优于随机码与哈希码。"
       }
     ],
     "guide": {
-      "problem": "生成式推荐尝试把 item、Semantic ID 或列表当作输出序列，统一召回、排序甚至召排融合。本章节涉及 hstu, onerec, tiger 三篇工作。",
-      "innovation": "TIGER 用 RQ-VAE 生成 Semantic ID 并把检索变成自回归生成；OneRec 把召回与排序统一成端到端列表生成；HSTU 把长期行为流作为统一序列重新设计注意力与系统实现。",
-      "method": "教程通过 OpenOneRec 验证 Semantic ID、teacher forcing、trie 约束与列表指标契约；通过 HSTU 验证长序列 next-item 训练；章节总结聚合各 Notebook 产物并比较合法率、重复率、解码延迟与 GPU ROI。",
-      "findings": "生成式方法在公开与工业数据上展现出统一潜力，但离线提升不等于任意目录上的线上增益；必须同时评估无效 ID、重复率、目录更新、P99 与 GPU ROI。",
-      "contribution": "为读者提供生成式推荐的结构地图：从 Semantic ID 检索、列表生成到统一长序列建模，并指出当前 smoke 实验的边界。",
-      "limitations": "smoke 档只验证核心张量与约束链路；完整训练需要 CUDA、大规模数据与官方配置，不能把小模型结果冒充官方复现。",
-      "one_liner": "聚合 TIGER、OneRec、HSTU 的实验产物，比较生成式召回、排序与召排融合的可运行性与验收维度。"
+      "background": "过去十年推荐系统的主线是『embedding + ANN』：把用户和物品压进同一向量空间，用近似最近邻召回，再逐级排序。本章三篇论文共同代表另一个方向——把推荐变成生成任务：模型不再从库里『找』物品，而是像语言模型写句子一样，把要推荐的物品标识逐个 token『写』出来。按 TIGER → OneRec → HSTU 的顺序，可以看到这条线如何一步步从召回走向统一。",
+      "problem": "生成式推荐要回答三个层层递进的问题：物品怎么表示成可生成的离散标识（TIGER 的 Semantic ID）？生成能不能不止于召回，直接产出整屏列表并对齐用户偏好（OneRec）？整个推荐问题能不能统一成一个随算力扩展的序列转导任务（HSTU）？",
+      "innovation": "TIGER 用 [[RQ-VAE|4|tiger-rqvae]] 把物品内容 embedding 量化成层次化 [[Semantic ID|1|tiger-semantic-id]]，检索变成自回归解码；OneRec 把召回与排序统一成单一生成模型，并用自采样本加 reward 模型的迭代 DPO 对齐偏好；HSTU 把全部特征序列化，用统一转导模块替代 DLRM 的拼装结构。",
+      "method": "教程通过 OpenOneRec 验证 Semantic ID、teacher forcing、trie 约束与列表指标契约；通过 HSTU 验证长序列 next-item 训练；本章总结聚合各 Notebook 产物，比较合法率、重复率、解码延迟与 GPU ROI，并把三篇论文的原文证据按页核对。",
+      "findings": "TIGER 在三个 Amazon 品类超过 SASRec/S³-Rec（[[Table 1|7|tiger-table1]]，Beauty NDCG@5 相对最高 +29.0%）；OneRec 在快手主页面 1% 流量 A/B 中总观看时长 +1.68%；HSTU 公开数据 HR@10 相对 SASRec 最高 +60.6%、工业在线 E-Task +12.4%。这些数字来自三篇论文各自的数据、指标与公司场景，彼此不能直接相减。",
+      "contribution": "为读者提供生成式推荐的结构地图：从 Semantic ID 检索（TIGER）、session 级列表生成与偏好对齐（OneRec/OpenOneRec）到统一长序列转导（HSTU），并给出每条链路在教程中的可运行验证边界。",
+      "limitations": "smoke 档只验证核心张量与约束链路；完整训练需要 CUDA、大规模数据与官方配置，不能把小模型结果冒充官方复现；三篇论文的在线收益分别来自快手与 Meta 的特定场景，不可外推到其他目录或业务。",
+      "one_liner": "生成式推荐三步走：TIGER 教模型『写出』物品标识，OneRec 让它写出整屏列表并对齐偏好，HSTU 把一切都变成可扩展的序列转导。"
     },
     "quick_index": [
       {
         "label": "TIGER 框架图",
         "page": 1,
         "evidence_id": "fig1-tiger",
-        "kind": "method"
+        "kind": "figure"
       },
       {
         "label": "生成式检索",
         "page": 1,
         "evidence_id": "tiger-proposed",
-        "kind": "method"
+        "kind": "definition"
       },
       {
         "label": "Semantic ID",
         "page": 1,
         "evidence_id": "tiger-semantic-id",
+        "kind": "definition"
+      },
+      {
+        "label": "RQ-VAE 量化",
+        "page": 4,
+        "evidence_id": "tiger-rqvae",
+        "kind": "method"
+      },
+      {
+        "label": "碰撞处理",
+        "page": 5,
+        "evidence_id": "tiger-collision",
         "kind": "method"
       },
       {
@@ -1914,94 +2282,100 @@
         "kind": "method"
       },
       {
-        "label": "离线效果",
-        "page": 1,
-        "evidence_id": "tiger-results",
-        "kind": "method"
+        "label": "表 1：序列推荐",
+        "page": 7,
+        "evidence_id": "tiger-table1",
+        "kind": "table"
+      },
+      {
+        "label": "表 2：ID 消融",
+        "page": 8,
+        "evidence_id": "tiger-table2",
+        "kind": "table"
       },
       {
         "label": "OneRec 框架图",
         "page": 3,
         "evidence_id": "fig2-onerec",
-        "kind": "method"
+        "kind": "figure",
+        "paper_id": "onerec"
       },
       {
         "label": "统一召排",
         "page": 1,
         "evidence_id": "onerec-proposed",
-        "kind": "method"
-      },
-      {
-        "label": "编码器-解码器",
-        "page": 1,
-        "evidence_id": "onerec-encoder-decoder",
-        "kind": "method"
-      },
-      {
-        "label": "稀疏 MoE",
-        "page": 1,
-        "evidence_id": "onerec-moe",
-        "kind": "method"
+        "kind": "definition",
+        "paper_id": "onerec"
       },
       {
         "label": "Session-wise 生成",
         "page": 1,
         "evidence_id": "onerec-session",
-        "kind": "method"
+        "kind": "method",
+        "paper_id": "onerec"
       },
       {
         "label": "IPA 偏好对齐",
         "page": 1,
         "evidence_id": "onerec-ipa",
-        "kind": "method"
+        "kind": "method",
+        "paper_id": "onerec"
       },
       {
-        "label": "在线收益",
-        "page": 1,
-        "evidence_id": "onerec-results",
-        "kind": "method"
-      },
-      {
-        "label": "离线效果",
-        "page": 6,
-        "evidence_id": "onerec-table1",
-        "kind": "conclusion"
+        "label": "表 2：在线 A/B",
+        "page": 8,
+        "evidence_id": "onerec-table2",
+        "kind": "table",
+        "paper_id": "onerec"
       },
       {
         "label": "HSTU 架构图",
         "page": 4,
         "evidence_id": "fig3-hstu",
-        "kind": "conclusion"
+        "kind": "figure",
+        "paper_id": "hstu"
       },
       {
         "label": "HSTU 提出",
         "page": 1,
         "evidence_id": "hstu-proposed",
-        "kind": "method"
+        "kind": "definition",
+        "paper_id": "hstu"
       },
       {
-        "label": "HSTU 三个子层",
+        "label": "三个子层公式",
         "page": 4,
         "evidence_id": "hstu-equations",
-        "kind": "conclusion"
+        "kind": "definition",
+        "paper_id": "hstu"
       },
       {
         "label": "点聚合注意力",
         "page": 4,
         "evidence_id": "hstu-pointwise",
-        "kind": "conclusion"
+        "kind": "method",
+        "paper_id": "hstu"
       },
       {
-        "label": "公开数据集效果",
+        "label": "表 4：公开数据",
         "page": 7,
         "evidence_id": "hstu-results",
-        "kind": "conclusion"
+        "kind": "table",
+        "paper_id": "hstu"
       },
       {
-        "label": "在线 A/B 测试",
+        "label": "表 7：工业在线",
         "page": 7,
         "evidence_id": "hstu-online",
-        "kind": "conclusion"
+        "kind": "table",
+        "paper_id": "hstu"
+      },
+      {
+        "label": "幂律扩展 1.5T",
+        "page": 8,
+        "evidence_id": "hstu-scaling",
+        "kind": "conclusion",
+        "paper_id": "hstu"
       }
     ]
   },
@@ -2074,8 +2448,8 @@
         "label": "原文：快手在线 watch-time +1.6%",
         "page": 1,
         "search": "1.6% increase",
-        "quote": "16 increase in watch time",
-        "note": "OneRec 部署在快手主场景，在线 watch-time 提升 1.6%；这是特定业务口径，不能直接外推。"
+        "quote": "achieving a 1.6% increase in watch-time",
+        "note": "OneRec 部署在快手主场景（数亿日活短视频平台），摘要报告 watch-time 提升 1.6%；正文 Table 2 的严格 A/B 给出 +1.68% 的口径。这是特定业务口径，不能直接外推。"
       },
       {
         "id": "onerec-table1",
@@ -2086,16 +2460,47 @@
         "search": "Table 1",
         "quote": "Table 1: Offline performance of our proposed OneRec",
         "note": "表 1 对比 Pointwise、Listwise、TIGER 与 OneRec 各变体在观看时长与交互指标上的表现。"
+      },
+      {
+        "id": "onerec-balanced-kmeans",
+        "paper_id": "onerec",
+        "keyword": "均衡量化 Semantic ID",
+        "label": "原文：多级均衡量化",
+        "page": 3,
+        "search": "multi-level balanced quantitative mechanism",
+        "quote": "such method is suboptimal due to the unbalanced code distribution which is known as the hourglass phenomenon",
+        "note": "RQ-VAE 残差量化会出现码本分布不均的 hourglass 现象；OneRec 改用残差 K-Means 均衡量化，Algorithm 1 保证每个簇恰好分到 |V|/K 个视频。"
+      },
+      {
+        "id": "onerec-deploy",
+        "paper_id": "onerec",
+        "keyword": "推理工程优化",
+        "label": "原文：KV cache、float16 与 13% 激活",
+        "page": 6,
+        "search": "13% of the parameters",
+        "quote": "during inference only 13% of the parameters are activated",
+        "note": "在线部署用 KV cache 解码、float16 量化与 beam size 128 控制延迟；得益于 MoE，推理时只有 13% 的参数被激活。"
+      },
+      {
+        "id": "onerec-table2",
+        "paper_id": "onerec",
+        "keyword": "在线 A/B 测试",
+        "label": "原文 Table 2：在线绝对提升",
+        "page": 8,
+        "search": "absolute improvement",
+        "quote": "Table 2: The absolute improvement of OneRec compared to the current multi-stage system in the online A/B testing setting.",
+        "note": "快手主页面 1% 主流量的严格 A/B：OneRec-0.1B 总观看时长 +0.57%，OneRec-1B +1.21%，OneRec-1B+IPA +1.68%、平均观看时长 +6.56%。"
       }
     ],
     "guide": {
-      "problem": "工业推荐通常采用召回→粗排→精排的多级级联结构，各阶段独立优化，存在目标不一致、误差累积与系统复杂度高的问题。生成式检索（如 TIGER）只替代召回阶段，仍未统一排序目标。",
-      "innovation": "OneRec 提出首个端到端统一生成式推荐模型：用单一 Transformer 编解码器直接把用户历史映射为候选 session，并用 [[稀疏 MoE|1|onerec-moe]] 扩展容量、[[IPA/DPO|1|onerec-ipa]] 做偏好对齐，取代传统级联流水线。",
-      "method": "模型采用 [[encoder-decoder|1|onerec-encoder-decoder]]：编码器读用户历史行为序列，解码器通过 Casual Self-Attention、Cross-Attention 与 MoE 前馈层自回归生成 session；训练分两阶段：先用 next-token 目标学习 session 生成，再用 reward 模型采样 chosen/rejected 列表，通过 [[迭代 DPO|1|onerec-ipa]] 对齐用户偏好。",
-      "findings": "离线实验显示 OneRec 在观看时长与交互指标上优于 Pointwise、Listwise 与 TIGER；[[快手主场景在线 A/B 测试 watch-time 提升 1.6%|1|onerec-results]]；IPA 相比其它 DPO 变体能进一步提升生成质量。",
-      "contribution": "首次把召回与排序统一为单一生成模型并在大规模工业场景验证，提出 session-wise 生成与迭代偏好对齐两种关键技术，为生成式推荐的工程化落地提供实证。",
-      "limitations": "训练与在线服务需配合 KV cache、beam search、float16 量化等工程优化；DPO 依赖 reward 模型和采样策略设计；论文为快手特定场景，教学 Notebook 在 KuaiRand 上复现，指标与在线收益不可直接比较。",
-      "one_liner": "用单一 Encoder-Decoder 生成式模型统一召回与排序，配合稀疏 MoE 与 IPA/DPO，在线 watch-time 提升 1.6%。"
+      "background": "先看熟悉的级联推荐：论文 Figure 1(b) 画出真实规模——约 10^10 的视频库先经召回选出约 10^5，粗排压到约 10^3，精排只剩几十条。每一级独立训练，前一级的上限就是后一级的天花板，各级目标也互不一致。TIGER 那样的生成式检索只换掉了召回一级，排序仍靠老流水线。一个自然的问题：能不能让一个生成模型直接把『用户历史』变成『这一屏推荐的视频列表』？",
+      "problem": "统一召排要同时闯三关。第一关是表示：视频要先变成可生成的离散 token，而 RQ-VAE 残差量化会出现少数码点挤满、多数闲置的 hourglass 现象。第二关是生成形态：逐点生成 next-item 后还要靠人工规则拼列表，一致性和多样性难保证。第三关是对齐：推荐一次请求只曝光一个列表，不像 NLP 那样能同时拿到人工标注的正负偏好对。",
+      "innovation": "OneRec 自称首个在真实场景显著超过复杂级联系统的端到端生成模型：[[统一生成式召排|1|onerec-proposed]] 用一个 T5 式 encoder-decoder 直接产出整个 session；[[多级均衡量化|3|onerec-balanced-kmeans]] 用残差 K-Means 替代 RQ-VAE 缓解码本失衡；[[session-wise 生成|1|onerec-session]] 把『列表』而非『单点』作为生成单位；[[IPA|1|onerec-ipa]] 从模型自己 beam search 的样本里挑最好/最差做 DPO，解决推荐没有人工偏好对的问题。",
+      "method": "内容 embedding 先经 3 层残差 K-Means 量化成 Semantic ID（每层 8192 个簇）。[[Encoder-decoder|1|onerec-encoder-decoder]] 读 256 条历史行为，decoder 以 BOS 起始、按 next-token 交叉熵自回归生成 5 个视频的 session；前馈层换成 [[稀疏 MoE|1|onerec-moe]]（24 个专家、每 token 激活 2 个）。随后进入 IPA：beam search 采 128 个候选列表，reward 模型打分，最高分为 chosen、最低分为 rejected，按 Eq.10 的 DPO 损失迭代训练，且只用 1% 的训练数据做对齐（Figure 4 显示比例加到 5% 收益有限）。",
+      "findings": "离线 [[Table 1|6|onerec-table1]]（指标由 reward 模型估计）：OneRec-1B+IPA 的 swt mean/max 为 0.1025/0.1933，OneRec-1B 为 0.0991/0.1529，TIGER-1B 为 0.0873/0.1368，SASRec 仅 0.0375/0.0803；IPA 优于 DPO/IPO/cDPO 等全部对比变体。规模消融显示 0.05B→1B 持续提升（0.1B 相对 0.05B 最高 +14.45%）。在线 [[Table 2|8|onerec-table2]]（快手主页面 1% 流量）：OneRec-1B+IPA 总观看时长 +1.68%、平均观看时长 +6.56%（摘要约写作 1.6%）。",
+      "contribution": "证明『召回+排序』可以被单一生成模型端到端替代，并在亿级日活平台落地；session-wise 生成与『自采样本 + RM 打分 + 迭代 DPO』的对齐流程被后续 OneRec 系列与开源 OpenOneRec 沿用。教程 4.2 节复现的是这套 token/trie/对齐契约，不是 1B 模型本身。",
+      "limitations": "离线指标全是 reward 模型打分的估计值，不是真实留存行为；论文结论也承认 likes 等互动指标上仍有限。1B 参数 + beam 128 的在线服务依赖 [[KV cache、float16 与 13% 激活|6|onerec-deploy]] 等工程优化。所有数字来自快手短视频场景，搬到 KuaiRand 教学实验或任何其他目录都不能直接比较。",
+      "one_liner": "把『召回→粗排→精排』流水线折叠成一个 encoder-decoder：读历史行为，自回归生成整屏 session，再用自己采样、reward 模型打分的 DPO 迭代对齐偏好。"
     },
     "quick_index": [
       {
@@ -2108,7 +2513,7 @@
         "label": "统一生成式召排",
         "page": 1,
         "evidence_id": "onerec-proposed",
-        "kind": "innovation"
+        "kind": "definition"
       },
       {
         "label": "Encoder-Decoder",
@@ -2135,15 +2540,33 @@
         "kind": "method"
       },
       {
+        "label": "均衡量化",
+        "page": 3,
+        "evidence_id": "onerec-balanced-kmeans",
+        "kind": "method"
+      },
+      {
+        "label": "推理 13% 激活",
+        "page": 6,
+        "evidence_id": "onerec-deploy",
+        "kind": "method"
+      },
+      {
+        "label": "表 1：离线对比",
+        "page": 6,
+        "evidence_id": "onerec-table1",
+        "kind": "table"
+      },
+      {
         "label": "在线 watch-time +1.6%",
         "page": 1,
         "evidence_id": "onerec-results",
         "kind": "conclusion"
       },
       {
-        "label": "表 1：离线对比",
-        "page": 6,
-        "evidence_id": "onerec-table1",
+        "label": "表 2：在线 A/B",
+        "page": 8,
+        "evidence_id": "onerec-table2",
         "kind": "table"
       }
     ]
@@ -2209,16 +2632,47 @@
         "search": "Table 7",
         "quote": "Table 7. Offline/Online Comparison of Ranking Models.",
         "note": "表 7 显示基于 HSTU 的生成式推荐（GR）在工业排序任务上相对 DLRM 在线 E-Task 提升 12.4%、C-Task 提升 4.4%。"
+      },
+      {
+        "id": "hstu-ablation",
+        "paper_id": "hstu",
+        "keyword": "流式消融",
+        "label": "原文 Table 5：工业流式消融",
+        "page": 7,
+        "search": "ablated HSTU",
+        "quote": "Table 5. Evaluation of HSTU, ablated HSTU, and Transformers on industrial-scale datasets in one-pass streaming settings.",
+        "note": "Table 5（单遍流式）：HSTU 检索 log pplx 3.978 优于 Transformer 的 4.069；换成 softmax 注意力的变体 E-Task NE 从 0.4937 退化到 0.5067（NE 越低越好），证明逐点聚合与相对偏置都有贡献。"
+      },
+      {
+        "id": "hstu-efficiency",
+        "paper_id": "hstu",
+        "keyword": "编码器效率",
+        "label": "原文：训练最高快 15.2 倍",
+        "page": 7,
+        "search": "15.2x and 5.6x",
+        "quote": "HSTU is up to 15.2x and 5.6x more efficient than Transformers in training and inference, respectively.",
+        "note": "与 FlashAttention-2 版 Transformer 同配置对比（d=512、8 头、bfloat16、H100、序列长 1024–8192）：训练最高快 15.2 倍、推理最高快 5.6 倍；更省的激活显存还允许堆超过 2 倍层数。"
+      },
+      {
+        "id": "hstu-scaling",
+        "paper_id": "hstu",
+        "keyword": "幂律扩展",
+        "label": "原文：GR 扩展到 1.5 万亿参数",
+        "page": 8,
+        "search": "1.5 trillion",
+        "quote": "GRs leading to 1.5 trillion parameter models, whereas DLRMs performance saturate at about 200 billion parameters",
+        "note": "主指标随训练算力呈幂律提升、跨越三个数量级；最大配置为 8192 序列长、1024 维、24 层 HSTU，年训练算力接近 GPT-3/LLaMa-2 量级，而 DLRM 约在 2000 亿参数处饱和。"
       }
     ],
     "guide": {
-      "problem": "传统 DLRM 依赖大量手工特征工程、异构模块（FM/DCN/DIN/MoE）组合，且难以随计算规模持续提升；同时推荐数据具有高基数、非平稳、流式特点，现有 Transformer 的 softmax 注意力与位置编码并不完全适配。",
-      "innovation": "HSTU 把推荐定义为生成式序列转导任务，提出 [[Hierarchical Sequential Transduction Unit|1|hstu-proposed]]：用单一模块统一特征抽取、交互与表示变换，并引入 [[逐点聚合注意力|4|hstu-pointwise]] 与相对注意力偏置，适配非平稳流式数据。",
-      "method": "原始特征被序列化为统一特征；HSTU 层通过 [[Eq.1/2/3|4|hstu-equations]] 计算：先把输入线性投影为门控 U、query Q、key K、value V，再用 SiLU(QK^T + rab) 在因果范围内做 [[逐点聚合|4|hstu-pointwise]]（不 softmax），最后经 LayerNorm、逐点乘 U 与 f2 变换加残差；多层堆叠后预测下一个交互。",
-      "findings": "在 MovieLens 1M/20M 与 Amazon Books 上，HSTU 相对 SASRec 的 HR@10 提升 8.6%–65.8%；在工业级流式设置中，基于 HSTU 的生成式推荐在 [[在线 A/B 测试|7|hstu-online]]中相对 DLRM E-Task 提升 12.4%、C-Task 提升 4.4%；模型质量随训练算力呈幂律扩展。",
-      "contribution": "提出面向大规模推荐的统一序列转导架构 HSTU，证明生成式推荐可替代传统 DLRM 并在工业场景获得显著在线收益；其逐点聚合注意力与相对偏置设计影响后续推荐基础模型研究。",
-      "limitations": "HSTU 需要大规模算力与流式训练基础设施才能发挥优势；教学 Notebook 提供轻量可执行版本与 full profile 工业前置条件说明；论文指标来自 Meta 工业系统，不能直接等同于公开数据复现结果。",
-      "one_liner": "把推荐重新定义为序列转导任务，用 HSTU 的统一模块与逐点聚合注意力替代异构 DLRM，在线 A/B 测试提升 12.4%。"
+      "background": "工业推荐每天产生上百亿条用户行为，特征基数常以十亿计。DLRM 的做法是人工构造成千上万个异构特征，再用 FM/DCN/DIN/MoE 等模块拼装打分。但论文指出一个尴尬事实：大多数工业 DLRM 的质量并不随算力增长而提升。与此同时，语言和视觉领域的 Transformer 靠『把一切都当序列』吃到了算力红利——推荐能不能也这样？",
+      "problem": "三个障碍挡在前面：推荐特征没有语言那样天然的序列结构；用户兴趣流是非平稳的，新内容每分钟涌入，物品『词表』不断变化；softmax 注意力把历史权重归一化成总和 1，会抹掉『相关历史有多少条』这个强度信号，而它恰恰是预测观看时长这类强度的关键。",
+      "innovation": "把推荐重新定义为生成式序列转导任务，并提出 [[HSTU|1|hstu-proposed]]：[[Eq.1/2/3|4|hstu-equations]] 用一个统一模块同时承担 DLRM 里特征抽取、特征交互与表示变换三件事；注意力改为 [[逐点聚合|4|hstu-pointwise]]——不做整序列 softmax 归一化，再叠相对位置/时间偏置 rab^{p,t}，并配 M-FALCON 等系统级设计。",
+      "method": "输入是所有特征序列化后的统一流。每个 HSTU 层：f1 线性投影经 SiLU 激活后拆成门控 U 与 Q、K、V；空间聚合 A(X)V(X)=SiLU(QK^T+rab^{p,t})V(X)，让多个强相关历史可以同时保持高贡献；LayerNorm 后与 U 逐点相乘再过 f2，残差堆叠。训练从曝光级改成生成式，按 1/n_i 采样用户使成本降一个 O(N) 因子；推理取最后位置表示做 next-item 预测。",
+      "findings": "公开数据 [[Table 4|7|hstu-results]]（multi-pass full-shuffle 设定）：相对论文自跑的 SASRec，HR@10 从 ML-1M 的 0.2853→0.3097（+8.6%，HSTU-large 达 +15.5%）到 Books 的 0.0292→0.0404（+38.4%，large +60.6%），Books NDCG@10 最高 +65.8%。[[Table 5 消融|7|hstu-ablation]] 显示 softmax 变体与去偏置变体均退化。[[效率|7|hstu-efficiency]]：同配置下训练最高快 15.2 倍、推理快 5.6 倍。工业流式 [[Table 7|7|hstu-online]]：GR 相对 DLRM 在线 E-Task +12.4%、C-Task +4.4%；[[质量随算力幂律扩展|8|hstu-scaling]]，最大 1.5 万亿参数。",
+      "contribution": "给出『推荐=序列转导』的完整范式与可扩展架构，首次在十亿用户平台用统一生成式模型替代多年迭代的 DLRM 并取得在线收益；其逐点聚合注意力、相对偏置与 M-FALCON 推理成为后续推荐基础模型的参照。",
+      "limitations": "优势依赖 Meta 级算力、流式训练基础设施与海量行为数据；公开数据集评测是 multi-pass full-shuffle 设定，与线上单遍流式不同；Table 4 的 SASRec 是论文自跑基线，不等于 SASRec 原论文数字；E-Task/C-Task 是 Meta 内部业务指标，外人无法复算。教程 Notebook 在 KuaiRand 上只做轻量 next-item 契约验证，数值不能与上述任何一行相减。",
+      "one_liner": "把『特征工程+模块拼装』的 DLRM 换成一个纯序列转导器：所有特征变成序列，SiLU 逐点聚合注意力替代 softmax，让推荐模型像 LLM 一样随算力幂律变强。"
     },
     "quick_index": [
       {
@@ -2252,10 +2706,28 @@
         "kind": "table"
       },
       {
+        "label": "表 5：流式消融",
+        "page": 7,
+        "evidence_id": "hstu-ablation",
+        "kind": "table"
+      },
+      {
+        "label": "效率 15.2x",
+        "page": 7,
+        "evidence_id": "hstu-efficiency",
+        "kind": "conclusion"
+      },
+      {
         "label": "表 7：工业在线",
         "page": 7,
         "evidence_id": "hstu-online",
         "kind": "table"
+      },
+      {
+        "label": "幂律扩展 1.5T",
+        "page": 8,
+        "evidence_id": "hstu-scaling",
+        "kind": "conclusion"
       }
     ]
   },
@@ -2278,7 +2750,7 @@
         "label": "原文：相关与预测",
         "page": 2,
         "search": "correlates the ratings in order to determine",
-        "quote": "First, it correlates the ratings in order to determine which users' ratings are most similar to each other. Second, it predicts how well users will like new articles, based on ratings from similar users.",
+        "quote": "First, it correlates the ratings in order to determine which users’ ratings are most similar to each other. Second, it predicts how well users will like new articles, based on ratings from similar users.",
         "note": "协同过滤的两步：先算用户相似度，再用相似用户的评分预测目标用户偏好。"
       },
       {
@@ -2307,8 +2779,8 @@
         "keyword": "偏置项",
         "label": "原文：加入偏置",
         "page": 4,
-        "search": "adding biases",
-        "quote": "One benefit of the matrix factorization approach to collaborative filtering is its flexibility in dealing with various data aspects",
+        "search": "large systematic tendencies",
+        "quote": "For example, typical collaborative filtering data exhibits large systematic tendencies for some users to give higher ratings than others, and for some items to receive higher ratings than others.",
         "note": "全局均值、用户偏置、物品偏置吸收打分尺度和物品热度，是 MF 工程化关键扩展。"
       },
       {
@@ -2318,7 +2790,7 @@
         "label": "原文：二阶 FM 模型方程",
         "page": 2,
         "search": "degree d = 2",
-        "quote": "The model equation for a factorization machine of degree d = 2 is defined as follows.",
+        "quote": "The model equation for a factorization machine of degree d = 2 is defined as:",
         "note": "公式 1 同时包含一阶线性项与二阶交叉项；交叉项用隐向量内积，而不是独立参数。"
       },
       {
@@ -2383,6 +2855,7 @@
       }
     ],
     "guide": {
+      "background": "在深度学习进入推荐系统之前，工业界靠五条经典路线解决“给谁推什么”：让读者互评互助的协同过滤、把评分矩阵分解成隐因子的矩阵分解、用隐向量共享稀疏交叉的因子分解机、树模型产规则加线性模型出概率的 GBDT+LR、以及把行为序列当句子学的 word2vec。本总结页把这些方法放回同一张地图，比较它们各自解决的问题与留下的短板。",
       "problem": "本章节覆盖 12 条来自 fm, grouplens, he2014, mf, word2vec 等论文的关键证据，目标是在同一口径下比较本章算法的任务边界与结构选择。",
       "innovation": "每篇论文解决一个特定结构问题：从协同过滤定义、相关与预测两步、开放架构到Skip-gram、模型架构图。",
       "method": "章节总结不重新训练，而是读取各算法 Notebook 写入 results 的 JSON，在统一表格中比较主指标、辅助指标、baseline 与数据口径。",
@@ -2580,6 +3053,7 @@
       }
     ],
     "guide": {
+      "background": "深度召回要回答一个问题：怎样在十亿级物品里毫秒级找回几百个候选？DSSM 给出“两侧独立编码 + 相似度”的可检索结构，MIND 把一个用户拆成多个兴趣向量，SASRec 让表示随行为顺序变化。本总结页把三篇论文放回同一条演进线，对照它们的实验协议与本仓库的实际产物。",
       "problem": "本章节覆盖 11 条来自 dssm, mind, sasrec 等论文的关键证据，目标是在同一口径下比较本章算法的任务边界与结构选择。",
       "innovation": "每篇论文解决一个特定结构问题：从深度语义模型、余弦相似度、NDCG 实验到因果遮罩、稀疏与稠密数据。",
       "method": "章节总结不重新训练，而是读取各算法 Notebook 写入 results 的 JSON，在统一表格中比较主指标、辅助指标、baseline 与数据口径。",
@@ -2761,6 +3235,7 @@
       }
     ],
     "guide": {
+      "background": "召回给出几百个候选后，精排要在毫秒内给每个候选一个点击概率。DeepFM 把低阶交叉与高阶组合放进一个端到端模型，DIN 让历史行为按候选动态加权，DIEN 进一步建模兴趣随时间的演化。本总结页对照三篇论文的实验口径与本仓库在 KuaiRand 上的真实结果。",
       "problem": "本章节覆盖 10 条来自 deepfm, dien, din 等论文的关键证据，目标是在同一口径下比较本章算法的任务边界与结构选择。",
       "innovation": "每篇论文解决一个特定结构问题：从共享输入、同时建模高低阶交互、Criteo 离线收益到兴趣演化建模、CTR +20.7%。",
       "method": "章节总结不重新训练，而是读取各算法 Notebook 写入 results 的 JSON，在统一表格中比较主指标、辅助指标、baseline 与数据口径。",
@@ -2916,6 +3391,7 @@
       }
     ],
     "guide": {
+      "background": "真实产品很少只优化一个目标：点击、点赞、完播、购买往往要同时估计。共享底层表示能借力也会互相拖累（负迁移、跷跷板效应），MMoE 用多专家多门控拆分共享方式，PLE 再给每个任务专属空间。本总结页对照两篇论文的设置与本仓库的多任务实验。",
       "problem": "本章节覆盖 8 条来自 mmoe, ple 等论文的关键证据，目标是在同一口径下比较本章算法的任务边界与结构选择。",
       "innovation": "每篇论文解决一个特定结构问题：从MMoE 结构图、共享专家 + 任务门控、任务专属 Gate到CGC 门控、离线收益。",
       "method": "章节总结不重新训练，而是读取各算法 Notebook 写入 results 的 JSON，在统一表格中比较主指标、辅助指标、baseline 与数据口径。",

@@ -51,6 +51,35 @@ window.MathJax = {
 _V2_START = "<!-- Load mathjax -->"
 _V2_END = "<!-- End of mathjax configuration -->"
 
+# Preview HTML renders inside the detail page's sandboxed iframe. Without
+# retargeting, a click on a site-internal link (e.g. a 3.0 curriculum
+# cross-reference) loads the full application shell — topbar, sidebar and all —
+# inside the iframe, producing nested chrome. Retarget instead:
+#   - same-origin links to a different path -> _top (whole page navigates; the
+#     detail page keeps the #anchor and focuses it inside its own preview tab)
+#   - external links -> _blank
+#   - pure #anchor links keep their default in-preview scrolling.
+LINK_TARGETS = """<script id="recsys-preview-link-targets">
+(function () {
+  function retarget() {
+    document.querySelectorAll('a[href]').forEach(function (anchor) {
+      var href = anchor.getAttribute('href');
+      if (!href || href.charAt(0) === '#') return;
+      var url;
+      try { url = new URL(href, document.baseURI); } catch (error) { return; }
+      if (url.origin === location.origin) {
+        if (url.pathname !== location.pathname) anchor.target = '_top';
+      } else {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', retarget);
+  else retarget();
+})();
+</script>"""
+
 
 def _upgrade_mathjax(body: str) -> str:
     start = body.find(_V2_START)
@@ -61,6 +90,7 @@ def _upgrade_mathjax(body: str) -> str:
 
 
 def polish_preview(body: str) -> str:
-    """Upgrade MathJax and add formula sizing/centering fixes without changing outputs."""
+    """Upgrade MathJax, retarget iframe links and fix formula sizing/centering."""
     body = _upgrade_mathjax(body)
-    return body.replace("</head>", f"{PREVIEW_STYLE}</head>", 1)
+    body = body.replace("</head>", f"{PREVIEW_STYLE}</head>", 1)
+    return body.replace("</body>", f"{LINK_TARGETS}</body>", 1)
