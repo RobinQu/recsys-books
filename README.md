@@ -76,7 +76,7 @@ python scripts/build_previews.py
 
 论文到正文的锚点在 `config/paper_evidence.json` 中维护。每个锚点包含正文关键字、论文 ID、页码、可搜索短语、短引文和边界解释，并在导读正文中派生多个可点击的下划线语义入口。模型结构优先使用 `config/paper_figures.json` 登记的论文原图裁切并保留 Figure/页码出处；论文没有合适结构图时才生成原创 SVG。
 
-详细内容约束、资源策略和页面结构见 `AGENTS.md` 与 `TUTORIAL_REQUIREMENTS.md`。
+详细内容约束、资源策略和页面结构见 `AGENTS.md` 与 `docs/TUTORIAL_REQUIREMENTS.md`。
 
 ## 5. 测试与质量门禁
 

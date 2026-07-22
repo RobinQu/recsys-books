@@ -276,7 +276,7 @@ const artifact = {
     title: "互联网推荐算法：从协同过滤到生成式推荐",
     description: "以召回与排序双视角梳理推荐算法演进、典型方法优缺点和国内外工业实践。",
     generatedAt: "2026-07-17T00:00:00+08:00",
-    sources: [{ id: sourceId, label: "论文与官方工业资料综合来源", path: "recommendation_algorithm_sources.md" }],
+    sources: [{ id: sourceId, label: "论文与官方工业资料综合来源", path: "docs/recommendation_algorithm_sources.md" }],
     charts,
     tables,
     blocks,
@@ -291,7 +291,7 @@ const artifact = {
   sources: [{
     id: sourceId,
     label: "论文与官方工业资料综合来源",
-    path: "recommendation_algorithm_sources.md",
+    path: "docs/recommendation_algorithm_sources.md",
     query: {
       language: "markdown",
       description: "基于原始论文、公司研究页面和官方工程博客整理；含证据等级、口径限制与全部链接。",

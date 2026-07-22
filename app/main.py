@@ -288,7 +288,7 @@ def legacy_source_redirect(slug: str):
 
 @app.get("/legacy", response_class=HTMLResponse)
 def legacy():
-    path = ROOT / "legacy_recsys_report.html"
+    path = ROOT / "legacy" / "legacy_recsys_report.html"
     if not path.exists():
         raise HTTPException(404)
     return FileResponse(path, media_type="text/html")
@@ -296,12 +296,12 @@ def legacy():
 
 @app.get("/research-ledger")
 def research_ledger():
-    return FileResponse(ROOT / "recommendation_algorithm_sources.md", media_type="text/markdown; charset=utf-8")
+    return FileResponse(ROOT / "docs" / "recommendation_algorithm_sources.md", media_type="text/markdown; charset=utf-8")
 
 
 @app.get("/tutorial-requirements")
 def tutorial_requirements():
-    return FileResponse(ROOT / "TUTORIAL_REQUIREMENTS.md", media_type="text/markdown; charset=utf-8")
+    return FileResponse(ROOT / "docs" / "TUTORIAL_REQUIREMENTS.md", media_type="text/markdown; charset=utf-8")
 
 
 @app.exception_handler(404)
