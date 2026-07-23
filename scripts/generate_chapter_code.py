@@ -22,14 +22,14 @@ MODEL_IMPORTS = {
     "3_3_3_dien": ("torch_rechub.models.ranking", "DIEN"),
     "3_4_1_mmoe": ("torch_rechub.models.multi_task", "MMOE"),
     "3_4_2_ple": ("torch_rechub.models.multi_task", "PLE"),
-    "4_3_dlrm_hstu_practice": ("torch_rechub.models.generative", "HSTUModel"),
+    "4_2_dlrm_hstu_practice": ("torch_rechub.models.generative", "HSTUModel"),
 }
 
 RUNNERS = {
     "3_2_1_dssm": "run_dssm", "3_2_2_mind": "run_mind", "3_2_3_sasrec": "run_sasrec",
     "3_3_1_deepfm": "run_deepfm", "3_3_2_din": "run_din", "3_3_3_dien": "run_dien",
     "3_4_1_mmoe": "run_mmoe", "3_4_2_ple": "run_ple",
-    "4_2_openonerec_practice": "run_openonerec", "4_3_dlrm_hstu_practice": "run_hstu",
+    "4_1_openonerec_practice": "run_openonerec", "4_2_dlrm_hstu_practice": "run_hstu",
 }
 
 RUN_BLOCKS = {
@@ -41,8 +41,8 @@ RUN_BLOCKS = {
     "3_3_3_dien": ["_run_sequence_ranker", "run_dien"],
     "3_4_1_mmoe": ["_multitask_view", "_run_multitask", "run_mmoe"],
     "3_4_2_ple": ["_multitask_view", "_run_multitask", "run_ple"],
-    "4_2_openonerec_practice": ["_semantic_catalog", "run_openonerec"],
-    "4_3_dlrm_hstu_practice": ["_sequence_windows_from_sequences", "run_hstu"],
+    "4_1_openonerec_practice": ["_semantic_catalog", "run_openonerec"],
+    "4_2_dlrm_hstu_practice": ["_sequence_windows_from_sequences", "run_hstu"],
 }
 
 TRAIN_IMPORTS = {
@@ -54,8 +54,8 @@ TRAIN_IMPORTS = {
     "3_3_3_dien": "from sklearn.metrics import log_loss\nfrom torch_rechub.basic.features import SequenceFeature, SparseFeature\nfrom torch_rechub.models.ranking import DIEN",
     "3_4_1_mmoe": "from sklearn.linear_model import LogisticRegression\nfrom torch_rechub.basic.features import DenseFeature\nfrom torch_rechub.models.multi_task import MMOE",
     "3_4_2_ple": "from sklearn.linear_model import LogisticRegression\nfrom torch_rechub.basic.features import DenseFeature\nfrom torch_rechub.models.multi_task import PLE",
-    "4_2_openonerec_practice": "from .model import TinyListGenerator",
-    "4_3_dlrm_hstu_practice": "from torch_rechub.models.generative import HSTUModel",
+    "4_1_openonerec_practice": "from .model import TinyListGenerator",
+    "4_2_dlrm_hstu_practice": "from torch_rechub.models.generative import HSTUModel",
 }
 
 MODEL_GUIDES = {
@@ -67,8 +67,8 @@ MODEL_GUIDES = {
     "3_3_3_dien": ["GRU 从行为序列提取逐时刻兴趣状态", "辅助损失要求相邻兴趣能够区分真实下一行为和负样本", "AUGRU 用候选相关性控制兴趣状态更新"],
     "3_4_1_mmoe": ["多个 expert 学习不同共享模式", "每个任务的 gate 生成独立专家权重", "任务 tower 只读取自己的混合结果并输出对应目标"],
     "3_4_2_ple": ["共享 expert 与任务专属 expert 明确分开", "每层 gate 控制信息流向，减少不相关任务的负迁移", "多层渐进抽取后再进入各任务 tower"],
-    "4_2_openonerec_practice": ["item 先被编码为多级 Semantic ID", "生成器逐 token 输出推荐列表", "解码时必须用合法目录约束，避免生成不存在的物品"],
-    "4_3_dlrm_hstu_practice": ["item embedding 将高基数 ID 映射为稠密向量", "HSTU block 针对非平稳长行为流建模", "每个位置预测下一物品，最后位置用于在线推荐"],
+    "4_1_openonerec_practice": ["item 先被编码为多级 Semantic ID", "生成器逐 token 输出推荐列表", "解码时必须用合法目录约束，避免生成不存在的物品"],
+    "4_2_dlrm_hstu_practice": ["item embedding 将高基数 ID 映射为稠密向量", "HSTU block 针对非平稳长行为流建模", "每个位置预测下一物品，最后位置用于在线推荐"],
 }
 
 CLASSIC_MODELS = {
@@ -182,7 +182,7 @@ MODEL_CLASS = {name}
 def model_class():
     return MODEL_CLASS
 '''
-    if slug == "4_2_openonerec_practice":
+    if slug == "4_1_openonerec_practice":
         return '''"""Small list generator used to explain OpenOneRec's list-level objective."""
 import torch
 
@@ -219,11 +219,23 @@ def train_source(slug: str) -> str:
         source = source_path.read_text(encoding="utf-8")
         lines = source.splitlines()
         wanted = set(RUN_BLOCKS[slug])
+        found = set()
         blocks = []
         for node in ast.parse(source).body:
             if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name in wanted:
+                found.add(node.name)
                 blocks.append("\n".join(lines[node.lineno - 1:(node.end_lineno or node.lineno)]))
-        implementation = annotate_training("\n\n".join(blocks))
+        implementation = "\n\n".join(blocks)
+        missing = wanted - found
+        # chapter_code 是实现的可读源头；industrial_experiments.py 已改为 load_runner
+        # 委托存根。提取不到真实实现时必须失败，否则会用存根覆盖出不可运行的章节代码。
+        if missing or "load_runner" in implementation:
+            raise RuntimeError(
+                f"{slug}: 无法脚手架 train.py —— {source_path} 中没有 "
+                f"{sorted(missing) or sorted(wanted)} 的真实实现（该模块现在只保留委托存根）。"
+                f"请从 git 恢复 chapter_code/{slug}/train.py，或先在 {source_path} 中补回实现。"
+            )
+        implementation = annotate_training(implementation)
         framework_imports = TRAIN_IMPORTS[slug]
         return f'''"""Training and evaluation orchestration for {slug}.
 
@@ -295,7 +307,6 @@ def write_chapter(slug: str, title: str) -> None:
     files = {
         "__init__.py": f'"""Python companion package for {title}."""\n',
         "model.py": model_source(slug, title),
-        "train.py": train_source(slug),
         "inference.py": '''"""Reusable inference path, deliberately separated from optimization."""
 from __future__ import annotations
 import torch
@@ -320,7 +331,7 @@ def test_training_pipeline_returns_observed_results():
     assert result.get("randomly_fabricated_rows", 0) == 0
 ''',
     }
-    if slug in {"4_2_openonerec_practice", "4_3_dlrm_hstu_practice"}:
+    if slug in {"4_1_openonerec_practice", "4_2_dlrm_hstu_practice"}:
         files["test_model.py"] = '''"""CUDA-first chapter test with an explicit CPU-only basic fallback."""
 import torch
 from train import train_and_evaluate
@@ -330,6 +341,10 @@ def test_training_pipeline_returns_observed_results():
     assert isinstance(result, dict) and result
     assert result.get("randomly_fabricated_rows", result.get("dataset", {}).get("randomly_fabricated_rows", 0)) == 0
 '''
+    # 已有 train.py 是读者可见的实现源头，只有缺失时才脚手架；
+    # 提取不到真实实现时 train_source 会响亮失败，而不是产出委托存根。
+    if not (directory / "train.py").exists():
+        files["train.py"] = train_source(slug)
     for name, source in files.items():
         path = directory / name
         # Chapter Python files are maintained as the readable source of truth.

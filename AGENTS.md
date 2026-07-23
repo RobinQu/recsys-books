@@ -9,7 +9,7 @@ Keep exactly two information levels: the home page and an algorithm/notebook det
 The four tabs live in a single tab bar under the page header (`app/templates/notebook_shell.html`).
 
 1. **论文导读 (Paper Evidence)**
-   - Shown only when `show_paper_guide` is true. `app/content.py:notebook_has_paper_guide` returns `False` for the foundations chapter (3.0), every chapter opening/导读 page, and every summary page (3_x_summary / 4_1_generative_overview); only algorithm detail pages keep it. Summary pages do their cross-paper comparison (论文关联关系, 实验数据审计, 未来发展) inside the summary notebook instead.
+   - Shown only when `show_paper_guide` is true. `app/content.py:notebook_has_paper_guide` returns `False` for the foundations chapter (3.0), every chapter opening/导读 page, and every summary page (3_x_summary / 4_3_generative_summary); only algorithm detail pages keep it. Summary pages do their cross-paper comparison (论文关联关系, 实验数据审计, 未来发展) inside the summary notebook instead.
    - Default active tab when available; otherwise the default falls back to 实验预览.
    - Split-pane layout on desktop: left prose, right embedded PDF viewer.
    - **Left pane (prose):**
@@ -74,10 +74,10 @@ Algorithm-specific model, preprocessing, training, inference and tests live in `
 
 ### Chapter-code generator (`scripts/generate_chapter_code.py`)
 
-For each notebook slug, the generator writes a small package under `chapter_code/<slug>/`:
+For each notebook slug, the generator writes a small package under `chapter_code/<slug>/`. Checked-in chapter files are the readable source of truth: the generator only scaffolds files that are missing and never overwrites existing ones.
 
 - `model.py`: a minimal executable model for classic chapters (ItemCF, BiasMF, FM, GBDT+LR, SkipGram); for deep/generative chapters it imports the Torch-RecHub class and adds a short structural guide as comments.
-- `train.py`: extracts the relevant `run_*` functions from `recsys_lab/industrial_experiments.py` and wraps them in a `train_and_evaluate` entry point; classic chapters delegate to `recsys_lab.experiments.run_classic`.
+- `train.py`: scaffolded only when missing, by extracting the relevant `run_*` functions from `recsys_lab/industrial_experiments.py` and wrapping them in a `train_and_evaluate` entry point; classic chapters delegate to `recsys_lab.experiments.run_classic`. Since `industrial_experiments.py` now keeps only `load_runner` delegation stubs (implementations live in `chapter_code/`), the generator raises a `RuntimeError` instead of emitting an unrunnable stub when the real implementation cannot be extracted — restore the chapter's `train.py` from git in that case.
 - `inference.py`: a shared `predict(model, batch)` helper that calls `model.eval()` and `torch.no_grad()`.
 - `test_model.py`: a one-epoch smoke test that asserts the training pipeline returns a dict.
 - `__init__.py` / `.vscode/settings.json` / `pyrightconfig.json`: package metadata and IDE settings.
