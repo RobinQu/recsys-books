@@ -83,14 +83,14 @@
     {% for anchor,num,title,opening,summary,desc in chapter_groups %}<section id="{{ anchor }}" class="section lab-section reveal"><div class="section-kicker">{{ num }} · HANDS-ON</div><div class="lab-head"><div><h2>{{ title }}</h2><p>{{ desc }}</p></div><div class="lab-actions"><a class="button" href="/notebooks/{{ opening }}">数学导读</a><a class="ghost button-like" href="/notebooks/{{ summary }}">结果总结</a></div></div><div class="direct-chapter-links">{% for model in models if model.chapter == anchor %}<a href="/notebooks/{{ model.notebook }}"><span>{{ model.stage }}</span><b>{{ model.name }}</b><small>{{ model.idea }}</small></a>{% endfor %}</div></section>{% endfor %}
 
     <section id="generative" class="section reveal">
-      <div class="section-kicker">04 · GENERATIVE RECOMMENDATION</div><h2>生成式召回、排序与召排融合</h2><div class="hero-actions"><a class="button" href="/notebooks/4_0_generative_foundations">数学与任务导读</a><a class="ghost button-like" href="/notebooks/4_1_generative_overview">发展与结果总结</a></div>
+      <div class="section-kicker">04 · GENERATIVE RECOMMENDATION</div><h2>生成式召回、排序与召排融合</h2><div class="hero-actions"><a class="button" href="/notebooks/4_0_generative_foundations">数学与任务导读</a><a class="ghost button-like" href="/notebooks/4_3_generative_summary">发展与结果总结</a></div>
       <div class="gen-path"><article><span>RETRIEVAL</span><h3>生成式召回</h3><p>TIGER 先用 RQ-VAE 将 item 压成多级 Semantic ID，再由序列模型自回归生成 ID。语义相近 item 共享前缀，利于冷启动；必须约束到合法 ID trie 并处理码本漂移。</p></article><article><span>RANKING</span><h3>生成式排序</h3><p>把候选与上下文放入语言模型，让模型输出排列或相关性 token。优势是指令与语义迁移；瓶颈是候选长度、位置偏差、校准、吞吐和可复现实验。</p></article><article><span>UNIFICATION</span><h3>召排融合</h3><p>OneRec 直接生成推荐 session/list，并以奖励模型、DPO 对齐；HSTU 用面向高基数、非平稳行为流的序列转换单元统一预训练与下游任务。</p></article></div>
       <h3 class="subheading">国内外公开工业实践</h3><div class="practice-grid">{% for p in practices %}<a href="{{ p.url }}" target="_blank" rel="noreferrer" class="practice-card"><span>{{ p.company }} · Evidence {{ p.evidence }}</span><h4>{{ p.system }}</h4><p>{{ p.lesson }}</p></a>{% endfor %}</div>
     </section>
 
     {% set genlabs = [
-      ('openonerec','4.2','基于 OpenOneRec 的实战','4_2_openonerec_practice','轻量档实际执行 RecIF-Bench schema、Semantic ID/trie 约束、列表级指标和 DPO 样本构造；完整档给出官方 1.7B/8B 训练入口与显存前置条件。'),
-      ('hstu','4.3','基于 DLRM HSTU 的实战','4_3_dlrm_hstu_practice','CPU 档用 Torch-RecHub HSTU 跑 next-item 训练与 NDCG；工业档映射到 Meta generative-recommenders 的 DLRM-v3 配置、M-FALCON 与多 GPU 要求。')
+      ('openonerec','4.1','基于 OpenOneRec 的实战','4_1_openonerec_practice','轻量档实际执行 RecIF-Bench schema、Semantic ID/trie 约束、列表级指标和 DPO 样本构造；完整档给出官方 1.7B/8B 训练入口与显存前置条件。'),
+      ('hstu','4.2','基于 DLRM HSTU 的实战','4_2_dlrm_hstu_practice','CPU 档用 Torch-RecHub HSTU 跑 next-item 训练与 NDCG；工业档映射到 Meta generative-recommenders 的 DLRM-v3 配置、M-FALCON 与多 GPU 要求。')
     ] %}
     {% for anchor,num,title,slug,desc in genlabs %}<section id="{{ anchor }}" class="section lab-section reveal"><div class="section-kicker">{{ num }} · HANDS-ON</div><div class="lab-head"><div><h2>{{ title }}</h2><p>{{ desc }}</p></div><div class="lab-actions"><a class="button" href="/notebooks/{{ slug }}">进入算法教程</a></div></div></section>{% endfor %}
 

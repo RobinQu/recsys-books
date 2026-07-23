@@ -9,7 +9,7 @@
       "baseline_metric": null,
       "baseline_value": null,
       "framework": "OpenOneRec contract + PyTorch executable proxy",
-      "source_notebook": "4_2_openonerec_practice",
+      "source_notebook": "4_1_openonerec_practice",
       "validation_mode": "cpu_basic_smoke",
       "dataset": "KuaiRand-Pure (Kuaishou, CIKM 2022)",
       "randomly_fabricated_rows": 0

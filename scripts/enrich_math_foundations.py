@@ -89,14 +89,14 @@ MATH_BY_HAND = {
         "任务 gate 只从共享专家和自己的专属专家中选择；共享 gate 汇总所有专家供下一层公共表示。层层重复后，共享信息逐步提纯，"
         "同时各任务保留不愿共享的私有特征。直觉上像公共课 + 专业课：都听公共课，但不被迫共享全部专业细节。",
     ),
-    "4_2_openonerec_practice": (
+    "4_1_openonerec_practice": (
         "**通用先修：** 3.0.4 条件概率与 3.0.5 Softmax/序列 NLL。"
         " **本节新增：** 自回归分解（链式概率 $\\prod_t P(y_t|y_{<t},x)$）、Semantic ID（RQ-VAE 把物品变成离散 token）、DPO 偏好对齐损失。",
         "自回归分解 $P(y_1,\\ldots,y_T|x)=\\prod_t P(y_t|y_{<t},x)$ 表示：每一步根据上下文和已生成 token 预测下一 token。"
         "Trie 像目录树：前缀 $(1,2)$ 下只允许真实后继 $\\{3,4\\}$，保证不生成非法物品。"
         "DPO 不训练显式 reward，而是让偏好列表 $y^+$ 相对 $y^-$ 的 log-ratio 超过参考模型一个间隔。",
     ),
-    "4_3_dlrm_hstu_practice": (
+    "4_2_dlrm_hstu_practice": (
         "**通用先修：** 3.0.2 注意力/逐元素乘积与 3.0.3 SiLU。"
         " **本节新增：** Pointwise Aggregated Attention（跨位置不归一，多个历史可以同时高分）和相对时间偏置 $r_{t,j}$。",
         "给定序列 $[i_1,\\ldots,i_t]$，HSTU 计算 $a_{t,j}=\\operatorname{SiLU}(q_t\\odot k_j+r_{t,j})$，"

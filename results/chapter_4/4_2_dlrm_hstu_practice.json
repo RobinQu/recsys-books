@@ -9,7 +9,7 @@
       "baseline_metric": null,
       "baseline_value": null,
       "framework": "torch_rechub.models.generative.HSTUModel",
-      "source_notebook": "4_3_dlrm_hstu_practice",
+      "source_notebook": "4_2_dlrm_hstu_practice",
       "validation_mode": "cpu_basic_smoke",
       "dataset": "KuaiRand-Pure (Kuaishou, CIKM 2022)",
       "randomly_fabricated_rows": 0

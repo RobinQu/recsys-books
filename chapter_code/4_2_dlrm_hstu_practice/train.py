@@ -1,4 +1,4 @@
-"""Training and evaluation orchestration for 4_3_dlrm_hstu_practice.
+"""Training and evaluation orchestration for 4_2_dlrm_hstu_practice.
 
 Shared dataset/metric helpers stay in the common module; the model-specific
 tensor construction, loss, optimizer, inference and metrics are visible here.

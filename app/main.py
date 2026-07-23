@@ -39,10 +39,11 @@ LEGACY_NOTEBOOKS = {
     "3_3_ranking_deepfm_din_dien": "3_3_summary",
     "3_4_multitask_mmoe_ple": "3_4_summary",
     "3_0_1_data_and_experiment_pipeline": "3_0_7_data_pipeline",
-    "3_5_0_transformer_foundations": "3_2_0_retrieval_foundations",
-    "3_5_1_sasrec": "3_2_3_sasrec",
-    "3_5_summary": "3_2_summary",
     "3_0_data_pipeline": "3_0_7_data_pipeline",
+    "4_1_generative_overview": "4_3_generative_summary",
+    "4_2_openonerec_practice": "4_1_openonerec_practice",
+    "4_3_dlrm_hstu_practice": "4_2_dlrm_hstu_practice",
+    "4_4_generative_summary": "4_3_generative_summary",
     "a_4_1_data_ml_basics": "3_0_1_data_ml_basics",
     "a_4_2_linear_algebra": "3_0_2_linear_algebra",
     "a_4_3_calculus": "3_0_3_calculus",
@@ -284,14 +285,6 @@ def legacy_source_redirect(slug: str):
     if notebook is None:
         raise HTTPException(404, "Unknown notebook")
     return RedirectResponse(f"/notebooks/{slug}#source", status_code=307)
-
-
-@app.get("/legacy", response_class=HTMLResponse)
-def legacy():
-    path = ROOT / "legacy" / "legacy_recsys_report.html"
-    if not path.exists():
-        raise HTTPException(404)
-    return FileResponse(path, media_type="text/html")
 
 
 @app.get("/research-ledger")

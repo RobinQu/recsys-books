@@ -2001,7 +2001,7 @@
       }
     ]
   },
-  "4_1_generative_overview": {
+  "4_3_generative_summary": {
     "items": [
       {
         "id": "fig1-tiger",
@@ -2379,7 +2379,7 @@
       }
     ]
   },
-  "4_2_openonerec_practice": {
+  "4_1_openonerec_practice": {
     "items": [
       {
         "id": "fig2-onerec",
@@ -2571,7 +2571,7 @@
       }
     ]
   },
-  "4_3_dlrm_hstu_practice": {
+  "4_2_dlrm_hstu_practice": {
     "items": [
       {
         "id": "fig3-hstu",

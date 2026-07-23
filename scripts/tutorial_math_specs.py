@@ -346,7 +346,7 @@ print({"numeric": numeric, "analytic": analytic})
 - [BiasMF：评分误差对隐向量的梯度](/notebooks/3_1_2_matrix_factorization)
 - [DeepFM：共享 embedding 的两条梯度路径](/notebooks/3_3_1_deepfm)
 - [DIEN：序列网络与辅助损失反传](/notebooks/3_3_3_dien)
-- [HSTU：深层序列模型的梯度稳定性](/notebooks/4_3_dlrm_hstu_practice)
+- [HSTU：深层序列模型的梯度稳定性](/notebooks/4_2_dlrm_hstu_practice)
 
 ## Checks
 
@@ -465,7 +465,7 @@ plt.xlabel("mean prediction"); plt.ylabel("positive rate"); plt.legend(); plt.gr
 - [DSSM：条件概率与负采样](/notebooks/3_2_1_dssm)
 - [DIN：候选条件下的点击概率](/notebooks/3_3_2_din)
 - [MMoE：多个 Bernoulli 任务](/notebooks/3_4_1_mmoe)
-- [OpenOneRec：序列条件概率](/notebooks/4_2_openonerec_practice)
+- [OpenOneRec：序列条件概率](/notebooks/4_1_openonerec_practice)
 
 ## Checks
 
@@ -583,7 +583,7 @@ g=np.array([6.,8.]); clipped=g*min(1,5/np.linalg.norm(g)); print("clipped",clipp
 - [DeepFM：mini-batch 与共享参数](/notebooks/3_3_1_deepfm)
 - [MMoE：gate 与任务冲突](/notebooks/3_4_1_mmoe)
 - [PLE：共享/专属专家缓解负迁移](/notebooks/3_4_2_ple)
-- [HSTU：长序列训练稳定性](/notebooks/4_3_dlrm_hstu_practice)
+- [HSTU：长序列训练稳定性](/notebooks/4_2_dlrm_hstu_practice)
 
 ## Checks
 
@@ -703,8 +703,8 @@ print({"sequence_probability":token_p.prod(),"NLL":nll,"perplexity":ppl,"DPO_mar
 - [word2vec：负采样二元交叉熵](/notebooks/3_1_5_word2vec)
 - [DSSM：sampled softmax](/notebooks/3_2_1_dssm)
 - [SASRec：next-item NLL](/notebooks/3_2_3_sasrec)
-- [OpenOneRec：序列生成与 DPO](/notebooks/4_2_openonerec_practice)
-- [HSTU：序列预测与 Normalized Entropy](/notebooks/4_3_dlrm_hstu_practice)
+- [OpenOneRec：序列生成与 DPO](/notebooks/4_1_openonerec_practice)
+- [HSTU：序列预测与 Normalized Entropy](/notebooks/4_2_dlrm_hstu_practice)
 
 ## Checks
 

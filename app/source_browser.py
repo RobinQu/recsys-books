@@ -22,7 +22,7 @@ FRAMEWORK_MODULES = {
     "3_3_3_dien": ["torch_rechub.models.ranking.dien", "torch_rechub.trainers.ctr_trainer"],
     "3_4_1_mmoe": ["torch_rechub.models.multi_task.mmoe", "torch_rechub.trainers.mtl_trainer"],
     "3_4_2_ple": ["torch_rechub.models.multi_task.ple", "torch_rechub.trainers.mtl_trainer"],
-    "4_3_dlrm_hstu_practice": ["torch_rechub.models.generative.hstu", "torch_rechub.trainers.seq_trainer"],
+    "4_2_dlrm_hstu_practice": ["torch_rechub.models.generative.hstu", "torch_rechub.trainers.seq_trainer"],
 }
 
 CURRICULUM_SOURCE_PATHS = (

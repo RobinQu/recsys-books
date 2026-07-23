@@ -28,8 +28,8 @@
 | `3_3_3_dien` | A | 固化辅助损失、GRU/AUGRU 与严格时序语义 |
 | `3_4_1_mmoe` | A | 固化任务 gate、张量形状和共享梯度路径 |
 | `3_4_2_ple` | A | 固化 CGC、渐进抽取、样本空间与任务权重 |
-| `4_2_openonerec_practice` | P1 | 补自回归/DPO/trie 推导，并隔离官方 RecIF/reward 与本地 smoke |
-| `4_3_dlrm_hstu_practice` | P1 | 补非 Softmax 的 SiLU 聚合，并隔离 Meta full 协议与 KuaiRand 适配器 |
+| `4_1_openonerec_practice` | P1 | 补自回归/DPO/trie 推导，并隔离官方 RecIF/reward 与本地 smoke |
+| `4_2_dlrm_hstu_practice` | P1 | 补非 Softmax 的 SiLU 聚合，并隔离 Meta full 协议与 KuaiRand 适配器 |
 
 ## 面向高中毕业生的教学微契约
 

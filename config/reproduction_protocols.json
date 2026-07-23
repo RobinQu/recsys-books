@@ -11,5 +11,5 @@
   "3_3_3_dien": {"dataset":"Amazon Reviews Electronics 5-core","resource":"amazon-electronics-5core","split":"paper-compatible chronological negative sampling","metrics":["AUC","LogLoss"],"paper_comparison":"online CTR/eCPM values are not reproducible from public data"},
   "3_4_1_mmoe": {"dataset":"Census-Income KDD","resource":"census-income-kdd","split":"official train/test files","metrics":["task AUC","task LogLoss"],"paper_comparison":"compare with MMoE Census-income experiment"},
   "3_4_2_ple": {"dataset":"Census-Income KDD","resource":"census-income-kdd","split":"official train file plus 1:1 validation/test split of the official test file","metrics":["income AUC","marital-status AUC"],"paper_comparison":"PLE reports Census-income offline experiments; Tencent online values remain proprietary"},
-  "4_3_dlrm_hstu_practice": {"dataset":"MovieLens 20M + Amazon Books","resource":"movielens-20m-full","split":"official generative-recommenders preprocessing","metrics":["NDCG@10","HR@10"],"paper_comparison":"use Meta public configs and identical sampled-softmax candidate count"}
+  "4_2_dlrm_hstu_practice": {"dataset":"MovieLens 20M + Amazon Books","resource":"movielens-20m-full","split":"official generative-recommenders preprocessing","metrics":["NDCG@10","HR@10"],"paper_comparison":"use Meta public configs and identical sampled-softmax candidate count"}
 }

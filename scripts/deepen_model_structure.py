@@ -116,7 +116,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_ple` 用 Torch-RecHub 的 `PLE` 实现第 1–4 步；数据与标签与 MMoE 章节完全一致，便于对照结构差异。""",
     ),
-    "4_2_openonerec_practice": (
+    "4_1_openonerec_practice": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 
@@ -128,7 +128,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_openonerec` 在教程规模下实现第 1–4 步的接口契约；官方完整训练配置与 IPA 流程在 OpenOneRec 框架中。""",
     ),
-    "4_3_dlrm_hstu_practice": (
+    "4_2_dlrm_hstu_practice": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 

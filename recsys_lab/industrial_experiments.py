@@ -21,8 +21,8 @@ CHAPTER_RUNNERS = {
     "run_dien": "3_3_3_dien",
     "run_mmoe": "3_4_1_mmoe",
     "run_ple": "3_4_2_ple",
-    "run_openonerec": "4_2_openonerec_practice",
-    "run_hstu": "4_3_dlrm_hstu_practice",
+    "run_openonerec": "4_1_openonerec_practice",
+    "run_hstu": "4_2_dlrm_hstu_practice",
 }
 
 

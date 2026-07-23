@@ -1,4 +1,4 @@
-"""Training and evaluation orchestration for 4_2_openonerec_practice.
+"""Training and evaluation orchestration for 4_1_openonerec_practice.
 
 Shared dataset/metric helpers stay in the common module; the model-specific
 tensor construction, loss, optimizer, inference and metrics are visible here.

@@ -114,8 +114,8 @@ def test_deep_chapters_are_split_and_use_industrial_framework_classes():
         "3_4_1_mmoe.ipynb": ["MMoE", "gate", "run_mmoe", "Train & Inference", "Results Discussion"],
         "3_4_2_ple.ipynb": ["PLE", "专属专家", "run_ple", "Train & Inference", "Results Discussion"],
         "3_2_3_sasrec.ipynb": ["SASRec", "因果", "run_sasrec", "Train & Inference", "Results Discussion"],
-        "4_2_openonerec_practice.ipynb": ["OpenOneRec", "trie", "run_openonerec", "Train & Inference", "Results Discussion"],
-        "4_3_dlrm_hstu_practice.ipynb": ["HSTUModel", "因果", "run_hstu", "Train & Inference", "Results Discussion"],
+        "4_1_openonerec_practice.ipynb": ["OpenOneRec", "trie", "run_openonerec", "Train & Inference", "Results Discussion"],
+        "4_2_dlrm_hstu_practice.ipynb": ["HSTUModel", "因果", "run_hstu", "Train & Inference", "Results Discussion"],
     }
     for filename, required in expected.items():
         notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
@@ -137,8 +137,8 @@ def test_deep_notebooks_derive_model_specific_structure_and_loss():
         "3_4_1_mmoe.ipynb": ["[B,E,d]", "task gate", "\\lambda_k"],
         "3_4_2_ple.ipynb": ["CGC", "共享专家", "progressive extraction"],
         "3_2_3_sasrec.ipynb": ["QK^\\top", "因果 mask", "softplus"],
-        "4_2_openonerec_practice.ipynb": ["L_{DPO}", "teacher forcing", "trie"],
-        "4_3_dlrm_hstu_practice.ipynb": ["SiLU", "pointwise aggregated attention", "next-item"],
+        "4_1_openonerec_practice.ipynb": ["L_{DPO}", "teacher forcing", "trie"],
+        "4_2_dlrm_hstu_practice.ipynb": ["SiLU", "pointwise aggregated attention", "next-item"],
     }
     for filename, tokens in expected.items():
         notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
@@ -150,9 +150,9 @@ def test_deep_notebooks_derive_model_specific_structure_and_loss():
 def test_generative_notebooks_are_cuda_first_with_cpu_basic_fallback():
     names = [
         "4_0_generative_foundations.ipynb",
-        "4_1_generative_overview.ipynb",
-        "4_2_openonerec_practice.ipynb",
-        "4_3_dlrm_hstu_practice.ipynb",
+        "4_3_generative_summary.ipynb",
+        "4_1_openonerec_practice.ipynb",
+        "4_2_dlrm_hstu_practice.ipynb",
     ]
     for name in names:
         notebook = nbformat.read(Path("notebooks") / name, as_version=4)
@@ -179,7 +179,7 @@ def test_every_large_chapter_has_a_result_aggregation_notebook():
         "3_2_summary.ipynb": 3,
         "3_3_summary.ipynb": 3,
         "3_4_summary.ipynb": 2,
-        "4_1_generative_overview.ipynb": 2,
+        "4_3_generative_summary.ipynb": 2,
     }
     for filename, count in expected.items():
         notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
@@ -193,7 +193,7 @@ def test_summary_notebooks_explain_paper_comparability_and_do_not_hide_glyph_war
         notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
         source = "\n".join(cell.source for cell in notebook.cells)
         assert "原论文" in source and ("不可直接比较" in source or "不能相减" in source)
-    for filename in ["3_2_summary.ipynb", "3_3_summary.ipynb", "3_4_summary.ipynb", "4_1_generative_overview.ipynb"]:
+    for filename in ["3_2_summary.ipynb", "3_3_summary.ipynb", "3_4_summary.ipynb", "4_3_generative_summary.ipynb"]:
         notebook = nbformat.read(Path("notebooks") / filename, as_version=4)
         source = "\n".join(cell.source for cell in notebook.cells)
         assert "Noto Sans CJK" in source and "ASCII fallback" in source
@@ -364,12 +364,12 @@ def test_priority_math_audit_keeps_formula_and_data_protocol_boundaries_explicit
             "paper_protocol": ["Amazon Electronics", "阿里广告系统口径"],
             "tutorial_protocol": ["KuaiRand", "不能相减", "当前样本的负标签"],
         },
-        "4_2_openonerec_practice": {
+        "4_1_openonerec_practice": {
             "formula": ["P(y_1", r"\prod", "L_{DPO}", "trie", "Semantic ID"],
             "paper_protocol": ["RecIF", "reward", "官方"],
             "tutorial_protocol": ["KuaiRand", "smoke", "不把本地 chosen/rejected 当成官方 reward 数据"],
         },
-        "4_3_dlrm_hstu_practice": {
+        "4_2_dlrm_hstu_practice": {
             "formula": ["SiLU", "不做整序列 softmax", "因果 mask", "next-item"],
             "paper_protocol": ["MovieLens-20M", "Amazon Books", "full 协议"],
             "tutorial_protocol": ["KuaiRand", "不会自动切换", "严格时间切分"],

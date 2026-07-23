@@ -107,7 +107,6 @@ def test_home_contains_required_sections():
     assert "/notebooks/3_3_0_ranking_foundations" in html
     assert "/notebooks/3_4_0_multitask_foundations" in html
     assert "/notebooks/3_2_3_sasrec" in html
-    assert "/notebooks/3_5_0_transformer_foundations" not in html
     assert "/notebooks/4_0_generative_foundations" in html
     assert "/chapters/" not in html
     assert "/notebooks/3_1_1_collaborative_filtering" in html
@@ -116,8 +115,8 @@ def test_home_contains_required_sections():
     assert "/notebooks/3_4_1_mmoe" in html
     assert "先把公式翻译成可以手算的直觉" in html
     assert 'class="sidebar-subnav"' in html
-    assert "/notebooks/4_2_openonerec_practice" in html
-    assert "/notebooks/4_3_dlrm_hstu_practice" in html
+    assert "/notebooks/4_1_openonerec_practice" in html
+    assert "/notebooks/4_2_dlrm_hstu_practice" in html
     assert "查看 33 个 Notebook" in html
     assert "/notebooks/3_0_7_data_pipeline" in html
     assert "/notebooks/3_0_1_data_ml_basics" in html
@@ -144,7 +143,7 @@ def test_full_and_smoke_dataset_protocols_are_explicit_in_catalogue_and_headers(
         "3_3_3_dien": ("full：Amazon Electronics", "smoke：KuaiRand feed 序列"),
         "3_4_1_mmoe": ("full：Census-Income", "smoke：KuaiRand 双目标"),
         "3_4_2_ple": ("full：Census-Income", "smoke：KuaiRand 双目标"),
-        "4_3_dlrm_hstu_practice": ("full：Meta MovieLens-20M + Amazon Books", "smoke：KuaiRand feed 序列"),
+        "4_2_dlrm_hstu_practice": ("full：Meta MovieLens-20M + Amazon Books", "smoke：KuaiRand feed 序列"),
     }
     notebooks = {notebook["slug"]: notebook for notebook in content.NOTEBOOKS}
     for slug, phrases in affected.items():
@@ -355,7 +354,7 @@ def test_detail_pages_render_modes_and_paper_guide_by_role():
         "4_0_generative_foundations",
         # 总结章节在 notebook 内做跨论文比较，不再显示论文导读 tab
         "3_1_summary", "3_2_summary", "3_3_summary", "3_4_summary",
-        "4_1_generative_overview",
+        "4_3_generative_summary",
     }
     for notebook in NOTEBOOKS:
         slug = notebook["slug"]
@@ -387,16 +386,16 @@ def test_detail_pages_render_modes_and_paper_guide_by_role():
 
 def test_generative_interactive_mode_follows_cuda_capability(monkeypatch):
     monkeypatch.setenv("RECSYS_CUDA_AVAILABLE", "0")
-    html = client.get("/notebooks/4_2_openonerec_practice").text
+    html = client.get("/notebooks/4_1_openonerec_practice").text
     assert 'data-mode="execute" disabled aria-disabled="true"' in html
     assert "未检测到 CUDA" in html and "此实验需要 CUDA" in html
-    assert "/lab/tree/notebooks/4_2_openonerec_practice.ipynb" not in html
+    assert "/lab/tree/notebooks/4_1_openonerec_practice.ipynb" not in html
 
     monkeypatch.setenv("RECSYS_CUDA_AVAILABLE", "1")
-    html = client.get("/notebooks/4_2_openonerec_practice").text
+    html = client.get("/notebooks/4_1_openonerec_practice").text
     assert 'data-mode="execute" disabled' not in html
     assert "CUDA 已就绪" in html
-    assert "/lab/tree/notebooks/4_2_openonerec_practice.ipynb" in html
+    assert "/lab/tree/notebooks/4_1_openonerec_practice.ipynb" in html
 
 
 def test_cuda_compose_override_builds_cuda_image_and_exposes_gpu():
@@ -583,8 +582,8 @@ def test_algorithm_implementations_are_chapter_local():
         "3_3_1_deepfm": "def _ranking_fields",
         "3_3_2_din": "def _run_sequence_ranker",
         "3_4_1_mmoe": "def _run_multitask",
-        "4_2_openonerec_practice": "def _semantic_catalog",
-        "4_3_dlrm_hstu_practice": "def _sequence_windows_from_sequences",
+        "4_1_openonerec_practice": "def _semantic_catalog",
+        "4_2_dlrm_hstu_practice": "def _sequence_windows_from_sequences",
     }
     for slug, token in local_expectations.items():
         source = (Path("chapter_code") / slug / "train.py").read_text(encoding="utf-8")

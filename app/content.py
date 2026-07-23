@@ -23,8 +23,8 @@ MODELS = [
     {"id":"mmoe","chapter":"multitask","stage":"多目标","name":"MMoE","idea":"每个任务用独立 gate 混合同一组共享专家。","pros":"共享灵活；适合相关任务。","cons":"专家塌缩、梯度冲突与样本空间错位。","metric":"逐任务 AUC + business value","notebook":"3_4_1_mmoe"},
     {"id":"ple","chapter":"multitask","stage":"多目标","name":"PLE","idea":"逐层分离共享与任务专属专家，控制知识共享边界。","pros":"缓解负迁移与跷跷板。","cons":"结构、参数和调参成本更高。","metric":"逐任务 AUC + transfer gap","notebook":"3_4_2_ple"},
     {"id":"sasrec","chapter":"retrieval","stage":"召回/Transformer","name":"SASRec","idea":"以因果自注意力编码真实行为序列，输出当前用户向量并预测下一物品。","pros":"并行训练；兼顾近期转移与较长依赖；可接全库检索。","cons":"注意力随序列长度平方增长；严格依赖时间协议。","metric":"HR@K / NDCG@K / P99","notebook":"3_2_3_sasrec"},
-    {"id":"openonerec","chapter":"generative","stage":"生成式","name":"OpenOneRec","idea":"将 item/list token 化，自回归生成并用目录约束和奖励对齐。","pros":"统一列表目标；支持偏好优化。","cons":"无效 ID、重复、解码延迟与目录更新。","metric":"NDCG / invalid rate / P99","notebook":"4_2_openonerec_practice"},
-    {"id":"hstu","chapter":"generative","stage":"生成式","name":"DLRM HSTU","idea":"把长期行为流作为统一序列进行 next-item 预训练与下游迁移。","pros":"长序列、统一表征和规模效应。","cons":"训练服务协同复杂，GPU ROI 要求高。","metric":"HR/NDCG + throughput / P99","notebook":"4_3_dlrm_hstu_practice"},
+    {"id":"openonerec","chapter":"generative","stage":"生成式","name":"OpenOneRec","idea":"将 item/list token 化，自回归生成并用目录约束和奖励对齐。","pros":"统一列表目标；支持偏好优化。","cons":"无效 ID、重复、解码延迟与目录更新。","metric":"NDCG / invalid rate / P99","notebook":"4_1_openonerec_practice"},
+    {"id":"hstu","chapter":"generative","stage":"生成式","name":"DLRM HSTU","idea":"把长期行为流作为统一序列进行 next-item 预训练与下游迁移。","pros":"长序列、统一表征和规模效应。","cons":"训练服务协同复杂，GPU ROI 要求高。","metric":"HR/NDCG + throughput / P99","notebook":"4_2_dlrm_hstu_practice"},
 ]
 
 DATASETS = [
@@ -39,7 +39,7 @@ DATASETS = [
     {"name":"EB-NeRD","year":"2024","scale":"2.3M+ news users","fit":"新闻曝光、排序、多样性","note":"提供 demo/small/full，适合曝光偏差研究","url":"https://recsys.eb.dk/"},
     {"name":"Yambda-5B","year":"2025","scale":"4.79B events, 1M users, 9.39M tracks","fit":"工业级召回/排序/序列基础模型","note":"50M/500M/5B 三档；含 organic 标记和音频 embedding","url":"https://huggingface.co/datasets/yandex/yambda"},
     {"name":"Synerise UBM","year":"2025","scale":"multi-event retail logs, 1M target clients","fit":"通用行为表征、多任务","note":"购买/加购/移除/访问/搜索，Parquet","url":"https://recsys.synerise.com/summary"},
-    {"name":"RecIF-Bench","year":"2025","scale":"100M interactions, 200K users","fit":"4.2 OpenOneRec 生成式召排","note":"短视频/广告/商品统一评测；遵循官方许可","url":"https://github.com/Kuaishou-OneRec/OpenOneRec"},
+    {"name":"RecIF-Bench","year":"2025","scale":"100M interactions, 200K users","fit":"4.1 OpenOneRec 生成式召排","note":"短视频/广告/商品统一评测；遵循官方许可","url":"https://github.com/Kuaishou-OneRec/OpenOneRec"},
 ]
 
 PRACTICES = [
@@ -95,9 +95,9 @@ NOTEBOOKS = [
     {"slug":"3_4_2_ple","title":"3.4.2 PLE 渐进式专家抽取","kind":"algorithm","framework":"Torch-RecHub PLE","dataset":"full：Census-Income；smoke：KuaiRand 双目标","runtime":"约 25 秒 CPU"},
     {"slug":"3_4_summary","title":"3.4 总结：MMoE 与 PLE","kind":"summary","framework":"结果聚合与选型","dataset":"full：Census-Income；smoke：KuaiRand 实验 JSON","runtime":"约 5 秒 CPU"},
     {"slug":"4_0_generative_foundations","title":"4.0 导读与数学基础：生成式推荐","kind":"foundation","framework":"NumPy / Matplotlib","dataset":"full：按算法官方协议；smoke：KuaiRand 适配器","runtime":"默认 CUDA；CPU 仅基础检查"},
-    {"slug":"4_1_generative_overview","title":"4.1 总结：生成式召回、排序与融合","kind":"summary","framework":"结果聚合与工业选型","dataset":"full：按算法分别审计；smoke：KuaiRand 实验 JSON","runtime":"默认 CUDA；CPU 仅阅读"},
-    {"slug":"4_2_openonerec_practice","title":"4.2 OpenOneRec 实战","kind":"algorithm","framework":"OpenOneRec 契约 + PyTorch 约束生成器","dataset":"KuaiRand taxonomy adapter；RecIF full 需授权","runtime":"CUDA 混合精度；CPU basic smoke"},
-    {"slug":"4_3_dlrm_hstu_practice","title":"4.3 DLRM HSTU 实战","kind":"algorithm","framework":"Torch-RecHub HSTU + Meta DLRM-v3 配置","dataset":"full：Meta MovieLens-20M + Amazon Books；smoke：KuaiRand feed 序列","runtime":"CUDA 混合精度；官方配置需 4×24GB GPU"},
+    {"slug":"4_1_openonerec_practice","title":"4.1 OpenOneRec 实战","kind":"algorithm","framework":"OpenOneRec 契约 + PyTorch 约束生成器","dataset":"KuaiRand taxonomy adapter；RecIF full 需授权","runtime":"CUDA 混合精度；CPU basic smoke"},
+    {"slug":"4_2_dlrm_hstu_practice","title":"4.2 DLRM HSTU 实战","kind":"algorithm","framework":"Torch-RecHub HSTU + Meta DLRM-v3 配置","dataset":"full：Meta MovieLens-20M + Amazon Books；smoke：KuaiRand feed 序列","runtime":"CUDA 混合精度；官方配置需 4×24GB GPU"},
+    {"slug":"4_3_generative_summary","title":"4.3 总结：生成式召回、排序与召排融合","kind":"summary","framework":"结果聚合与工业选型","dataset":"full：按算法分别审计；smoke：KuaiRand 实验 JSON","runtime":"默认 CUDA；CPU 仅阅读"},
 ]
 
 # The six-course curriculum lives contiguously inside 3.0. Appendix A.4 is only
@@ -354,7 +354,7 @@ CHAPTERS = {
         "intro": "生成式推荐把 item、Semantic ID 或列表当作输出序列，探索从生成候选、生成排列到端到端 session 生成的统一路径。",
         "layout": "先比较 TIGER、生成式排序与 OneRec/HSTU 的任务边界，再分别通过 OpenOneRec 和 DLRM HSTU 实战验证合法解码、列表指标与序列契约。",
         "use_cases": "适合跨域统一建模、长序列和语义冷启；必须同时评估无效 ID、重复率、目录更新、P99 与 GPU ROI。",
-        "model_ids": ["openonerec", "hstu"], "opening": "4_0_generative_foundations", "notebooks": ["4_2_openonerec_practice", "4_3_dlrm_hstu_practice"], "summary": "4_1_generative_overview",
+        "model_ids": ["openonerec", "hstu"], "opening": "4_0_generative_foundations", "notebooks": ["4_1_openonerec_practice", "4_2_dlrm_hstu_practice"], "summary": "4_3_generative_summary",
         "sources": [("Rajput et al., 2023：TIGER", "https://arxiv.org/abs/2305.05065", "以 RQ-VAE Semantic ID 将全库召回转成受约束自回归生成。"), ("Kuaishou, 2025：OneRec / OpenOneRec", "https://github.com/Kuaishou-OneRec/OpenOneRec", "公开列表生成、奖励建模与 RecIF-Bench 流程，是召排融合的工业化样本。"), ("Zhai et al., 2024：HSTU", "https://arxiv.org/abs/2402.17152", "针对高基数、非平稳行为流重新设计序列转换与系统协同。")],
     },
 }

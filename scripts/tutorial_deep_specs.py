@@ -88,7 +88,7 @@ DEEP_MATH_PREREQUISITES = {
         ],
         "paper": "CGC 的可见专家约束、多层渐进分离，以及样本空间掩码和动态任务权重。",
     },
-    "4_2_openonerec_practice": {
+    "4_1_openonerec_practice": {
         "generic": [
             ("序列、标签与反馈", "/notebooks/3_0_1_data_ml_basics#observation-label"),
             ("embedding 与向量量化接口", "/notebooks/3_0_2_linear_algebra#matmul-embedding"),
@@ -97,7 +97,7 @@ DEEP_MATH_PREREQUISITES = {
         ],
         "paper": "残差量化到均衡 Semantic ID 的接口、trie 约束列表解码，以及 reward 模型边界内的迭代偏好对齐。",
     },
-    "4_3_dlrm_hstu_practice": {
+    "4_2_dlrm_hstu_practice": {
         "generic": [
             ("序列与严格时间切分", "/notebooks/3_0_1_data_ml_basics#split-leakage"),
             ("Q/K/V 张量形状", "/notebooks/3_0_2_linear_algebra#low-rank-attention"),
@@ -324,8 +324,8 @@ ax.set_title('PLE: shared plus task-specific experts'); plt.colorbar(image,ax=ax
             "caveat": "full 档参照论文 ML-1M 设置使用 2 blocks、d=50、长度 200、dropout 0.2 与 lr=0.001；只有该档可与 Table III 的 ML-1M HR/NDCG 对照。",
         },
         {
-            "slug": "4_2_openonerec_practice",
-            "title": "4.2 OpenOneRec：受约束列表生成实战",
+            "slug": "4_1_openonerec_practice",
+            "title": "4.1 OpenOneRec：受约束列表生成实战",
             "chapter": "chapter_4",
             "function": "run_openonerec",
             "source": "[Kuaishou OpenOneRec](https://github.com/Kuaishou-OneRec/OpenOneRec)",
@@ -345,8 +345,8 @@ ax.plot([.72,.86],[.38,.27]); ax.plot([.72,.86],[.38,.49]); ax.set_title('Catalo
             "caveat": "合法率只是底线，不等于相关性；还需看 Recall/NDCG、重复率、多样性、P99、目录更新和奖励偏差。",
         },
         {
-            "slug": "4_3_dlrm_hstu_practice",
-            "title": "4.3 DLRM HSTU：长行为序列实战",
+            "slug": "4_2_dlrm_hstu_practice",
+            "title": "4.2 DLRM HSTU：长行为序列实战",
             "chapter": "chapter_4",
             "function": "run_hstu",
             "source": "[Zhai et al., 2024, HSTU](https://arxiv.org/abs/2402.17152) · [Meta generative-recommenders](https://github.com/meta-recsys/generative-recommenders)",
@@ -376,8 +376,8 @@ ax.set_xticks(range(length)); ax.set_yticks(range(length)); plt.colorbar(image,a
         "3_3_3_dien": ("dien", "Table 2（公开集各重复 5 次）：Amazon Electronics DIEN AUC 0.7792±0.00243（DIN 0.7603、BaseModel 0.7435），Books 0.8453±0.00476（DIN 0.7880）。Table 3（工业数据，70 亿样本、历史截断 50）：DIEN 0.6541（DIN 0.6428、BaseModel 0.6350）。Table 4 消融：AUGRU 优于 AIGRU/AGRU；辅助损失在公开集贡献最大、工业集收益变小。Table 5 在线 A/B（2018-06-07~07-12，淘宝展示广告）：相对 BaseModel，DIEN CTR +20.7%、eCPM +17.1%、PPC −3.0%（DIN 为 +8.9%/+6.7%/−2.0%）。服务侧 GRU 隐状态 108→32 维，延迟 38.2→6.6 ms。以上均为论文系统口径，教程结果另行报告。"),
         "3_4_1_mmoe": ("mmoe", "原文先用合成数据控制任务相关性：输入 100 维、8 个 16 单元专家、tower 8 单元，每个设置独立重复 200 次——相关性降到 0.5 时 Shared-Bottom 与单门 OMoE 明显退化而 MMoE 几乎不变，且 MMoE 的最终损失方差更小（trainability）。UCI Census-income：299,285 条、40 特征、199,523 训练 + 99,762 测试，两组任务相关性 0.1768/0.2373，每种方法调参后独立训练 400 次；相关性更低的第二组 MMoE 主任务 AUC 最佳 0.8860、均值 0.8826，所有均值优于其他多任务模型。Google 排序：300 亿隐式反馈训练、100 万留出，Table 3 中 AUC@6M 0.6908（Shared-Bottom 0.6900）、R²@6M 0.09362（0.09287）；Table 4 线上 MMoE 相对 Shared-Bottom engagement +0.25%、satisfaction +2.65%。以上是论文系统口径，教程在 Census-income 官方切分与 KuaiRand 上重测的数值不可相减。"),
         "3_4_2_ple": ("ple", "原文工业数据：腾讯视频推荐 8 天日志采样，46.926M 用户、2.682M 视频、0.995B 样本，前 7 天训练。Table 1（复杂相关 VTR/VCR）：PLE VCR MSE 0.1307 最优、VTR AUC 0.6831，双任务 MTL gain 同时为正；MMoE 的 VCR gain 仅 +0.0001，ML-MMOE 升 VTR 损 VCR，即跷跷板。Table 3（4 周在线 A/B）：PLE 相对单任务总播放量 +4.17%、总观看时长 +3.57%（CGC +3.92%/+2.75%，MMoE +1.94%/+1.73%）；摘要另给相对 SOTA MTL +2.23%/+1.84% 的口径。Table 5：Census-income 两任务 0.9522/0.9945、Ali-CCP 0.6112/0.6097，均超单任务与 MMoE（MMoE 在 Ali-CCP CVR 上 gain −0.0302）；合成数据 PLE 平均 MTL gain 高 MMoE 87.2%。教程数值另行报告，不可相减。"),
-        "4_2_openonerec_practice": ("onerec", "原文 Table 1（离线，指标由 reward 模型估计而非真实行为）：OneRec-1B+IPA 的 swt mean/max 为 0.1025/0.1933，OneRec-1B 为 0.0991/0.1529，TIGER-1B 为 0.0873/0.1368，SASRec 仅 0.0375/0.0803；IPA 优于 DPO/IPO/cDPO/rDPO/CPO/simPO/S-DPO 全部对比变体。Table 2（快手主页面 1% 流量在线 A/B）：OneRec-1B+IPA 总观看时长 +1.68%、平均观看时长 +6.56%（摘要约写作 1.6%）。实现细节：Semantic ID 3 层、每层 8192 簇，历史 n=256、session m=5，MoE 24 专家每 token 激活 2 个，beam size 128，推理仅 13% 参数激活；0.05B→1B 规模消融持续提升。以上是快手业务口径，教程在 KuaiRand 上复现 Semantic ID、trie 约束与列表指标契约，数值不可相减。"),
-        "4_3_dlrm_hstu_practice": ("hstu", "原文 Table 4（公开数据，multi-pass full-shuffle 设定）：相对论文自跑的 SASRec，ML-1M HR@10 0.2853→0.3097（+8.6%，HSTU-large +15.5%），ML-20M +11.9%（large +22.8%），Books 0.0292→0.0404（+38.4%，large +60.6%），Books NDCG@10 最高 +65.8%。Table 5（工业单遍流式）消融显示换成 softmax 注意力或去掉相对偏置均退化；编码器与 FlashAttention-2 同配置对比，训练最高快 15.2 倍、推理快 5.6 倍（H100、bfloat16、序列 1024–8192）。Table 7（工业排序在线 A/B）：GR 相对 DLRM E-Task +12.4%、C-Task +4.4%；模型质量随训练算力幂律扩展，最大 1.5 万亿参数。以上是 Meta 系统口径，轻量实验只验证接口，数值不可相减。"),
+        "4_1_openonerec_practice": ("onerec", "原文 Table 1（离线，指标由 reward 模型估计而非真实行为）：OneRec-1B+IPA 的 swt mean/max 为 0.1025/0.1933，OneRec-1B 为 0.0991/0.1529，TIGER-1B 为 0.0873/0.1368，SASRec 仅 0.0375/0.0803；IPA 优于 DPO/IPO/cDPO/rDPO/CPO/simPO/S-DPO 全部对比变体。Table 2（快手主页面 1% 流量在线 A/B）：OneRec-1B+IPA 总观看时长 +1.68%、平均观看时长 +6.56%（摘要约写作 1.6%）。实现细节：Semantic ID 3 层、每层 8192 簇，历史 n=256、session m=5，MoE 24 专家每 token 激活 2 个，beam size 128，推理仅 13% 参数激活；0.05B→1B 规模消融持续提升。以上是快手业务口径，教程在 KuaiRand 上复现 Semantic ID、trie 约束与列表指标契约，数值不可相减。"),
+        "4_2_dlrm_hstu_practice": ("hstu", "原文 Table 4（公开数据，multi-pass full-shuffle 设定）：相对论文自跑的 SASRec，ML-1M HR@10 0.2853→0.3097（+8.6%，HSTU-large +15.5%），ML-20M +11.9%（large +22.8%），Books 0.0292→0.0404（+38.4%，large +60.6%），Books NDCG@10 最高 +65.8%。Table 5（工业单遍流式）消融显示换成 softmax 注意力或去掉相对偏置均退化；编码器与 FlashAttention-2 同配置对比，训练最高快 15.2 倍、推理快 5.6 倍（H100、bfloat16、序列 1024–8192）。Table 7（工业排序在线 A/B）：GR 相对 DLRM E-Task +12.4%、C-Task +4.4%；模型质量随训练算力幂律扩展，最大 1.5 万亿参数。以上是 Meta 系统口径，轻量实验只验证接口，数值不可相减。"),
     }
 
     # Keep the narrative close to the mathematics, while leaving the runnable
@@ -575,7 +575,7 @@ $$A=\mathrm{softmax}\left(\frac{QK^\top}{\sqrt d}+M\right),\qquad H=AV.$$
 $$L_t=\mathrm{softplus}(-h_t^\top e^+)+\mathrm{softplus}(h_t^\top e^-).$$
 
 softplus$(z)=\log(1+e^z)$ 始终为正。正物品点积越大，第一项越接近 0；负物品点积越小，第二项越接近 0。训练时所有位置可并行，推理时必须取最后有效位置而不是最后一个 padding，再做全库点积或 ANN。""", "`run_sasrec` 从真实时间戳生成序列、正目标和负目标；Torch-RecHub SASRec 实现 item/position embedding、causal attention 与 pairwise loss。"),
-        "4_2_openonerec_practice": (r"""
+        "4_1_openonerec_practice": (r"""
 ### 结构：把物品变成可以“写”出来的 Semantic ID
 
 先定记号：物品 $i$ 的内容 embedding（标题、标签等文本经预训练编码器得到）记为 $x_i$；量化器把它映射为 $m$ 级 token 元组 $s(i)=(c_1,\ldots,c_m)$，每个 $c_j$ 是第 $j$ 层码本里的一个编号。
@@ -624,7 +624,7 @@ $$L_{DPO}=-\log\sigma\{\beta[(\log\pi(y^+|x)-\log\pi_{ref}(y^+|x))-(\log\pi(y^-|
 ### Reward 的证据边界
 
 reward 模型 $R(x,y)$ 只是用历史反馈训练出的代理评分器，不是真实用户满意度，也不是线上因果收益。IPA 在模型自己采样的 128 个列表中按 $R$ 选 best/worst；DPO 随后只学习这对相对顺序，既不会直接优化真实观看时长，也无法修复 reward 模型没见过的偏差。trie 又只保证“目录合法”，不保证相关、多样或公平。因此三层验收必须分开：token 交叉熵检验模仿数据，reward/DPO 检验代理偏好，真正业务收益只能由同口径离线标签和线上 A/B 验证。smoke 实验只覆盖第一层与约束接口。""", "`run_openonerec` 展开教学 Semantic ID、teacher forcing 与 trie 解码；它没有训练官方 RQ-VAE/均衡量化器或 reward 模型。完整 OpenOneRec 配置留在官方框架，教程明确区分接口、代理 reward 和线上效果。"),
-        "4_3_dlrm_hstu_practice": (r"""
+        "4_2_dlrm_hstu_practice": (r"""
 ### 结构：一个模块替代 DLRM 的三类拼装件
 
 DLRM 通常把特征抽取（embedding 查表）、特征交互（FM/DCN）、表示变换（MLP/MoE）拼成三段。HSTU 的主张是：把所有特征序列化成统一流 $X\in\mathbb R^{B\times L\times d}$：$B$ 个用户、每人最多 $L$ 个事件、每个事件 $d$ 维，然后反复堆叠同一种模块。论文 Eq.1/2/3 给出每个 HSTU 层的三个子层：
@@ -847,7 +847,7 @@ print('PASS：数据、训练、推理、测试和结果产物均已验证。')"
          "DeepFM 处理静态 field 交互；DIN 让历史随候选变化；DIEN 再利用次序。复杂模型不保证胜出，AUC、LogLoss、GAUC 与 P99 必须同时评估。", "DeepFM · DIN · DIEN 原始论文"),
         ("3_4_summary", "3.4", "MMoE 与 PLE 多目标", "chapter_3_4", 2,
          "MMoE 为任务选择共享专家；PLE 再隔离任务专属专家。必须逐任务报告，避免平均指标掩盖跷跷板，并检查专家利用率与负迁移。", "MMoE · PLE 原始论文"),
-        ("4_1_generative_overview", "4.1", "生成式召回、排序与召排融合", "chapter_4", 2,
+        ("4_3_generative_summary", "4.3", "生成式召回、排序与召排融合", "chapter_4", 2,
          "OpenOneRec 关注 Semantic ID、列表解码与奖励对齐；HSTU 关注统一长序列。共同验收维度是相关性、合法性、重复率、目录更新、解码延迟与 GPU ROI。", "TIGER · OpenOneRec · HSTU 论文及官方仓库"),
     ]
     paper_audits = {
@@ -915,7 +915,7 @@ print('PASS：数据、训练、推理、测试和结果产物均已验证。')"
         ],
     }
     paper_relationships = {
-        "4_1_generative_overview": [
+        "4_3_generative_summary": [
             {
                 "paper": "TIGER (2023)",
                 "starts_from": "embedding+ANN 检索无法利用物品的层次语义，随机 ID 对新物品无泛化",
@@ -1013,7 +1013,7 @@ print('PASS：数据、训练、推理、测试和结果产物均已验证。')"
         ],
     }
     future_maps = {
-        "4_1_generative_overview": [
+        "4_3_generative_summary": [
             ["物品表示", "RQ-VAE 层次 Semantic ID", "均衡 K-Means 残差量化（每层 8192 簇）", "统一特征序列化，无显式 ID", "多模态内容与行为联合、可增量更新的标识"],
             ["生成单位", "下一物品的 ID token", "整屏 session 列表", "任意未来事件序列", "列表级多样性/新颖性的显式建模"],
             ["训练信号", "逐 token 交叉熵", "NTP + 自采样迭代 DPO", "生成式 next-item + 流式采样", "在线反馈闭环、多目标对齐与去偏"],
@@ -1043,13 +1043,13 @@ print('PASS：数据、训练、推理、测试和结果产物均已验证。')"
         ],
     }
     relationship_intros = {
-        "4_1_generative_overview": "三篇论文不是同一赛道上的升级排名，而是把“生成”逐层推深：TIGER 先回答“物品怎么变成可生成的标识”，OneRec 回答“生成能不能统一召回与排序并对齐偏好”，HSTU 回答“整个推荐能不能变成随算力扩展的序列转导”。下表中的“交接问题”比发表年份更重要。",
+        "4_3_generative_summary": "三篇论文不是同一赛道上的升级排名，而是把“生成”逐层推深：TIGER 先回答“物品怎么变成可生成的标识”，OneRec 回答“生成能不能统一召回与排序并对齐偏好”，HSTU 回答“整个推荐能不能变成随算力扩展的序列转导”。下表中的“交接问题”比发表年份更重要。",
         "3_2_summary": "三篇论文不是同一赛道上的简单升级排名。DSSM 提供“可独立编码并比较”的结构起点；MIND 沿着**表示数量**扩展，把一个用户拆成多个并行兴趣；SASRec 沿着**时间顺序**扩展，让当前表示随历史位置变化。下表中的“交接问题”比发表年份更重要。",
         "3_3_summary": "三篇论文沿同一条 CTR 排序线各自补一块短板：DeepFM 解决“静态特征交互要不要手工”，DIN 解决“用户表示与候选无关”，DIEN 解决“历史没有次序、行为不等于兴趣”。下表中的“交接问题”比发表年份更重要。",
         "3_4_summary": "两篇论文沿同一条多任务结构线：MMoE 解决“共享底层对任务关系太敏感”，PLE 解决“共享专家仍被无差别共享、跷跷板仍在”。下表中的“交接问题”比发表年份更重要。",
     }
     future_columns = {
-        "4_1_generative_overview": ["dimension", "TIGER line", "OneRec line", "HSTU line", "next questions"],
+        "4_3_generative_summary": ["dimension", "TIGER line", "OneRec line", "HSTU line", "next questions"],
         "3_2_summary": ["dimension", "DSSM line", "MIND line", "SASRec line", "next questions"],
         "3_3_summary": ["dimension", "DeepFM line", "DIN line", "DIEN line", "next questions"],
         "3_4_summary": ["dimension", "MMoE line", "PLE line", "next questions"],
