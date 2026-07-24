@@ -70,9 +70,7 @@ def run_sasrec(epochs: int | None = None, *, progress: ProgressCallback | None =
     neg = SequenceFeature("neg", vocab, embedding_dim, pooling="concat", shared_with="seq", padding_idx=0)
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = SASRec([seq, pos, neg], max_len=length, dropout_rate=.2 if full_profile() else .1, num_blocks=2 if full_profile() else 1, num_heads=1 if full_profile() else 2)
-    model.to(device)
     data = {"seq": torch.tensor(train_input), "pos": torch.tensor(train_target), "neg": torch.tensor(negative)}
-    data = {k: v.to(device) for k, v in data.items()}
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"sequence_users": len(train_input)})
     # 3) optimizer 只在训练阶段更新参数；推理阶段不应再调用它。
     optimizer = torch.optim.Adam(model.parameters(), lr=.001 if full_profile() else .008); losses=[]
@@ -102,7 +100,7 @@ def run_sasrec(epochs: int | None = None, *, progress: ProgressCallback | None =
     with torch.inference_mode():
         user_batches = []
         for start in range(0, len(eval_input), batch_size):
-            batch = {"seq": torch.tensor(eval_input[start:start + batch_size]).to(device)}
+            batch = {"seq": torch.tensor(eval_input[start:start + batch_size])}
             sequence_embedding = model.item_emb(batch, model.features[:1])[:, 0]
             # Inputs use left padding, so the newest valid event is always at
             # the final column. Torch-RecHub's user_tower currently computes

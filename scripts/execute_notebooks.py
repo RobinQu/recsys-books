@@ -67,7 +67,6 @@ def sanitize_notebook_outputs(
 
 def _execute_one(
     path: Path,
-    *,
     profile: str,
     execution_cwd: Path,
     artifact_root: Path,
@@ -152,7 +151,7 @@ def main():
             continue
         if workers <= 1 or len(paths) == 1:
             for path in paths:
-                _execute_one(path, profile=args.profile, execution_cwd=execution_cwd, artifact_root=artifact_root)
+                _execute_one(path, args.profile, execution_cwd, artifact_root)
         else:
             print(f"--- {phase_name} phase: {len(paths)} notebooks, {workers} workers ---", flush=True)
             with ProcessPoolExecutor(max_workers=workers) as pool:

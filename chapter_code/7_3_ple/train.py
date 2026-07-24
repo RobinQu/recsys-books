@@ -46,6 +46,9 @@ def _run_multitask(
     expert = {"dims": [24, 12], "activation": "relu", "dropout": 0.0}; towers = [{"dims": [12], "activation": "relu", "dropout": 0.0}] * 2
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = MMOE(features, ["classification", "classification"], 4, expert, towers) if kind == "mmoe" else PLE(features, ["classification", "classification"], 2, 2, 2, expert, towers)
+    if kind == "ple":
+        device = torch.device("cpu")
+    model.to(device)
     data = {f"x{i}": torch.tensor(x[:, i]).to(device) for i in range(x.shape[1])}; target = torch.tensor(labels).to(device)
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"train_rows": split, "test_rows": len(x_test)})
     # 3) optimizer 只在训练阶段更新参数；推理阶段不应再调用它。

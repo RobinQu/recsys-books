@@ -80,7 +80,7 @@ def run_mind(epochs: int = 26, *, progress: ProgressCallback | None = None) -> d
             stop = min(start + batch_size, len(rows))
             batch = {name: value[start:stop] for name, value in train_data.items()}
             logits = model(batch)
-            loss = torch.nn.functional.cross_entropy(logits, torch.zeros(stop - start, dtype=torch.long))
+            loss = torch.nn.functional.cross_entropy(logits, torch.zeros(stop - start, dtype=torch.long, device=device))
             optimizer.zero_grad(); loss.backward(); optimizer.step()
             epoch_loss += float(loss.detach()) * (stop - start)
             completed += 1
