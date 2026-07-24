@@ -16,6 +16,7 @@ from recsys_lab.runtime import (
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
+    training_device,
     train_binary as _train_binary,
     full_profile,
     sampled_embedding_rank_metrics,
@@ -54,7 +55,7 @@ def _sample_unobserved_negatives(user_ids, sequences, rows, vocab):
 def run_sasrec(epochs: int | None = None, *, progress: ProgressCallback | None = None) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
     emit_progress(progress, stage="data_prepare", current=0, total=1, message="加载数据并构造 SASRec 序列窗口")
-    seed_everything(); ratings, provenance = _real_amazon(max_users=160)
+    seed_everything(); device = training_device(); ratings, provenance = _real_amazon(max_users=160)
     epochs = (201 if full_profile() else 30) if epochs is None else epochs
     length = 200 if full_profile() else 20
     # SASRec treats every observed action as implicit positive feedback. A low
@@ -69,7 +70,9 @@ def run_sasrec(epochs: int | None = None, *, progress: ProgressCallback | None =
     neg = SequenceFeature("neg", vocab, embedding_dim, pooling="concat", shared_with="seq", padding_idx=0)
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = SASRec([seq, pos, neg], max_len=length, dropout_rate=.2 if full_profile() else .1, num_blocks=2 if full_profile() else 1, num_heads=1 if full_profile() else 2)
+    model.to(device)
     data = {"seq": torch.tensor(train_input), "pos": torch.tensor(train_target), "neg": torch.tensor(negative)}
+    data = {k: v.to(device) for k, v in data.items()}
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"sequence_users": len(train_input)})
     # 3) optimizer 只在训练阶段更新参数；推理阶段不应再调用它。
     optimizer = torch.optim.Adam(model.parameters(), lr=.001 if full_profile() else .008); losses=[]
@@ -99,7 +102,7 @@ def run_sasrec(epochs: int | None = None, *, progress: ProgressCallback | None =
     with torch.inference_mode():
         user_batches = []
         for start in range(0, len(eval_input), batch_size):
-            batch = {"seq": torch.tensor(eval_input[start:start + batch_size])}
+            batch = {"seq": torch.tensor(eval_input[start:start + batch_size]).to(device)}
             sequence_embedding = model.item_emb(batch, model.features[:1])[:, 0]
             # Inputs use left padding, so the newest valid event is always at
             # the final column. Torch-RecHub's user_tower currently computes
@@ -111,8 +114,8 @@ def run_sasrec(epochs: int | None = None, *, progress: ProgressCallback | None =
                 emit_progress(progress, stage="inference", current=completed, total=inference_chunks)
         user_vectors = torch.cat(user_batches)
         item_vectors = model.item_emb.embed_dict["seq"].weight[1:]
-        user_vectors = np.nan_to_num(user_vectors.numpy(), nan=0.0, posinf=0.0, neginf=0.0)
-        item_vectors = np.nan_to_num(item_vectors.numpy(), nan=0.0, posinf=0.0, neginf=0.0)
+        user_vectors = np.nan_to_num(user_vectors.cpu().numpy(), nan=0.0, posinf=0.0, neginf=0.0)
+        item_vectors = np.nan_to_num(item_vectors.cpu().numpy(), nan=0.0, posinf=0.0, neginf=0.0)
     seen = [set(row[row > 0] - 1) for row in eval_input]
     emit_progress(progress, stage="baseline", current=0, total=1, message="计算热门物品基线")
     popularity = np.bincount(train_input.ravel(), minlength=vocab)[1:]

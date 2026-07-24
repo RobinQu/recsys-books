@@ -17,6 +17,7 @@ from recsys_lab.runtime import (
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
+    training_device,
     train_binary as _train_binary,
     full_profile,
     real_amazon_electronics,
@@ -29,6 +30,7 @@ def _run_sequence_ranker(
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
     emit_progress(progress, stage="data_prepare", current=0, total=1, message=f"加载并构造 {kind.upper()} 序列")
     seed_everything()
+    device = training_device()
     if full_profile():
         interactions, provenance = real_amazon_electronics()
         rows = sequence_classification_rows(interactions, max_len=20, limit=0)
@@ -47,17 +49,19 @@ def _run_sequence_ranker(
     else:
         negative = [SequenceFeature("negative_history", n_items + 1, 12, pooling="concat", shared_with="item_id", padding_idx=0)]
         model = DIEN(user, history, negative, item, {"dims": [40, 20], "dropout": 0.0}, alpha=.1); used = list(tensors)
+    model.to(device)
     train = {name: tensors[name][:split] for name in used}; y_train = torch.tensor(labels[:split])
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"rows": len(labels)})
     # 4) 公共训练循环执行 forward、二元交叉熵、backward 和 optimizer.step。
     losses = _train_binary(
-        model, train, y_train, epochs, .012, dien=kind == "dien", progress=progress,
+        model, train, y_train, epochs, .012, dien=kind == "dien", device=device, progress=progress,
     )
     # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
     inference_batch = 65_536
     inference_rows = len(labels) - split
     inference_chunks = (inference_rows + inference_batch - 1) // inference_batch
     emit_progress(progress, stage="inference", current=0, total=inference_chunks, message="分批生成序列排序概率")
+    tensors = {k: v.to(device) for k, v in tensors.items()}
     model.eval()
     with torch.inference_mode():
         chunks = []
@@ -66,7 +70,7 @@ def _run_sequence_ranker(
             chunks.append(output[0] if kind == "dien" else output)
             if progress_due(chunk_index, inference_chunks):
                 emit_progress(progress, stage="inference", current=chunk_index, total=inference_chunks)
-        probability = torch.cat(chunks).numpy() if chunks else np.empty(0, dtype=np.float32)
+        probability = torch.cat(chunks).cpu().numpy() if chunks else np.empty(0, dtype=np.float32)
     history_values = rows["history"]
     overlap = (history_values == rows["item_id"][:, None]).mean(1)
     # 6) 返回真实测试切分上的指标和必要诊断信息，供章节总结统一读取。

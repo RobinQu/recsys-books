@@ -111,7 +111,7 @@ def seed_everything(seed: int = 2026) -> None:
     np.random.seed(seed)
     torch.manual_seed(seed)
     if not full_profile():
-        torch.set_num_threads(1)
+        torch.set_num_threads(min(4, os.cpu_count() or 1))
         return
     configured = os.getenv("RECSYS_TORCH_THREADS")
     if configured is not None:
@@ -124,6 +124,15 @@ def seed_everything(seed: int = 2026) -> None:
     else:
         thread_count = min(8, os.cpu_count() or 1)
     torch.set_num_threads(thread_count)
+
+
+def training_device() -> torch.device:
+    """Use CUDA when available; fall back to CPU otherwise."""
+    if torch.cuda.is_available():
+        torch.set_float32_matmul_precision("high")
+        torch.backends.cuda.matmul.allow_tf32 = True
+        return torch.device("cuda")
+    return torch.device("cpu")
 
 
 def save_records(chapter: str, name: str, records: list[dict]) -> Path:
@@ -204,9 +213,14 @@ def train_binary(
     dien: bool = False,
     batch_size: int = 4096,
     *,
+    device: torch.device | None = None,
     progress: ProgressCallback | None = None,
 ) -> list[float]:
     """Mini-batch BCE loop that can consume complete public datasets."""
+    if device is not None:
+        model.to(device)
+        data = {name: value.to(device) for name, value in data.items()}
+        labels = labels.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     losses: list[float] = []
     steps_per_epoch = (len(labels) + batch_size - 1) // batch_size

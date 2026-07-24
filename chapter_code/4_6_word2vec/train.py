@@ -4,7 +4,7 @@ import torch
 
 from .model import SkipGram, negative_sampling_loss
 from recsys_lab.data import leave_last_out, load_movielens
-from recsys_lab.runtime import ProgressCallback, emit_progress, full_profile, progress_due
+from recsys_lab.runtime import ProgressCallback, emit_progress, full_profile, progress_due, training_device
 
 
 def _skip_gram_pair_count(sequences, window: int = 3) -> int:
@@ -43,6 +43,7 @@ def _skip_gram_pair_batches(sequences, batch_size: int, window: int = 3):
 
 def train_and_evaluate(epochs: int = 8, *, progress: ProgressCallback | None = None) -> dict:
     torch.manual_seed(2026)
+    device = training_device()
     # 时间留一法：每个用户最后一个正反馈物品作为测试目标，其余构成训练序列。
     emit_progress(progress, stage="data_prepare", current=0, total=1, message="加载 MovieLens 并构造正反馈序列")
     ratings, _ = load_movielens(max_users=80, max_items=360, min_user_events=12)
@@ -63,6 +64,7 @@ def train_and_evaluate(epochs: int = 8, *, progress: ProgressCallback | None = N
     rng = np.random.default_rng(2026)
 
     model = SkipGram(num_items, dim=32)
+    model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.05)
     losses: list[float] = []
     pair_batch = min(pair_count, 1_000_000)
@@ -73,10 +75,10 @@ def train_and_evaluate(epochs: int = 8, *, progress: ProgressCallback | None = N
     for _ in range(epochs):
         weighted = 0.0
         for chunk in _skip_gram_pair_batches(sequences.values(), pair_batch, window=3):
-            center = torch.from_numpy(chunk[:, 0])
-            context = torch.from_numpy(chunk[:, 1])
+            center = torch.from_numpy(chunk[:, 0]).to(device)
+            context = torch.from_numpy(chunk[:, 1]).to(device)
             # 对每个正样本采样若干负物品，构成正负对比；负采样避免遍历全物品表。
-            neg = torch.tensor(rng.integers(1, num_items, size=(len(chunk), num_neg)), dtype=torch.long)
+            neg = torch.tensor(rng.integers(1, num_items, size=(len(chunk), num_neg)), dtype=torch.long).to(device)
             score_pos = model(center, context)
             score_neg = model(center[:, None].expand(-1, num_neg).reshape(-1), neg.reshape(-1))
             loss = negative_sampling_loss(score_pos, score_neg)
@@ -90,7 +92,7 @@ def train_and_evaluate(epochs: int = 8, *, progress: ProgressCallback | None = N
     # 用中心嵌入作为物品向量；归一为单位向量后用余弦相似度召回，量纲稳定且与 item2vec 检索惯例一致。
     emit_progress(progress, stage="inference", current=0, total=1, message="提取归一化物品向量")
     with torch.inference_mode():
-        embeddings = model.center.weight.detach().numpy()
+        embeddings = model.center.weight.detach().cpu().numpy()
     norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
     normed = embeddings / np.maximum(norms, 1e-12)
     emit_progress(progress, stage="inference", current=1, total=1)

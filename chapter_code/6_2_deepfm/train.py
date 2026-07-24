@@ -19,6 +19,7 @@ from recsys_lab.runtime import (
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
+    training_device,
     train_binary as _train_binary,
     complete_or_recent,
     full_profile,
@@ -43,6 +44,7 @@ def _run_criteo_deepfm(epochs: int, *, progress: ProgressCallback | None = None)
     train 构建，测试集未见类别编码为 0。
     """
     emit_progress(progress, stage="data_prepare", current=0, total=1, message="加载并编码 Criteo_x1 官方切分")
+    device = training_device()
     train, _, test, provenance = _real_criteo()
     dense = [f"I{index}" for index in range(1, 14)]
     sparse_names = [f"C{index}" for index in range(1, 27)]
@@ -62,14 +64,16 @@ def _run_criteo_deepfm(epochs: int, *, progress: ProgressCallback | None = None)
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"train_rows": len(train), "test_rows": len(test)})
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = DeepFM(features, features, {"dims": [64, 32], "activation": "relu", "dropout": 0.0})
+    model.to(device)
     # 4) 公共训练循环执行 forward、二元交叉熵、backward 和 optimizer.step。
     losses = _train_binary(
-        model, train_x, labels_train, epochs, .001, batch_size=100_000, progress=progress,
+        model, train_x, labels_train, epochs, .001, batch_size=100_000, device=device, progress=progress,
     )
     # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
     inference_batch = 500_000
     inference_chunks = (len(labels_test) + inference_batch - 1) // inference_batch
     emit_progress(progress, stage="inference", current=0, total=inference_chunks, message="分批生成 Criteo 测试概率")
+    test_x = {k: v.to(device) for k, v in test_x.items()}
     model.eval()
     with torch.inference_mode():
         probability_chunks = []
@@ -77,7 +81,7 @@ def _run_criteo_deepfm(epochs: int, *, progress: ProgressCallback | None = None)
             probability_chunks.append(model({name: value[start:start + inference_batch] for name, value in test_x.items()}))
             if progress_due(chunk_index, inference_chunks):
                 emit_progress(progress, stage="inference", current=chunk_index, total=inference_chunks)
-        probability = torch.cat(probability_chunks).numpy()
+        probability = torch.cat(probability_chunks).cpu().numpy()
     # LR 基线只用前 200 万训练行拟合（口径写入 provenance），与论文的 LR 对照保持同任务。
     emit_progress(progress, stage="baseline", current=0, total=1, message="训练 LR 基线")
     baseline = LogisticRegression(max_iter=100).fit(
@@ -102,6 +106,7 @@ def _run_criteo_deepfm(epochs: int, *, progress: ProgressCallback | None = None)
 def run_deepfm(epochs: int = 28, *, progress: ProgressCallback | None = None) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
     seed_everything()
+    device = training_device()
     if full_profile():
         return _run_criteo_deepfm(epochs, progress=progress)
     emit_progress(progress, stage="data_prepare", current=0, total=1, message="加载 KuaiRand 排序数据")
@@ -115,17 +120,19 @@ def run_deepfm(epochs: int = 28, *, progress: ProgressCallback | None = None) ->
     ]
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = DeepFM(features, features, {"dims": [48, 24], "activation": "relu", "dropout": 0.0})
+    model.to(device)
     tensors = {name: torch.tensor(value, dtype=torch.long) for name, value in fields.items()}
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"rows": len(labels)})
     # 4) 公共训练循环执行 forward、二元交叉熵、backward 和 optimizer.step。
     losses = _train_binary(
         model, {k: v[:split] for k, v in tensors.items()}, torch.tensor(labels[:split]), epochs, .015,
-        progress=progress,
+        device=device, progress=progress,
     )
     # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
     inference_batch = 131_072
     inference_chunks = (len(labels) - split + inference_batch - 1) // inference_batch
     emit_progress(progress, stage="inference", current=0, total=inference_chunks, message="分批生成测试概率")
+    tensors = {k: v.to(device) for k, v in tensors.items()}
     model.eval()
     with torch.inference_mode():
         chunks = []
@@ -133,7 +140,7 @@ def run_deepfm(epochs: int = 28, *, progress: ProgressCallback | None = None) ->
             chunks.append(model({k: v[start:start + inference_batch] for k, v in tensors.items()}))
             if progress_due(chunk_index, inference_chunks):
                 emit_progress(progress, stage="inference", current=chunk_index, total=inference_chunks)
-        probability = torch.cat(chunks).numpy()
+        probability = torch.cat(chunks).cpu().numpy()
     baseline_x = np.c_[frame.tab.to_numpy(), frame.hour.to_numpy(), frame.duration_bucket.to_numpy()]
     emit_progress(progress, stage="baseline", current=0, total=1, message="训练独立 LR 基线")
     baseline = LogisticRegression(max_iter=300).fit(baseline_x[:split], labels[:split])

@@ -17,6 +17,7 @@ from recsys_lab.runtime import (
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
+    training_device,
     train_binary as _train_binary,
     complete_or_recent,
     real_multitask_dataset as _real_multitask,
@@ -39,13 +40,14 @@ def _run_multitask(
 ) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
     emit_progress(progress, stage="data_prepare", current=0, total=1, message=f"加载 {kind.upper()} 多任务数据")
-    seed_everything(); x_train, y_train, x_test, y_test, provenance = _real_multitask()
+    seed_everything(); device = training_device(); x_train, y_train, x_test, y_test, provenance = _real_multitask()
     x = np.r_[x_train, x_test]; labels = np.r_[y_train, y_test]; split = len(x_train)
     features = [DenseFeature(f"x{i}") for i in range(x.shape[1])]
     expert = {"dims": [24, 12], "activation": "relu", "dropout": 0.0}; towers = [{"dims": [12], "activation": "relu", "dropout": 0.0}] * 2
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = MMOE(features, ["classification", "classification"], 4, expert, towers) if kind == "mmoe" else PLE(features, ["classification", "classification"], 2, 2, 2, expert, towers)
-    data = {f"x{i}": torch.tensor(x[:, i]) for i in range(x.shape[1])}; target = torch.tensor(labels)
+    model.to(device)
+    data = {f"x{i}": torch.tensor(x[:, i]).to(device) for i in range(x.shape[1])}; target = torch.tensor(labels).to(device)
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"train_rows": split, "test_rows": len(x_test)})
     # 3) optimizer 只在训练阶段更新参数；推理阶段不应再调用它。
     optimizer = torch.optim.Adam(model.parameters(), lr=.012); losses = []
@@ -76,7 +78,7 @@ def _run_multitask(
             chunks.append(model({name: value[start:start + batch_size] for name, value in data.items()}))
             if progress_due(chunk_index, inference_chunks):
                 emit_progress(progress, stage="inference", current=chunk_index, total=inference_chunks)
-        probability = torch.cat(chunks).numpy()
+        probability = torch.cat(chunks).cpu().numpy()
     independent_auc = []
     emit_progress(progress, stage="baseline", current=0, total=2, message="训练两个独立 LR 基线")
     for task in range(2):

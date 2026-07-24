@@ -4,7 +4,7 @@ import torch
 
 from .model import FactorizationMachine
 from recsys_lab.data import load_movielens
-from recsys_lab.runtime import ProgressCallback, emit_progress, full_profile, progress_due
+from recsys_lab.runtime import ProgressCallback, emit_progress, full_profile, progress_due, training_device
 
 BATCH = 2_000_000  # full 档 mini-batch 上限
 
@@ -22,6 +22,10 @@ def train_and_evaluate(epochs: int = 8, *, progress: ProgressCallback | None = N
     labels = torch.tensor(frame.like.to_numpy(), dtype=torch.float32)
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"rows": len(frame)})
     split = int(len(frame) * .8); model = FactorizationMachine(int(feature_ids.max()) + 1)
+    device = training_device()
+    model.to(device)
+    feature_ids = feature_ids.to(device)
+    labels = labels.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=.02); losses = []
     emit_progress(progress, stage="train", current=0, total=epochs, message="训练 Factorization Machine")
     for epoch in range(epochs):
@@ -40,12 +44,12 @@ def train_and_evaluate(epochs: int = 8, *, progress: ProgressCallback | None = N
             emit_progress(progress, stage="train", current=epoch + 1, total=epochs, metrics={"loss": losses[-1]})
     emit_progress(progress, stage="inference", current=0, total=1, message="分批生成测试集概率")
     with torch.inference_mode():
-        probability = torch.cat([torch.sigmoid(model(feature_ids[start:start + BATCH])) for start in range(split, len(feature_ids), BATCH)]).numpy()
+        probability = torch.cat([torch.sigmoid(model(feature_ids[start:start + BATCH])) for start in range(split, len(feature_ids), BATCH)]).cpu().numpy()
     emit_progress(progress, stage="inference", current=1, total=1)
     from sklearn.metrics import log_loss, roc_auc_score
     emit_progress(progress, stage="evaluate", current=0, total=1, message="计算 AUC 与 LogLoss")
-    auc = float(roc_auc_score(labels[split:].numpy(), probability))
-    test_logloss = float(log_loss(labels[split:].numpy(), np.clip(probability, 1e-6, 1 - 1e-6)))
+    auc = float(roc_auc_score(labels[split:].cpu().numpy(), probability))
+    test_logloss = float(log_loss(labels[split:].cpu().numpy(), np.clip(probability, 1e-6, 1 - 1e-6)))
     emit_progress(progress, stage="evaluate", current=1, total=1, metrics={"auc": auc, "logloss": test_logloss})
     dataset = "MovieLens latest (33M)" if full_profile() else "MovieLens latest-small"
     return {

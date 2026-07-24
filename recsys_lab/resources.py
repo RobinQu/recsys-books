@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import shutil
+import sys
 import tarfile
 import tempfile
 import time
@@ -175,20 +176,59 @@ def inspect_resource(kind: str, item: dict) -> ResourceState:
     return ResourceState(item["id"], kind, str(path.relative_to(ROOT)), "ready", path.stat().st_size, digest)
 
 
+def _format_size(size_bytes: int) -> str:
+    for unit in ("B", "KB", "MB", "GB"):
+        if size_bytes < 1024:
+            return f"{size_bytes:.1f} {unit}" if unit != "B" else f"{size_bytes} {unit}"
+        size_bytes /= 1024
+    return f"{size_bytes:.1f} TB"
+
+
+def _render_progress(label: str, downloaded: int, total: int | None, *, is_tty: bool) -> None:
+    if not is_tty:
+        return
+    if total and total > 0:
+        fraction = downloaded / total
+        filled = int(30 * fraction)
+        bar = "█" * filled + "░" * (30 - filled)
+        line = f"\r  {label}  {fraction:3.0%} {bar}  {_format_size(downloaded)}/{_format_size(total)}"
+    else:
+        line = f"\r  {label}  {_format_size(downloaded)}"
+    sys.stderr.write(line)
+    sys.stderr.flush()
+
+
 def _download_url(url: str, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_suffix(destination.suffix + ".part")
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     last_error: Exception | None = None
+    is_tty = hasattr(sys.stderr, "isatty") and sys.stderr.isatty()
+    label = destination.name
     for attempt in range(3):
         try:
-            with urllib.request.urlopen(request, timeout=90) as response, temporary.open("wb") as output:
-                shutil.copyfileobj(response, output, length=1024 * 1024)
+            with urllib.request.urlopen(request, timeout=90) as response:
+                total = response.headers.get("Content-Length")
+                total = int(total) if total else None
+                downloaded = 0
+                chunk_size = 256 * 1024
+                with temporary.open("wb") as output:
+                    while True:
+                        chunk = response.read(chunk_size)
+                        if not chunk:
+                            break
+                        output.write(chunk)
+                        downloaded += len(chunk)
+                        _render_progress(label, downloaded, total, is_tty=is_tty)
+            if is_tty:
+                sys.stderr.write("\n")
             temporary.replace(destination)
             return
         except Exception as error:  # network failures are reported in the lock
             last_error = error
             temporary.unlink(missing_ok=True)
+            if is_tty:
+                sys.stderr.write("\n")
             time.sleep(2**attempt)
     raise RuntimeError(f"download failed: {url}: {last_error}")
 
@@ -239,10 +279,13 @@ def ensure_resources(
     RESOURCE_ROOT.mkdir(parents=True, exist_ok=True)
     states: list[ResourceState] = []
     fetched = 0  # resources actually downloaded this run (ready items are skipped)
-    for kind, item in iter_resources(kinds, ids):
+    resource_list = list(iter_resources(kinds, ids))
+    total = len(resource_list)
+    for index, (kind, item) in enumerate(resource_list, 1):
         state = inspect_resource(kind, item)
         should_fetch = download and state.status != "ready" and (item.get("required", False) or include_optional)
         if should_fetch and not offline:
+            print(f"[{index}/{total}] fetching {item['id']} …", end="", flush=True)
             try:
                 if item["provider"] == "huggingface":
                     _download_huggingface(item, target_path(item), offline)
@@ -256,8 +299,15 @@ def ensure_resources(
                 state = inspect_resource(kind, item)
                 if state.status == "ready":
                     fetched += 1
+                    size_info = f" ({_format_size(state.size)})" if state.size else ""
+                    print(f" done{size_info}")
+                else:
+                    print(f" {state.status}")
             except Exception as error:
                 state.message = str(error)
+                print(f" failed: {error}")
+        elif state.status != "ready":
+            print(f"[{index}/{total}] {item['id']} … {state.status}")
         states.append(state)
     # 合并历史锁文件：按 --id/--kind 过滤的调用只更新涉及条目，
     # 不能整文件覆写，否则单次小范围调用会丢失其他资源的就绪记录。

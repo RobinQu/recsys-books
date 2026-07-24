@@ -17,6 +17,7 @@ from recsys_lab.runtime import (
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
+    training_device,
     train_binary as _train_binary,
     full_profile,
     real_amazon_electronics,
@@ -29,6 +30,7 @@ def _run_sequence_ranker(
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
     emit_progress(progress, stage="data_prepare", current=0, total=1, message=f"加载并构造 {kind.upper()} 序列")
     seed_everything()
+    device = training_device()
     if full_profile():
         interactions, provenance = real_amazon_electronics()
         rows = sequence_classification_rows(interactions, max_len=20, limit=0)

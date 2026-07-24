@@ -4,6 +4,7 @@ import argparse
 import os
 import re
 import sys
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -64,6 +65,43 @@ def sanitize_notebook_outputs(
         ]
 
 
+def _execute_one(
+    path: Path,
+    *,
+    profile: str,
+    execution_cwd: Path,
+    artifact_root: Path,
+) -> str:
+    """Execute a single notebook in a worker process."""
+    os.environ["RECSYS_PROFILE"] = profile
+    os.environ["RECSYS_ARTIFACT_ROOT"] = str(artifact_root)
+    print(f"executing {path.name} ...", flush=True)
+    nb = nbformat.read(path, as_version=4)
+    client = NotebookClient(
+        nb,
+        timeout=600 if profile == "smoke" else 7200,
+        kernel_name="python3",
+        resources={"metadata": {"path": str(execution_cwd)}},
+    )
+    client.execute()
+    sanitize_notebook_outputs(
+        nb,
+        project_root=ROOT,
+        artifact_root=artifact_root,
+        execution_cwd=execution_cwd,
+    )
+    nbformat.write(nb, path)
+    print(f"executed {path.name}")
+    return path.name
+
+
+def _worker_count() -> int:
+    import torch
+    if torch.cuda.is_available():
+        return 2
+    return min(4, os.cpu_count() or 1)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", default="smoke", choices=["smoke", "full"])
@@ -86,6 +124,12 @@ def main():
         default=ROOT,
         help="结果等运行产物的根目录；默认使用仓库根目录",
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=None,
+        help="并行 worker 数；默认根据 CPU/GPU 自动选择",
+    )
     args = parser.parse_args()
     os.environ["RECSYS_PROFILE"] = args.profile
     notebook_dir = args.notebook_dir.resolve()
@@ -97,28 +141,32 @@ def main():
     os.environ["RECSYS_ARTIFACT_ROOT"] = str(artifact_root)
     slugs = [item["slug"] for item in NOTEBOOKS]
     summary_slugs = {"4_7_classic_summary", "5_5_retrieval_summary", "6_5_ranking_summary", "7_4_multitask_summary", "8_4_generative_summary"}
-    execution_order = [slug for slug in slugs if slug not in summary_slugs] + [slug for slug in slugs if slug in summary_slugs]
-    paths = [notebook_dir / f"{slug}.ipynb" for slug in execution_order]
+    detail_paths = [notebook_dir / f"{slug}.ipynb" for slug in slugs if slug not in summary_slugs]
+    summary_paths = [notebook_dir / f"{slug}.ipynb" for slug in slugs if slug in summary_slugs]
     if args.only:
-        paths = [notebook_dir / f"{args.only}.ipynb"]
-    for path in paths:
-        print(f"executing {path.name} ...", flush=True)
-        nb = nbformat.read(path, as_version=4)
-        client = NotebookClient(
-            nb,
-            timeout=600 if args.profile == "smoke" else 7200,
-            kernel_name="python3",
-            resources={"metadata": {"path": str(execution_cwd)}},
-        )
-        client.execute()
-        sanitize_notebook_outputs(
-            nb,
-            project_root=ROOT,
-            artifact_root=artifact_root,
-            execution_cwd=execution_cwd,
-        )
-        nbformat.write(nb, path)
-        print(f"executed {path.name}")
+        detail_paths = [notebook_dir / f"{args.only}.ipynb"]
+        summary_paths = []
+    workers = args.workers or _worker_count()
+    for phase_name, paths in [("detail", detail_paths), ("summary", summary_paths)]:
+        if not paths:
+            continue
+        if workers <= 1 or len(paths) == 1:
+            for path in paths:
+                _execute_one(path, profile=args.profile, execution_cwd=execution_cwd, artifact_root=artifact_root)
+        else:
+            print(f"--- {phase_name} phase: {len(paths)} notebooks, {workers} workers ---", flush=True)
+            with ProcessPoolExecutor(max_workers=workers) as pool:
+                futures = {
+                    pool.submit(_execute_one, path, args.profile, execution_cwd, artifact_root): path
+                    for path in paths
+                }
+                for future in as_completed(futures):
+                    path = futures[future]
+                    try:
+                        future.result()
+                    except Exception as exc:
+                        print(f"FAILED {path.name}: {exc}", flush=True)
+                        raise
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ from recsys_lab.runtime import (
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
+    training_device,
     train_binary as _train_binary,
     full_profile,
     sampled_embedding_rank_metrics,
@@ -47,7 +48,7 @@ def _mind_rows(ratings, history_length=10, negatives=5):
 def run_mind(epochs: int = 26, *, progress: ProgressCallback | None = None) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
     emit_progress(progress, stage="data_prepare", current=0, total=1, message="加载数据并构造 MIND 序列")
-    seed_everything(); ratings, provenance = _real_amazon()
+    seed_everything(); device = training_device(); ratings, provenance = _real_amazon()
     rows = _mind_rows(ratings); n_users, n_items = ratings.user_id.nunique(), ratings.item_id.nunique(); history_length = 10
     embedding_dim = 36 if full_profile() else 12
     interest_num = 3 if full_profile() else 2
@@ -57,12 +58,14 @@ def run_mind(epochs: int = 26, *, progress: ProgressCallback | None = None) -> d
     negative_feature = [SequenceFeature("negative_items", n_items + 1, embedding_dim, pooling="concat", shared_with="item_id", padding_idx=0)]
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = MIND(user_feature, history_feature, item_feature, negative_feature, history_length, interest_num=interest_num)
+    model.to(device)
     train_data = {
         "user_id": torch.tensor([r[0] for r in rows]),
         "history": torch.tensor([r[1] for r in rows]),
         "item_id": torch.tensor([r[2] for r in rows]),
         "negative_items": torch.tensor([r[3] for r in rows]),
     }
+    train_data = {k: v.to(device) for k, v in train_data.items()}
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"sequence_users": len(rows)})
     # 3) optimizer 只在训练阶段更新参数；推理阶段不应再调用它。
     optimizer = torch.optim.Adam(model.parameters(), lr=.005); losses = []
@@ -84,7 +87,7 @@ def run_mind(epochs: int = 26, *, progress: ProgressCallback | None = None) -> d
             if progress_due(completed, total_batches):
                 emit_progress(progress, stage="train", current=completed, total=total_batches)
         losses.append(epoch_loss / len(rows))
-    inference = {"user_id": train_data["user_id"], "history": torch.tensor([r[4] for r in rows])}
+    inference = {"user_id": train_data["user_id"], "history": torch.tensor([r[4] for r in rows]).to(device)}
     # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
     item_batch_size = 131_072
     user_chunks = (len(rows) + batch_size - 1) // batch_size
@@ -103,15 +106,15 @@ def run_mind(epochs: int = 26, *, progress: ProgressCallback | None = None) -> d
             completed += 1
             if progress_due(completed, total_inference):
                 emit_progress(progress, stage="inference", current=completed, total=total_inference)
-        user_interests = torch.cat(interest_chunks).numpy()
+        user_interests = torch.cat(interest_chunks).cpu().numpy()
         model.mode = "item"
         item_chunks_out = []
         for start in range(1, n_items + 1, item_batch_size):
-            item_chunks_out.append(model({"item_id": torch.arange(start, min(start + item_batch_size, n_items + 1))}))
+            item_chunks_out.append(model({"item_id": torch.arange(start, min(start + item_batch_size, n_items + 1)).to(device)}))
             completed += 1
             if progress_due(completed, total_inference):
                 emit_progress(progress, stage="inference", current=completed, total=total_inference)
-        item_embeddings = torch.cat(item_chunks_out).numpy()
+        item_embeddings = torch.cat(item_chunks_out).cpu().numpy()
         model.mode = None
     seen = [set(np.asarray(r[4])[np.asarray(r[4]) > 0] - 1) for r in rows]
     targets = np.asarray([r[5] - 1 for r in rows])

@@ -121,7 +121,7 @@ def test_train_binary_progress_does_not_change_seeded_results():
     assert events[-1]["current"] == events[-1]["total"] == 16
 
 
-def test_seed_everything_uses_one_smoke_thread_and_bounded_full_threads(monkeypatch):
+def test_seed_everything_uses_bounded_smoke_threads_and_bounded_full_threads(monkeypatch):
     configured: list[int] = []
     monkeypatch.setattr(runtime.torch, "set_num_threads", configured.append)
     monkeypatch.setattr(runtime.os, "cpu_count", lambda: 24)
@@ -137,7 +137,7 @@ def test_seed_everything_uses_one_smoke_thread_and_bounded_full_threads(monkeypa
     monkeypatch.setenv("RECSYS_TORCH_THREADS", "6")
     runtime.seed_everything()
 
-    assert configured == [1, 8, 6]
+    assert configured == [4, 8, 6]
 
 
 def test_industrial_wrapper_forwards_keyword_progress(monkeypatch):

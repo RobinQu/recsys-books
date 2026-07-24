@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+from concurrent.futures import ThreadPoolExecutor
 from importlib import import_module
 
 from .industrial_experiments import run_deepfm, run_dssm, run_mind, run_mmoe, run_openonerec
@@ -13,11 +14,21 @@ def run_classic(epochs: int = 8, *, progress: ProgressCallback | None = None) ->
     def execute(slug: str):
         return import_module(f"chapter_code.{slug}.train").train_and_evaluate(epochs, progress=progress)
 
-    cf = execute("4_2_collaborative_filtering")
-    mf = execute("4_3_matrix_factorization")
-    fm = execute("4_4_factorization_machine")
-    gbdt_lr = execute("4_5_gbdt_lr")
-    word2vec = execute("4_6_word2vec")
+    slugs = [
+        "4_2_collaborative_filtering",
+        "4_3_matrix_factorization",
+        "4_4_factorization_machine",
+        "4_5_gbdt_lr",
+        "4_6_word2vec",
+    ]
+    with ThreadPoolExecutor(max_workers=len(slugs)) as pool:
+        results = {slug: pool.submit(execute, slug) for slug in slugs}
+        results = {slug: future.result() for slug, future in results.items()}
+    cf = results["4_2_collaborative_filtering"]
+    mf = results["4_3_matrix_factorization"]
+    fm = results["4_4_factorization_machine"]
+    gbdt_lr = results["4_5_gbdt_lr"]
+    word2vec = results["4_6_word2vec"]
     return {
         "dataset": "MovieLens latest-small",
         "randomly_fabricated_rows": 0,
@@ -29,8 +40,11 @@ def run_classic(epochs: int = 8, *, progress: ProgressCallback | None = None) ->
 
 
 def run_retrieval(epochs: int = 8, *, progress: ProgressCallback | None = None) -> dict:
-    dssm = run_dssm(epochs, progress=progress)
-    mind = run_mind(epochs, progress=progress)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        dssm_fut = pool.submit(run_dssm, epochs, progress=progress)
+        mind_fut = pool.submit(run_mind, epochs, progress=progress)
+        dssm = dssm_fut.result()
+        mind = mind_fut.result()
     return {"backend": "Torch-RecHub on Amazon Reviews 2023", "randomly_fabricated_rows": 0,
             "dssm_recall@10": round(dssm["recall@10"], 4), "mind_recall@10": round(mind["recall@10"], 4), "embedding_dim": 16}
 

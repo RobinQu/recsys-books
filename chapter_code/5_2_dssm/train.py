@@ -16,6 +16,7 @@ from recsys_lab.runtime import (
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
+    training_device,
     train_binary as _train_binary,
     complete_or_recent,
     full_profile,
@@ -26,7 +27,7 @@ from recsys_lab.runtime import (
 def run_dssm(epochs: int = 24, *, progress: ProgressCallback | None = None) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
     emit_progress(progress, stage="data_prepare", current=0, total=1, message="加载并切分 DSSM 数据")
-    seed_everything(); ratings, provenance = _real_amazon()
+    seed_everything(); device = training_device(); ratings, provenance = _real_amazon()
     events = complete_or_recent(ratings, 5200).reset_index(drop=True)
     split = int(len(events) * .8)
     train, test = events.iloc[:split], events.iloc[split:]
@@ -36,6 +37,7 @@ def run_dssm(epochs: int = 24, *, progress: ProgressCallback | None = None) -> d
     tower = {"dims": [32, 16], "activation": "relu", "dropout": 0.0}
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = DSSM(user_features, item_features, tower, tower, temperature=.12)
+    model.to(device)
 
     def fields(frame):
         return {
@@ -46,11 +48,12 @@ def run_dssm(epochs: int = 24, *, progress: ProgressCallback | None = None) -> d
     # 4) 公共训练循环执行 forward、二元交叉熵、backward 和 optimizer.step。
     emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"train_rows": len(train), "test_rows": len(test)})
     losses = _train_binary(
-        model, fields(train), torch.tensor(train.like.to_numpy()), epochs, .004, progress=progress,
+        model, fields(train), torch.tensor(train.like.to_numpy()), epochs, .004, device=device, progress=progress,
     )
     # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
     inference_batch = 131_072
     test_fields = fields(test)
+    test_fields = {k: v.to(device) for k, v in test_fields.items()}
     test_chunks = (len(test) + inference_batch - 1) // inference_batch
     user_chunks = (n_users + inference_batch - 1) // inference_batch
     item_chunks = (n_items + inference_batch - 1) // inference_batch
@@ -65,23 +68,23 @@ def run_dssm(epochs: int = 24, *, progress: ProgressCallback | None = None) -> d
             completed += 1
             if progress_due(completed, total_chunks):
                 emit_progress(progress, stage="inference", current=completed, total=total_chunks)
-        probability = torch.cat(probability_chunks).numpy() if probability_chunks else np.empty(0, dtype=np.float32)
+        probability = torch.cat(probability_chunks).cpu().numpy() if probability_chunks else np.empty(0, dtype=np.float32)
         model.mode = "user"
         user_chunks_out = []
         for start in range(1, n_users + 1, inference_batch):
-            user_chunks_out.append(model({"user_id": torch.arange(start, min(start + inference_batch, n_users + 1))}))
+            user_chunks_out.append(model({"user_id": torch.arange(start, min(start + inference_batch, n_users + 1)).to(device)}))
             completed += 1
             if progress_due(completed, total_chunks):
                 emit_progress(progress, stage="inference", current=completed, total=total_chunks)
-        user_embedding = torch.cat(user_chunks_out).numpy() if user_chunks_out else np.empty((0, 16), dtype=np.float32)
+        user_embedding = torch.cat(user_chunks_out).cpu().numpy() if user_chunks_out else np.empty((0, 16), dtype=np.float32)
         model.mode = "item"
         item_chunks_out = []
         for start in range(1, n_items + 1, inference_batch):
-            item_chunks_out.append(model({"item_id": torch.arange(start, min(start + inference_batch, n_items + 1))}))
+            item_chunks_out.append(model({"item_id": torch.arange(start, min(start + inference_batch, n_items + 1)).to(device)}))
             completed += 1
             if progress_due(completed, total_chunks):
                 emit_progress(progress, stage="inference", current=completed, total=total_chunks)
-        item_embedding = torch.cat(item_chunks_out).numpy() if item_chunks_out else np.empty((0, 16), dtype=np.float32)
+        item_embedding = torch.cat(item_chunks_out).cpu().numpy() if item_chunks_out else np.empty((0, 16), dtype=np.float32)
         model.mode = None
     user_embedding = np.nan_to_num(user_embedding, nan=0.0, posinf=0.0, neginf=0.0)
     item_embedding = np.nan_to_num(item_embedding, nan=0.0, posinf=0.0, neginf=0.0)
