@@ -23,7 +23,11 @@ RUN uv sync --locked --no-install-package torch \
 
 COPY . .
 ARG RECSYS_RESOURCE_INIT=download
-RUN if [ "$RECSYS_RESOURCE_INIT" = "download" ]; then python scripts/init_resources.py --strict; else python scripts/init_resources.py --verify; fi \
+# gated 资源（如 RecIF-Bench）通过 BuildKit secret 注入 HF_TOKEN；token 不进入镜像层，
+# 未提供 secret 时 gated 资源按 required:false 跳过，不阻断构建。
+RUN --mount=type=secret,id=hf_token,required=false \
+    export HF_TOKEN="$(cat /run/secrets/hf_token 2>/dev/null || true)"; \
+    if [ "$RECSYS_RESOURCE_INIT" = "download" ]; then python scripts/init_resources.py --strict; else python scripts/init_resources.py --verify; fi \
     && python scripts/generate_model_diagrams.py \
     && python scripts/generate_paper_figures.py \
     && python scripts/generate_chapter_code.py \

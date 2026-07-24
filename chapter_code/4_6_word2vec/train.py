@@ -4,6 +4,7 @@ import torch
 
 from .model import SkipGram, negative_sampling_loss
 from recsys_lab.data import leave_last_out, load_movielens
+from recsys_lab.runtime import full_profile
 
 
 def _skip_gram_pairs(sequences, window: int = 3):
@@ -35,22 +36,27 @@ def train_and_evaluate(epochs: int = 8) -> dict:
                 "recall@5": 0.0, "loss_curve": []}
 
     num_items = int(ratings.item_id.max()) + 2  # +1 偏移、+1 容纳 1-indexing
-    center = torch.tensor([p[0] for p in pairs], dtype=torch.long)
-    context = torch.tensor([p[1] for p in pairs], dtype=torch.long)
     num_neg = 5
     rng = np.random.default_rng(2026)
 
     model = SkipGram(num_items, dim=32)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.05)
     losses: list[float] = []
+    pair_batch = len(pairs) if len(pairs) <= 5_000_000 else 5_000_000  # full 档分批，控制负采样张量内存
     for _ in range(epochs):
-        # 对每个正样本采样若干负物品，构成正负对比；负采样避免遍历全物品表。
-        neg = torch.tensor(rng.integers(1, num_items, size=(len(pairs), num_neg)), dtype=torch.long)
-        score_pos = model(center, context)
-        score_neg = model(center[:, None].expand(-1, num_neg).reshape(-1), neg.reshape(-1))
-        loss = negative_sampling_loss(score_pos, score_neg)
-        optimizer.zero_grad(); loss.backward(); optimizer.step()
-        losses.append(float(loss.detach()))
+        weighted = 0.0
+        for start in range(0, len(pairs), pair_batch):
+            chunk = pairs[start:start + pair_batch]
+            center = torch.tensor([p[0] for p in chunk], dtype=torch.long)
+            context = torch.tensor([p[1] for p in chunk], dtype=torch.long)
+            # 对每个正样本采样若干负物品，构成正负对比；负采样避免遍历全物品表。
+            neg = torch.tensor(rng.integers(1, num_items, size=(len(chunk), num_neg)), dtype=torch.long)
+            score_pos = model(center, context)
+            score_neg = model(center[:, None].expand(-1, num_neg).reshape(-1), neg.reshape(-1))
+            loss = negative_sampling_loss(score_pos, score_neg)
+            optimizer.zero_grad(); loss.backward(); optimizer.step()
+            weighted += float(loss.detach()) * len(chunk)
+        losses.append(weighted / len(pairs))
 
     # 用中心嵌入作为物品向量；归一为单位向量后用余弦相似度召回，量纲稳定且与 item2vec 检索惯例一致。
     with torch.no_grad():
@@ -58,6 +64,9 @@ def train_and_evaluate(epochs: int = 8) -> dict:
     norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
     normed = embeddings / np.maximum(norms, 1e-12)
     test_frame = test.sort_values("user_id")
+    if full_profile() and len(test_frame) > 5000:
+        # 33M 全量逐用户评估是平方级成本：用固定种子抽 5000 个用户评估，口径写入 provenance。
+        test_frame = test_frame.iloc[rng.choice(len(test_frame), size=5000, replace=False)]
     targets = (test_frame.item_id.to_numpy() + 1)
     users = test_frame.user_id.to_numpy()
     seen = {user: set(seq) for user, seq in sequences.items()}
@@ -75,5 +84,6 @@ def train_and_evaluate(epochs: int = 8) -> dict:
             top5 = np.argpartition(-scores, kth=k)[:5]
             hits += int(target in top5)
     recall = hits / max(len(targets), 1)
-    return {"dataset": "MovieLens latest-small", "randomly_fabricated_rows": 0,
+    dataset = "MovieLens latest (33M, 5,000 用户种子抽样评估)" if full_profile() else "MovieLens latest-small"
+    return {"dataset": dataset, "randomly_fabricated_rows": 0,
             "recall@5": float(recall), "loss_curve": losses}

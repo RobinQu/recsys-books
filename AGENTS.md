@@ -68,6 +68,45 @@ Classic algorithms may use deterministic MovieLens/Amazon teaching subsets. Deep
 
 Generative notebooks are CUDA-first. Their default runners must reject a host without CUDA; the Web detail page disables interactive execution when CUDA is unavailable. CPU CI may call the explicit `cpu_smoke=True` path only for data contracts, tensor shapes, a bounded forward/backward pass and constrained decoding. Accuracy/effect thresholds for OpenOneRec and HSTU belong in CUDA-gated tests. `Dockerfile` builds the CPU image (CPU-only torch from the locked pytorch-cpu index); `Dockerfile.cuda` builds the CUDA image by swapping in the CUDA-enabled torch wheel from PyPI. `docker-compose.cuda.yml` is an override that switches the affected services to `Dockerfile.cuda` (tagged `recsys-atlas-cuda`) and passes NVIDIA devices into the containers. GitHub Actions builds and publishes both web images plus the IDE image.
 
+## Data and evaluation architecture
+
+### Chapter × dataset matrix
+
+Every algorithm chapter has exactly two dataset tracks, switched by `RECSYS_PROFILE`:
+
+| Chapter | full (paper-aligned) | smoke (CI/teaching adapter) |
+|---|---|---|
+| 3 (math curriculum) | teaching arrays, no paper protocol | bundled MovieLens latest-small |
+| 4.2–4.4, 4.6 classic | MovieLens latest (~33M, `movielens-latest-full`) | latest-small deterministic slice |
+| 4.5 GBDT+LR | Criteo_x1 official 7:2:1 (`criteo-x1-full`) | MovieLens-derived CTR slice |
+| 5.2 / 5.3 / 5.4 retrieval | Books 5-core / MIND Books 2014 10-core / ML-1M | Amazon 2023 Video Games slice |
+| 6.2 DeepFM | Criteo_x1 official 7:2:1 | KuaiRand-Pure |
+| 6.3 / 6.4 DIN/DIEN | Electronics 5-core | KuaiRand-Pure |
+| 7.2 / 7.3 MMoE/PLE | Census-Income KDD | KuaiRand-Pure |
+| 8.2 OpenOneRec | RecIF-Bench authorized copy (`openonerec-recif`, gated) | KuaiRand Semantic-ID adapter |
+| 8.3 HSTU | MovieLens 20M (`movielens-20m-full`) | KuaiRand feed sequences |
+
+Summary chapters compare on one shared dataset per family (4: MovieLens, 5: Video Games, 6/7/8: KuaiRand) and never mix both tracks in one table.
+
+### Loader and dispatcher conventions
+
+- Full-profile loaders in `recsys_lab/data.py` read only the manifest resource, verify official statistics and raise on drift. Stable releases (ML-1M, ML-20M, Census-Income, Criteo_x1, RecIF, MIND Books) use exact counts; GroupLens `ml-latest` is regenerated upstream, so its loader asserts a 33M floor and records the actual count in provenance instead of hard-coding one snapshot.
+- The official Amazon 5-core files still contain a few users with fewer than 5 interactions. The loader removes only that residual and records `raw_rows` / `dropped_rows` in `frame.attrs`; `test_full_data` asserts the raw line count, the exact residual and that nothing else was dropped.
+- MIND's 10-core is **item-first single-pass** (items with ≥10 users, then users with ≥10 items): this reproduces the paper's 6,271,511 samples exactly, while iterating to convergence (4.7M) or filtering users first (5.79M) does not. The paper Table 1 user/item counts (351,356 / 393,801) do not match the reproducible view (218,972 / 369,114), so the sample row count is the comparison anchor and the discrepancy is documented in `mind_amazon_provenance` and the reproduction contract.
+- `recsys_lab/runtime.py` `real_*` dispatchers own the full/smoke switch; each chapter `train.py` owns its algorithm-specific full branch, including scale engineering: sparse top-k ItemCF, mini-batched MF/FM training, seeded evaluation samples for quadratic-cost evaluation, and batched full-vocab softmax for HSTU — the `[B, L, V]` logits of a 26k+ vocabulary never materialize in a single forward (the paper's industrial answer is sampled softmax).
+
+### Test and CI tiers
+
+| Tier | Marker / compose service | Trigger | Gate |
+|---|---|---|---|
+| unittest | `pytest -q` (default suite) | every push, ci.yml `unittest` | API, evidence, content, code quality |
+| smoke integration | `docker compose run --rm test` | every push, ci.yml `smoke` | regenerates artifacts, executes all notebooks in smoke mode |
+| full data | `pytest -m full_data`, `test-full` | weekly or dispatch | complete official row counts, no truncation |
+| CPU accuracy | `pytest -m accuracy`, `test-accuracy` | weekly or dispatch | conservative effect floors on ml-latest / Criteo_x1 |
+| CUDA accuracy | `pytest -m cuda_accuracy`, `test-cuda-accuracy` | dispatch, self-hosted GPU | generative gates on RecIF / ML-20M; auto-skipped without CUDA |
+
+Gated resources authenticate through `HF_TOKEN`; image builds receive it as a BuildKit secret (`hf_token`) so it never enters image layers, and both `publish-images.yml` and the dispatch CI jobs inject it from GitHub secrets. `ensure_resources` merges `resources/resource-lock.json` instead of rewriting it, so `--id`-filtered invocations cannot drop the readiness records of other resources.
+
 ## Code ownership
 
 Algorithm-specific model, preprocessing, training, inference and tests live in `chapter_code/<slug>/`. Only genuinely cross-chapter data adapters, metrics, seeding and compatibility routes belong in `recsys_lab/`. Generated notebooks are sourced from `scripts/generate_notebooks.py`, `scripts/tutorial_deep_specs.py` and related spec files; update the generator before regenerating artifacts.
@@ -131,7 +170,7 @@ Summary notebooks add a **Paper Evidence Map** cell that loads `config/paper_evi
 
 `config/resources.json` is the tracked source-of-truth. Downloaded papers, full datasets, vendor bundles and `resource-lock.json` live under ignored `resources/`. Run `python scripts/init_resources.py --strict` for required papers/viewer resources. Add `--include-optional --kind datasets --id <id>` for a full dataset. Google Scholar is discovery metadata only: automation must fetch from arXiv, Hugging Face, an official repository or an explicit open/direct URL, and must respect licensing, gating and robots rules.
 
-The initializer is idempotent and standard-library-first. In the application image, `pypdf` additionally validates that PDF title text matches the manifest, preventing an unrelated but syntactically valid PDF from entering the evidence chain. Docker copies any locally initialized resources and then calls the same initializer; application startup verifies state and downloads only when `RECSYS_RESOURCE_AUTO_DOWNLOAD=1` is explicitly set.
+The initializer is idempotent and standard-library-first. In the application image, `pypdf` additionally validates that PDF title text matches the manifest, preventing an unrelated but syntactically valid PDF from entering the evidence chain. Gated Hugging Face datasets (e.g. `openonerec-recif`) authenticate through the `HF_TOKEN` environment variable; Docker builds receive it as a BuildKit secret (`hf_token`) so it never enters image layers. Docker copies any locally initialized resources and then calls the same initializer; application startup verifies state and downloads only when `RECSYS_RESOURCE_AUTO_DOWNLOAD=1` is explicitly set.
 
 ## Paper evidence design
 
@@ -212,6 +251,8 @@ Paper claims must preserve their original experiment setting. Separate: (1) resu
 
 ## Verification
 
-Run `docker compose run --rm test`. It regenerates chapter code/notebooks, runs unit/API/effect checks, executes all notebooks in smoke mode and builds previews. Run `docker compose --profile full run --rm test-full` for paper-protocol data/effect validation; it must verify complete test-set counts and must never treat smoke metrics as paper reproduction. Ruff and Python compilation are shared with the IDE. When changing paper resources, also run `python scripts/init_resources.py --verify --strict`; when changing the reader, inspect at least one formula/figure page at desktop and narrow viewport.
+Run `docker compose run --rm test`. It regenerates chapter code/notebooks, runs unit/API/effect checks, executes all notebooks in smoke mode and builds previews. Run `docker compose --profile full run --rm test-full` for paper-protocol data/effect validation; it must verify complete test-set counts and must never treat smoke metrics as paper reproduction. Run `docker compose --profile full run --rm test-accuracy` for the CPU accuracy gates on the complete ml-latest / Criteo_x1 datasets, and `docker compose -f docker-compose.yml -f docker-compose.cuda.yml --profile cuda run --rm test-cuda-accuracy` for the generative gates (RecIF-Bench + ML-20M) on a CUDA host; both need `HF_TOKEN` in the environment for gated resources. Ruff and Python compilation are shared with the IDE. When changing paper resources, also run `python scripts/init_resources.py --verify --strict`; when changing the reader, inspect at least one formula/figure page at desktop and narrow viewport.
+
+GitHub Actions runs two workflows: `ci.yml` (unittest + smoke on every push/PR; full-data and CPU accuracy weekly or on dispatch; CUDA accuracy only on self-hosted GPU runners) and `publish-images.yml` (builds and publishes the CPU/CUDA/IDE images, injecting `HF_TOKEN` as a BuildKit secret for gated resources — the token never enters image layers).
 
 The local code-server is passwordless only because Compose binds it to `127.0.0.1`. Keep the Python interpreter at `/usr/local/bin/python`, definition navigation enabled, `train.py` as the default chapter entry, and Secondary Sidebar hidden.

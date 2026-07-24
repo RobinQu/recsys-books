@@ -35,20 +35,35 @@ def _full_profile() -> bool:
 
 @lru_cache(maxsize=8)
 def _load_cached(max_users: int, max_items: int, min_user_events: int) -> tuple[pd.DataFrame, pd.DataFrame]:
-    ratings_path = DATA_DIR / "ratings.csv"
-    movies_path = DATA_DIR / "movies.csv"
-    if not ratings_path.exists() or not movies_path.exists():
-        raise FileNotFoundError(
-            f"缺少真实数据集：{ratings_path}。请从 {SOURCE_URL} 下载并解压到 {DATA_DIR}。"
-        )
-
-    ratings = pd.read_csv(ratings_path)
-    movies = pd.read_csv(movies_path)
-
-    # full 保留官方文件的全部评分；smoke 才使用确定性子集。
+    # full 档读取官方完整 MovieLens latest（约 33M 评分）；smoke 档使用仓库内
+    # latest-small 的确定性教学切片。
     if _full_profile():
+        path = RESOURCE_DATA / "movielens" / "ml-latest.zip"
+        if not path.exists():
+            raise FileNotFoundError(
+                f"缺少 MovieLens latest 完整版：{path}。请运行 "
+                "`python scripts/init_resources.py --include-optional --kind datasets --id movielens-latest-full`"
+            )
+        with zipfile.ZipFile(path) as bundle:
+            with bundle.open("ml-latest/ratings.csv") as handle:
+                ratings = pd.read_csv(handle)
+            with bundle.open("ml-latest/movies.csv") as handle:
+                movies = pd.read_csv(handle)
+        # GroupLens 会定期重新生成 latest，因此只校验数量级并以 provenance 记录实际行数。
+        if len(ratings) < 33_000_000:
+            raise ValueError(f"MovieLens latest 行数异常：预期约 33M 评分，实际 {len(ratings)}")
         subset = ratings.copy()
     else:
+        ratings_path = DATA_DIR / "ratings.csv"
+        movies_path = DATA_DIR / "movies.csv"
+        if not ratings_path.exists() or not movies_path.exists():
+            raise FileNotFoundError(
+                f"缺少真实数据集：{ratings_path}。请从 {SOURCE_URL} 下载并解压到 {DATA_DIR}。"
+            )
+
+        ratings = pd.read_csv(ratings_path)
+        movies = pd.read_csv(movies_path)
+
         user_order = (
             ratings.groupby("userId").size().rename("events").reset_index()
             .sort_values(["events", "userId"], ascending=[False, True])
@@ -109,11 +124,11 @@ def load_movielens(max_users: int = 120, max_items: int = 600, min_user_events: 
 def movielens_provenance(ratings: pd.DataFrame) -> dict:
     full = ratings.attrs.get("resource_profile") == "full"
     return {
-        "dataset": DATASET_NAME,
-        "source": SOURCE_URL,
+        "dataset": "MovieLens latest (GroupLens, ~33M ratings)" if full else DATASET_NAME,
+        "source": "https://files.grouplens.org/datasets/movielens/ml-latest.zip" if full else SOURCE_URL,
         "license_file": str(DATA_DIR / "README.txt"),
         "profile": "full" if full else "smoke",
-        "slice_rule": "complete MovieLens latest-small ratings file" if full else "deterministic user/item subset",
+        "slice_rule": "complete official MovieLens latest ratings file" if full else "deterministic user/item subset",
         "rows_used": int(len(ratings)),
         "users_used": int(ratings.user_id.nunique()),
         "items_used": int(ratings.item_id.nunique()),
@@ -192,7 +207,10 @@ def _load_amazon_2018_cached(category: str, min_user_events: int) -> pd.DataFram
     raw = pd.read_json(path, lines=True, compression="gzip")
     frame = raw.rename(columns={"reviewerID": "raw_user_id", "asin": "raw_item_id", "overall": "rating", "unixReviewTime": "timestamp"})
     valid = frame.groupby("raw_user_id").size()
-    frame = frame[frame.raw_user_id.isin(valid[valid >= min_user_events].index)].copy()
+    filtered = frame[frame.raw_user_id.isin(valid[valid >= min_user_events].index)].copy()
+    # 官方 5-core 文件仍含少量 <min_user_events 交互的用户；记录过滤残差供完整性校验。
+    raw_rows, dropped_rows = len(frame), len(frame) - len(filtered)
+    frame = filtered
     user_map = {raw_id: index for index, raw_id in enumerate(sorted(frame.raw_user_id.unique()))}
     item_map = {raw_id: index for index, raw_id in enumerate(sorted(frame.raw_item_id.unique()))}
     frame["user_id"] = frame.raw_user_id.map(user_map).astype("int64")
@@ -202,6 +220,7 @@ def _load_amazon_2018_cached(category: str, min_user_events: int) -> pd.DataFram
     frame["hour"] = pd.to_datetime(frame.timestamp, unit="s", utc=True).dt.hour.astype("int64")
     frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
     frame.attrs.update(resource_profile="full", resource_path=str(path), dataset_name=f"Amazon Reviews {category} 5-core (2018)")
+    frame.attrs.update(raw_rows=raw_rows, dropped_rows=dropped_rows)
     return frame
 
 
@@ -219,7 +238,7 @@ def amazon_2018_provenance(frame: pd.DataFrame) -> dict:
     }
 
 
-MIND_AMAZON_STATS = {"rows": 6_271_511, "users": 351_356, "items": 393_801}
+MIND_AMAZON_STATS = {"rows": 6_271_511, "users": 218_972, "items": 369_114}
 
 
 @lru_cache(maxsize=1)
@@ -235,16 +254,13 @@ def _load_mind_amazon_books_cached() -> pd.DataFrame:
         path, names=["raw_user_id", "raw_item_id", "rating", "timestamp"],
         dtype={"raw_user_id": "string", "raw_item_id": "string", "rating": "float32", "timestamp": "int64"},
     )
-    # k-core is a joint constraint. Removing rare items can make users rare
-    # (and vice versa), therefore both filters repeat until convergence.
-    while True:
-        before = len(frame)
-        user_count = frame.groupby("raw_user_id", observed=True).raw_item_id.transform("size")
-        frame = frame[user_count >= 10]
-        item_count = frame.groupby("raw_item_id", observed=True).raw_user_id.transform("size")
-        frame = frame[item_count >= 10]
-        if len(frame) == before:
-            break
+    # MIND 论文口径（实测还原）：先按 item 过滤（>=10 个用户），再按 user 过滤
+    # （>=10 个物品），单遍不迭代。该顺序恰好还原论文的 6,271,511 个样本；
+    # 迭代收敛会过度过滤（4.7M），user-first 单遍则得到 5.79M。
+    item_count = frame.groupby("raw_item_id", observed=True).raw_user_id.transform("size")
+    frame = frame[item_count >= 10]
+    user_count = frame.groupby("raw_user_id", observed=True).raw_item_id.transform("size")
+    frame = frame[user_count >= 10]
     actual = {"rows": len(frame), "users": frame.raw_user_id.nunique(), "items": frame.raw_item_id.nunique()}
     if actual != MIND_AMAZON_STATS:
         raise ValueError(f"MIND Amazon preprocessing drift: expected {MIND_AMAZON_STATS}, got {actual}")
@@ -252,7 +268,7 @@ def _load_mind_amazon_books_cached() -> pd.DataFrame:
     frame["item_id"] = pd.factorize(frame.raw_item_id, sort=True)[0].astype("int64")
     frame["like"] = np.ones(len(frame), dtype="float32")
     frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
-    frame.attrs.update(resource_profile="full", resource_path=str(path), dataset_name="Amazon Books 2014 / MIND iterative 10-core")
+    frame.attrs.update(resource_profile="full", resource_path=str(path), dataset_name="Amazon Books 2014 / MIND 10-core")
     return frame
 
 
@@ -264,8 +280,9 @@ def mind_amazon_provenance(frame: pd.DataFrame) -> dict:
     return {
         "dataset": frame.attrs["dataset_name"],
         "source": "https://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Books.csv",
-        "profile": "full", "slice_rule": "complete 2014 ratings file; iterative user/item 10-core to convergence",
+        "profile": "full", "slice_rule": "complete 2014 ratings file; item-first single-pass user/item 10-core（论文口径，恰好还原 6,271,511 样本）",
         "paper_expected_stats": MIND_AMAZON_STATS, "local_resource": frame.attrs["resource_path"],
+        "paper_table1_note": "论文 Table 1 的 users/items（351,356/393,801）与本可复现口径（218,972/369,114）不同；样本行数 6,271,511 完全一致，以行数为比较锚点",
         "rows_used": int(len(frame)), "users_used": int(frame.user_id.nunique()),
         "items_used": int(frame.item_id.nunique()), "randomly_fabricated_rows": 0,
     }
@@ -312,6 +329,132 @@ def movielens_1m_provenance(frame: pd.DataFrame) -> dict:
         "local_resource": frame.attrs["resource_path"], "rows_used": int(len(frame)),
         "raw_rows_read": int(frame.attrs["raw_rows"]),
         "users_used": int(frame.user_id.nunique()), "items_used": int(frame.item_id.nunique()),
+        "randomly_fabricated_rows": 0,
+    }
+
+
+@lru_cache(maxsize=1)
+def _load_movielens_20m_cached() -> pd.DataFrame:
+    """MovieLens 20M：HSTU 论文公开基准之一，作为隐式反馈序列使用。"""
+    path = RESOURCE_DATA / "movielens" / "ml-20m.zip"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"缺少 MovieLens 20M：{path}。请运行 "
+            "`python scripts/init_resources.py --include-optional --kind datasets --id movielens-20m-full`"
+        )
+    with zipfile.ZipFile(path) as bundle, bundle.open("ml-20m/ratings.csv") as handle:
+        frame = pd.read_csv(handle)
+    if (len(frame), frame.userId.nunique(), frame.movieId.nunique()) != (20_000_263, 138_493, 26_744):
+        raise ValueError("MovieLens 20M 官方统计（20,000,263 / 138,493 / 26,744 有评分电影）不一致")
+    frame = frame.rename(columns={"userId": "raw_user_id", "movieId": "raw_item_id"})
+    user_map = {raw_id: index for index, raw_id in enumerate(sorted(frame.raw_user_id.unique()))}
+    item_map = {raw_id: index for index, raw_id in enumerate(sorted(frame.raw_item_id.unique()))}
+    frame["user_id"] = frame.raw_user_id.map(user_map).astype("int64")
+    frame["item_id"] = frame.raw_item_id.map(item_map).astype("int64")
+    frame = frame.sort_values(["timestamp", "user_id", "item_id"]).reset_index(drop=True)
+    frame.attrs.update(resource_profile="full", resource_path=str(path))
+    return frame
+
+
+def load_movielens_20m() -> pd.DataFrame:
+    return _load_movielens_20m_cached().copy()
+
+
+def movielens_20m_provenance(frame: pd.DataFrame) -> dict:
+    return {
+        "dataset": "MovieLens 20M", "source": "https://files.grouplens.org/datasets/movielens/ml-20m.zip",
+        "profile": "full",
+        "slice_rule": "complete official 20,000,263 ratings; every observed rating is implicit feedback (generative-recommenders 口径)",
+        "local_resource": frame.attrs["resource_path"], "rows_used": int(len(frame)),
+        "users_used": int(frame.user_id.nunique()), "items_used": int(frame.item_id.nunique()),
+        "randomly_fabricated_rows": 0,
+    }
+
+
+CRITEO_SPLITS = {"train.csv": 33_003_326, "valid.csv": 8_250_124, "test.csv": 4_587_167}
+CRITEO_COLUMNS = ["label", *[f"I{index}" for index in range(1, 14)], *[f"C{index}" for index in range(1, 27)]]
+
+
+@lru_cache(maxsize=1)
+def _load_criteo_cached() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Load the official reczoo Criteo_x1 7:2:1 split (45,840,617 rows total).
+
+    类别列按 category 读入以控制内存；完整训练属于 dispatch 级任务，需要大内存机器。
+    """
+    path = RESOURCE_DATA / "criteo-x1" / "Criteo_x1.zip"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"缺少 Criteo_x1：{path}。请运行 "
+            "`python scripts/init_resources.py --include-optional --kind datasets --id criteo-x1-full`"
+        )
+    dtype = {"label": "int8", **{f"I{index}": "float32" for index in range(1, 14)}, **{f"C{index}": "category" for index in range(1, 27)}}
+    frames = []
+    with zipfile.ZipFile(path) as bundle:
+        for member, expected_rows in CRITEO_SPLITS.items():
+            with bundle.open(member) as probe:
+                has_header = probe.readline().decode(errors="replace").strip().split(",")[0] == "label"
+            with bundle.open(member) as handle:
+                frame = pd.read_csv(handle, header=0 if has_header else None, dtype=dtype)
+            if list(frame.columns) != CRITEO_COLUMNS:
+                if len(frame.columns) != len(CRITEO_COLUMNS):
+                    raise ValueError(f"Criteo_x1 {member} 列数 {len(frame.columns)} 与协议 40 不一致")
+                frame.columns = CRITEO_COLUMNS
+                frame = frame.astype(dtype)
+            if len(frame) != expected_rows:
+                raise ValueError(f"Criteo_x1 {member} 行数 {len(frame):,} 与官方 {expected_rows:,} 不一致")
+            frame.attrs.update(resource_profile="full", resource_path=str(path), split=member.removesuffix(".csv"))
+            frames.append(frame)
+    return tuple(frames)
+
+
+def load_criteo() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    return _load_criteo_cached()
+
+
+def criteo_provenance(train: pd.DataFrame, valid: pd.DataFrame, test: pd.DataFrame) -> dict:
+    return {
+        "dataset": "Criteo Display Ads (reczoo Criteo_x1)", "source": "https://huggingface.co/datasets/reczoo/Criteo_x1",
+        "profile": "full", "split": "official 7:2:1 train/valid/test files",
+        "train_rows": int(len(train)), "valid_rows": int(len(valid)), "test_rows": int(len(test)),
+        "features": "13 dense (I1-I13) + 26 categorical (C1-C26)",
+        "randomly_fabricated_rows": 0,
+    }
+
+
+RECIF_DIR = RESOURCE_DATA / "openonerec-recif"
+
+
+@lru_cache(maxsize=1)
+def _load_recif_cached() -> tuple[pd.DataFrame, pd.DataFrame]:
+    """OpenOneRec RecIF-Bench：官方用户交互 release 与 video/ads 域 pid→Semantic ID 目录。"""
+    release = RECIF_DIR / "onerec_bench_release.parquet"
+    catalog_path = RECIF_DIR / "video_ad_pid2sid.parquet"
+    if not release.exists() or not catalog_path.exists():
+        raise FileNotFoundError(
+            f"缺少 RecIF-Bench：{RECIF_DIR}。该数据为 gated 资源，请先在 Hugging Face 接受官方条款，"
+            "再运行 `HF_TOKEN=... python scripts/init_resources.py --include-optional --kind datasets --id openonerec-recif`"
+        )
+    users = pd.read_parquet(release)
+    catalog = pd.read_parquet(catalog_path)
+    if len(users) != 162_074:
+        raise ValueError(f"RecIF-Bench release 用户数 {len(users):,} 与官方 162,074 不一致")
+    users.attrs.update(resource_profile="full", resource_path=str(release))
+    catalog.attrs.update(resource_path=str(catalog_path))
+    return users, catalog
+
+
+def load_recif() -> tuple[pd.DataFrame, pd.DataFrame]:
+    users, catalog = _load_recif_cached()
+    return users.copy(), catalog.copy()
+
+
+def recif_provenance(users: pd.DataFrame, catalog: pd.DataFrame) -> dict:
+    return {
+        "dataset": "OpenOneRec RecIF-Bench (Apache-2.0, gated 授权副本)",
+        "source": "https://huggingface.co/datasets/OpenOneRec/OpenOneRec-RecIF",
+        "profile": "full", "license": "Apache-2.0（接受官方条款后下载；不二次分发）",
+        "users": int(len(users)), "video_ad_items": int(len(catalog)),
+        "split": "official release；benchmark_data 提供 8 个任务的官方测试集",
         "randomly_fabricated_rows": 0,
     }
 

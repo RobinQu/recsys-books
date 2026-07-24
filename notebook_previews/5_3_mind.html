@@ -7517,7 +7517,7 @@ window.MathJax = {
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=35758cc4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b2b69df1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7530,17 +7530,17 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b9c1e74f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a30a3350">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h2><p>本 Notebook 的默认真实数据是 <strong>Amazon Books 2014：按 MIND 论文执行迭代 10-core，并核验 6,271,511 行</strong>。<code>smoke</code> 档读取仓库内可审计的确定性切片，<code>full</code> 档扩大到官方完整文件；两档都不制造交互、曝光、标签或行为序列。切片规则、源地址、哈希与许可记录在 <code>data/README.md</code> 及对应数据目录。</p>
+<h2 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h2><p>本 Notebook 的默认真实数据是 <strong>Amazon Books 2014：按 MIND 论文协议（item-first 单遍 10-core）执行，并核验 6,271,511 行</strong>。<code>smoke</code> 档读取仓库内可审计的确定性切片，<code>full</code> 档扩大到官方完整文件；两档都不制造交互、曝光、标签或行为序列。切片规则、源地址、哈希与许可记录在 <code>data/README.md</code> 及对应数据目录。</p>
 <p><strong>主要资料：</strong> <a href="https://arxiv.org/abs/1904.08030">Li et al., 2019, MIND</a></p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e8784a0f">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=26264673">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7605,7 +7605,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4e3b9e99">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e67e3e3f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7624,7 +7624,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=89d5155a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=08e8e322">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7637,22 +7637,22 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=feda0e82">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=61a14a2b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Reproduction-Contract">Reproduction Contract<a class="anchor-link" href="#Reproduction-Contract">¶</a></h2><p><strong>正式数据：</strong> Amazon Books ratings-only 2014, iterative 10-core<br/>
+<h2 id="Reproduction-Contract">Reproduction Contract<a class="anchor-link" href="#Reproduction-Contract">¶</a></h2><p><strong>正式数据：</strong> Amazon Books ratings-only 2014, item-first single-pass 10-core<br/>
 <strong>资源 ID：</strong> <code>amazon-books-2014-ratings</code><br/>
 <strong>切分：</strong> paper protocol: random 19:1 train/test; a deterministic seed records the sampled target<br/>
 <strong>指标：</strong> HitRate@10, HitRate@50, HitRate@100<br/>
-<strong>与论文比较边界：</strong> MIND Table 1/2: 351,356 users, 393,801 goods, 6,271,511 samples; absolute comparison is accepted only if these post-filter counts match</p>
+<strong>与论文比较边界：</strong> 样本行数与论文 Table 1/2 完全一致（6,271,511），以行数为比较锚点；论文 users/items（351,356/393,801）与可复现口径（218,972/369,114）不同，不作硬校验</p>
 <p><code>full</code> 只有在运行输出证明数据、切分、候选集、模型配置与指标均对齐时，才可能进入论文数值比较；它不是把教学适配器自动变成论文复现的开关。<code>smoke</code> 只做张量、损失和推理链路回归。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cc058f48">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c60fe71b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7729,7 +7729,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e9b9acea">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d82ddab7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7746,7 +7746,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b4047e4a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8733355f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7767,16 +7767,16 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=138b1d75">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e6ef0e75">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Data">Data<a class="anchor-link" href="#Data">¶</a></h2><h3 id="%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">权威 full 协议（效果验收目标）<a class="anchor-link" href="#%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">¶</a></h3><p><strong>正式数据：</strong> Amazon Books ratings-only 2014, iterative 10-core<br/>
+<h2 id="Data">Data<a class="anchor-link" href="#Data">¶</a></h2><h3 id="%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">权威 full 协议（效果验收目标）<a class="anchor-link" href="#%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">¶</a></h3><p><strong>正式数据：</strong> Amazon Books ratings-only 2014, item-first single-pass 10-core<br/>
 <strong>资源 ID：</strong> <code>amazon-books-2014-ratings</code><br/>
 <strong>切分：</strong> paper protocol: random 19:1 train/test; a deterministic seed records the sampled target<br/>
 <strong>指标：</strong> HitRate@10, HitRate@50, HitRate@100<br/>
-<strong>与论文比较边界：</strong> MIND Table 1/2: 351,356 users, 393,801 goods, 6,271,511 samples; absolute comparison is accepted only if these post-filter counts match</p>
+<strong>与论文比较边界：</strong> 样本行数与论文 Table 1/2 完全一致（6,271,511），以行数为比较锚点；论文 users/items（351,356/393,801）与可复现口径（218,972/369,114）不同，不作硬校验</p>
 <h3 id="smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">smoke 教学适配器（默认 runner 实际读取）<a class="anchor-link" href="#smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">¶</a></h3><p>仓库随附的真实 Amazon 评分教学子集；从每位用户的已观察序列构造 next-item 正例，并从其未观察目录中确定性采负例。它不满足论文的 10-core 后统计，只验证 <code>[B,L] -&gt; [B,K,d]</code> 与多兴趣检索链路。</p>
 <p>下方运行结果打印的 provenance 才是本次执行事实；若资源、统计或切分与 full 协议不一致，就必须标记为不可比较。</p>
 <p>**防泄漏清单：**按时间切分；item 映射只表达已知目录，不读取测试标签；低评分或未点击负反馈均来自数据中的已观察行；序列只看预测时刻以前；测试集只在最后评价。CPU 档使用真实数据的确定性子集，<strong>不是统一 benchmark 成绩</strong>。</p>
@@ -7784,7 +7784,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1d2e235c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=68edcd85">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7794,7 +7794,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d9321a45">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dbf53e33">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7821,7 +7821,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e34e5ceb">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=55aa18ae">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7830,7 +7830,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c9585eaf">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9562b890">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7848,7 +7848,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=93136a50">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7e962e5d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7867,7 +7867,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=09e49aab">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f1db2431">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7875,7 +7875,7 @@ window.MathJax = {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-python"><pre><span></span><span class="c1"># 论文数字只能在数据、切分、候选和指标全部同口径时相减。</span>
-<span class="n">paper_protocol</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s1">'{"dataset": "Amazon Books ratings-only 2014, iterative 10-core", "resource": "amazon-books-2014-ratings", "split": "paper protocol: random 19:1 train/test; a deterministic seed records the sampled target", "filters": "repeat user/item &gt;=10 filtering to convergence", "metrics": ["HitRate@10", "HitRate@50", "HitRate@100"], "paper_targets": {"HitRate@10": 0.0309, "HitRate@50": 0.1101, "HitRate@100": 0.1631}, "paper_comparison": "MIND Table 1/2: 351,356 users, 393,801 goods, 6,271,511 samples; absolute comparison is accepted only if these post-filter counts match"}'</span><span class="p">)</span>
+<span class="n">paper_protocol</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s1">'{"dataset": "Amazon Books ratings-only 2014, item-first single-pass 10-core", "resource": "amazon-books-2014-ratings", "split": "paper protocol: random 19:1 train/test; a deterministic seed records the sampled target", "filters": "paper protocol: filter items with &gt;=10 users, then users with &gt;=10 items, single pass (reproduces exactly 6,271,511 samples)", "metrics": ["HitRate@10", "HitRate@50", "HitRate@100"], "paper_targets": {"HitRate@10": 0.0309, "HitRate@50": 0.1101, "HitRate@100": 0.1631}, "paper_comparison": "样本行数与论文 Table 1/2 完全一致（6,271,511），以行数为比较锚点；论文 users/items（351,356/393,801）与可复现口径（218,972/369,114）不同，不作硬校验"}'</span><span class="p">)</span>
 <span class="n">paper_targets</span> <span class="o">=</span> <span class="n">paper_protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'paper_targets'</span><span class="p">,</span> <span class="p">{})</span>
 <span class="n">metric_key</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'HitRate@10'</span><span class="p">:</span><span class="s1">'paper_protocol_hr@10'</span><span class="p">,</span> <span class="s1">'NDCG@10'</span><span class="p">:</span><span class="s1">'paper_protocol_ndcg@10'</span><span class="p">,</span>
               <span class="s1">'AUC'</span><span class="p">:</span><span class="s1">'auc'</span><span class="p">,</span> <span class="s1">'LogLoss'</span><span class="p">:</span><span class="s1">'logloss'</span><span class="p">}</span>
@@ -7901,7 +7901,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f11b9721">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=05a1858e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7910,7 +7910,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9142362c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=eb6bed67">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7936,7 +7936,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d51cf9b9">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=51449b00">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7961,7 +7961,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=44de1dbc">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5c37900b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7970,7 +7970,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5f5a8fe5">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f41af2af">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7987,7 +7987,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4ac85e66">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9da39588">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

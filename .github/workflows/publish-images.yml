@@ -44,5 +44,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # gated 资源（RecIF-Bench）下载所需；secret 只存在于构建期，不进入镜像层。
+          secrets: |
+            hf_token=${{ secrets.HF_TOKEN }}
           cache-from: type=gha,scope=${{ matrix.name }}
           cache-to: type=gha,mode=max,scope=${{ matrix.name }}

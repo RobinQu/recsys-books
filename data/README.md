@@ -43,11 +43,38 @@ interactions, exposures, labels, ratings or sequences.
 - Native targets used without threshold fabrication: `is_click`, `long_view`, `is_like`, `is_follow`, `is_comment`, `is_forward`, `is_hate`
 - Exact machine-readable record: `kuairand-pure/provenance.json`
 
+## Full-profile external datasets
+
+These live under ignored `resources/datasets/` and are fetched by
+`python scripts/init_resources.py --include-optional --kind datasets --id <id>`:
+
+- `movielens-latest-full`: official MovieLens latest zip (~33M ratings,
+  GroupLens regenerates it periodically, so loaders assert a 33M floor and
+  record actual counts in provenance). Used by every chapter 4 classic
+  notebook in full profile.
+- `movielens-1m-full` / `movielens-20m-full`: stable GroupLens releases for
+  SASRec (5.4) and HSTU (8.3) paper protocols.
+- `amazon-books-5core` / `amazon-electronics-5core` /
+  `amazon-books-2014-ratings`: paper-aligned retrieval/ranking corpora
+  (5.2, 5.3, 6.3, 6.4).
+- `criteo-x1-full`: reczoo Criteo_x1 (HF), official 7:2:1 split
+  33,003,326 / 8,250,124 / 4,587,167 rows, sha256-pinned. Full profile for
+  GBDT+LR (4.5) and DeepFM (6.2).
+- `census-income-kdd`: MMoE/PLE (7.2, 7.3) official train/test.
+- `openonerec-recif`: gated, see the next section.
+
 ## OpenOneRec RecIF-Bench access boundary
 
-The official `OpenOneRec/OpenOneRec-RecIF` Hugging Face repository is gated as
-of this build. The smoke notebook therefore uses observed KuaiRand interactions
+The official `OpenOneRec/OpenOneRec-RecIF` Hugging Face repository is gated:
+each reader must accept the official terms and authenticate with their own
+`HF_TOKEN` before downloading. An authorized local copy (Apache License 2.0,
+see `resources/datasets/recif-bench/LICENSE`) now lives at
+`resources/datasets/recif-bench/` (~8.4 GB, snapshot 8f7cf2ee, fetched
+2026-07-24): `onerec_bench_release.parquet` (162,074 users with per-domain
+hist/target feedback), `benchmark_data/` (8 task test sets plus
+`sid2iid.json`/`sid2pid.json`), `video_ad_pid2sid.parquet` (15.9M pid→sid),
+`product_pid2sid.parquet` (2.07M pid→sid) and `pid2caption.parquet` (12.7M
+dense captions). The smoke notebook still uses observed KuaiRand interactions
 and video taxonomy through an explicitly named compatibility adapter; it does
-not claim to reproduce the RecIF-Bench score. The full profile requires the
-reader to accept the official license and authenticate before downloading the
-RecIF parquet and semantic-ID mappings.
+not claim to reproduce the RecIF-Bench score. Full-profile RecIF runs read
+only this local copy and never redistribute it.

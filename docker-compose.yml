@@ -71,9 +71,11 @@ services:
     image: recsys-atlas:latest
     command: >-
       sh -c "python scripts/init_resources.py --include-optional --strict --kind datasets
-      --id movielens-1m-full --id amazon-books-5core --id amazon-books-2014-ratings
+      --id movielens-latest-full --id movielens-1m-full --id movielens-20m-full
+      --id amazon-books-5core --id amazon-books-2014-ratings
       --id amazon-electronics-5core --id census-income-kdd
-      --id amazon-video-games-full --id kuairand-pure-full &&
+      --id amazon-video-games-full --id kuairand-pure-full
+      --id criteo-x1-full --id openonerec-recif &&
       RECSYS_PROFILE=full pytest -q -m full_data &&
       python scripts/generate_notebooks.py &&
       python scripts/execute_notebooks.py --profile full --only 5_2_dssm &&
@@ -87,5 +89,36 @@ services:
     environment:
       RECSYS_PROFILE: full
       PYTHONPATH: /workspace
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      - .:/workspace
+
+  test-accuracy:
+    profiles: ["full"]
+    build: .
+    image: recsys-atlas:latest
+    command: >-
+      sh -c "python scripts/init_resources.py --include-optional --strict --kind datasets
+      --id movielens-latest-full --id movielens-20m-full --id criteo-x1-full --id openonerec-recif &&
+      RECSYS_PROFILE=full pytest -q -m 'full_data or accuracy'"
+    environment:
+      RECSYS_PROFILE: full
+      PYTHONPATH: /workspace
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      - .:/workspace
+
+  test-cuda-accuracy:
+    profiles: ["cuda"]
+    build: .
+    image: recsys-atlas:latest
+    command: >-
+      sh -c "python scripts/init_resources.py --include-optional --strict --kind datasets
+      --id movielens-20m-full --id openonerec-recif &&
+      RECSYS_PROFILE=full pytest -q -m cuda_accuracy"
+    environment:
+      RECSYS_PROFILE: full
+      PYTHONPATH: /workspace
+      HF_TOKEN: ${HF_TOKEN:-}
     volumes:
       - .:/workspace

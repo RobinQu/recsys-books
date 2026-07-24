@@ -31,3 +31,19 @@ services:
       dockerfile: Dockerfile.cuda
     image: recsys-atlas-cuda:latest
     gpus: all
+
+  test-accuracy:
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    image: recsys-atlas-cuda:latest
+    gpus: all
+
+  test-cuda-accuracy:
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    image: recsys-atlas-cuda:latest
+    gpus: all
+    environment:
+      RECSYS_CUDA_AVAILABLE: "1"

@@ -7517,7 +7517,7 @@ window.MathJax = {
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0193d6a6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ff7cd7c8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7530,17 +7530,17 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=db8aab3f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f5d59979">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h2><p>本 Notebook 的默认真实数据是 <strong>KuaiRand-Pure：真实短视频曝光、点击、长播与多反馈序列</strong>。<code>smoke</code> 档读取仓库内可审计的确定性切片，<code>full</code> 档扩大到官方完整文件；两档都不制造交互、曝光、标签或行为序列。切片规则、源地址、哈希与许可记录在 <code>data/README.md</code> 及对应数据目录。 <strong>生成式章节默认要求 CUDA；无 CUDA 时只允许自动化测试执行 CPU basic smoke，不进行完整精度验证。</strong></p>
+<h2 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h2><p>本 Notebook 的默认真实数据是 <strong>KuaiRand-Pure（smoke 教学适配器）；full 档读取授权的 RecIF-Bench 本地副本</strong>。<code>smoke</code> 档读取仓库内可审计的确定性切片，<code>full</code> 档扩大到官方完整文件；两档都不制造交互、曝光、标签或行为序列。切片规则、源地址、哈希与许可记录在 <code>data/README.md</code> 及对应数据目录。 <strong>生成式章节默认要求 CUDA；无 CUDA 时只允许自动化测试执行 CPU basic smoke，不进行完整精度验证。</strong></p>
 <p><strong>主要资料：</strong> <a href="https://github.com/Kuaishou-OneRec/OpenOneRec">Kuaishou OpenOneRec</a></p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=419acd94">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=43577ab1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7605,7 +7605,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8193fc01">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f2ad9691">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7624,7 +7624,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f3d40a34">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0d8813c1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7637,18 +7637,22 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d3e20d09">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b6b6f97e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Reproduction-Contract">Reproduction Contract<a class="anchor-link" href="#Reproduction-Contract">¶</a></h2><p>本节暂无可公开取得且与论文完全等价的数据；报告只验证代码契约，不生成伪复现结论。</p>
+<h2 id="Reproduction-Contract">Reproduction Contract<a class="anchor-link" href="#Reproduction-Contract">¶</a></h2><p><strong>正式数据：</strong> OpenOneRec RecIF-Bench<br/>
+<strong>资源 ID：</strong> <code>openonerec-recif</code><br/>
+<strong>切分：</strong> official release + benchmark_data task test sets<br/>
+<strong>指标：</strong> Recall@32, AUC, LLM Score<br/>
+<strong>与论文比较边界：</strong> gated 授权副本；对齐 OpenOneRec 官方 SID 目录与指令任务，只读本地副本不二次分发</p>
 <p><code>full</code> 只有在运行输出证明数据、切分、候选集、模型配置与指标均对齐时，才可能进入论文数值比较；它不是把教学适配器自动变成论文复现的开关。<code>smoke</code> 只做张量、损失和推理链路回归。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6efb3ba6">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12540a51">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7714,7 +7718,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bcf443fd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bcb76694">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7731,7 +7735,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=21a2ae2c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=197dbc8a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7750,20 +7754,24 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6e785794">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1ccdf385">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Data">Data<a class="anchor-link" href="#Data">¶</a></h2><h3 id="%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">权威 full 协议（效果验收目标）<a class="anchor-link" href="#%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">¶</a></h3><p>本节暂无可公开取得且与论文完全等价的数据；报告只验证代码契约，不生成伪复现结论。</p>
-<h3 id="smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">smoke 教学适配器（默认 runner 实际读取）<a class="anchor-link" href="#smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">¶</a></h3><p>KuaiRand-Pure 的真实视频 tag、music type 与 item 分区形成教学 Semantic ID；真实反馈只用于小型 token/约束链路。CUDA 与 CPU 都不自动获得 gated 的 RecIF-Bench，也不把本地 chosen/rejected 当成官方 reward 数据。</p>
+<h2 id="Data">Data<a class="anchor-link" href="#Data">¶</a></h2><h3 id="%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">权威 full 协议（效果验收目标）<a class="anchor-link" href="#%E6%9D%83%E5%A8%81-full-%E5%8D%8F%E8%AE%AE%EF%BC%88%E6%95%88%E6%9E%9C%E9%AA%8C%E6%94%B6%E7%9B%AE%E6%A0%87%EF%BC%89">¶</a></h3><p><strong>正式数据：</strong> OpenOneRec RecIF-Bench<br/>
+<strong>资源 ID：</strong> <code>openonerec-recif</code><br/>
+<strong>切分：</strong> official release + benchmark_data task test sets<br/>
+<strong>指标：</strong> Recall@32, AUC, LLM Score<br/>
+<strong>与论文比较边界：</strong> gated 授权副本；对齐 OpenOneRec 官方 SID 目录与指令任务，只读本地副本不二次分发</p>
+<h3 id="smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">smoke 教学适配器（默认 runner 实际读取）<a class="anchor-link" href="#smoke-%E6%95%99%E5%AD%A6%E9%80%82%E9%85%8D%E5%99%A8%EF%BC%88%E9%BB%98%E8%AE%A4-runner-%E5%AE%9E%E9%99%85%E8%AF%BB%E5%8F%96%EF%BC%89">¶</a></h3><p>KuaiRand-Pure 的真实视频 tag、music type 与 item 分区形成教学 Semantic ID；真实反馈只用于小型 token/约束链路。full 档读取已授权的 RecIF-Bench 本地副本（官方 pid→Semantic ID 目录与 release 交互），smoke 不把本地 chosen/rejected 当成官方 reward 数据。</p>
 <p>下方运行结果打印的 provenance 才是本次执行事实；若资源、统计或切分与 full 协议不一致，就必须标记为不可比较。</p>
 <p>**防泄漏清单：**按时间切分；item 映射只表达已知目录，不读取测试标签；低评分或未点击负反馈均来自数据中的已观察行；序列只看预测时刻以前；测试集只在最后评价。无 CUDA 时的 CPU basic smoke 只验证基本功能，不产出精度结论。</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5356eb96">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=53b464f8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7773,7 +7781,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=65754114">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f090ccf7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7800,7 +7808,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d528d6cf">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c42eb9d6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7809,7 +7817,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8339c32c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8ba85e8f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7827,7 +7835,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4494ca63">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5787af3c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7846,7 +7854,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=da8e8137">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a4d23736">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7854,7 +7862,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-python"><pre><span></span><span class="c1"># 论文数字只能在数据、切分、候选和指标全部同口径时相减。</span>
-<span class="n">paper_protocol</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s1">'</span><span class="si">{}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">paper_protocol</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="s1">'{"dataset": "OpenOneRec RecIF-Bench", "resource": "openonerec-recif", "split": "official release + benchmark_data task test sets", "metrics": ["Recall@32", "AUC", "LLM Score"], "paper_comparison": "gated 授权副本；对齐 OpenOneRec 官方 SID 目录与指令任务，只读本地副本不二次分发"}'</span><span class="p">)</span>
 <span class="n">paper_targets</span> <span class="o">=</span> <span class="n">paper_protocol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'paper_targets'</span><span class="p">,</span> <span class="p">{})</span>
 <span class="n">metric_key</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'HitRate@10'</span><span class="p">:</span><span class="s1">'paper_protocol_hr@10'</span><span class="p">,</span> <span class="s1">'NDCG@10'</span><span class="p">:</span><span class="s1">'paper_protocol_ndcg@10'</span><span class="p">,</span>
               <span class="s1">'AUC'</span><span class="p">:</span><span class="s1">'auc'</span><span class="p">,</span> <span class="s1">'LogLoss'</span><span class="p">:</span><span class="s1">'logloss'</span><span class="p">}</span>
@@ -7880,7 +7888,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=36b1da89">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0ea3a8ce">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7889,7 +7897,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2d1adf1f">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f51b11f3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7915,7 +7923,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=19addf12">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2c003fb2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7940,7 +7948,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=72f41042">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=329412fd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7949,7 +7957,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0e0078ac">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c18e68fe">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7966,7 +7974,7 @@ $$\hat z_i=\sum_{\ell=1}^{m}C_\ell[c_\ell],\qquad s(i)=(c_1,\ldots,c_m).$$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4a263713">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e8c54050">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

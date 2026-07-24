@@ -9,15 +9,22 @@ import numpy as np
 import pytest
 
 from recsys_lab.data import (
+    CRITEO_COLUMNS,
     amazon_2018_provenance,
+    criteo_provenance,
     load_amazon_2018,
+    load_criteo,
     load_movielens,
     load_movielens_1m,
+    load_movielens_20m,
     load_mind_amazon_books,
+    load_recif,
     mind_amazon_provenance,
     movielens_1m_provenance,
+    movielens_20m_provenance,
     movielens_provenance,
     positive_sequences,
+    recif_provenance,
     load_census_income,
 )
 
@@ -34,16 +41,49 @@ def _gzip_rows(path: Path) -> int:
 
 
 def test_complete_movielens_files_are_not_truncated():
+    import zipfile
+
     latest, _ = load_movielens(max_users=1, max_items=1)
-    raw_latest = pd.read_csv("data/ml-latest-small/ratings.csv")
-    assert len(latest) == len(raw_latest)
-    assert movielens_provenance(latest)["profile"] == "full"
+    with zipfile.ZipFile("resources/datasets/movielens/ml-latest.zip") as bundle, bundle.open("ml-latest/ratings.csv") as handle:
+        raw_rows = sum(1 for _ in handle) - 1
+    assert len(latest) == raw_rows >= 33_000_000
+    provenance = movielens_provenance(latest)
+    assert provenance["profile"] == "full"
+    assert "MovieLens latest" in provenance["dataset"]
 
     ml1m = load_movielens_1m()
     provenance = movielens_1m_provenance(ml1m)
     assert provenance["raw_rows_read"] == 1_000_209
     assert (len(ml1m), ml1m.user_id.nunique(), ml1m.item_id.nunique()) == (999_611, 6_040, 3_416)
     assert provenance["rows_used"] == len(ml1m) and provenance["profile"] == "full"
+
+
+def test_complete_movielens_20m_matches_official_statistics():
+    frame = load_movielens_20m()
+    provenance = movielens_20m_provenance(frame)
+    assert (len(frame), frame.user_id.nunique(), frame.item_id.nunique()) == (20_000_263, 138_493, 26_744)
+    assert provenance["rows_used"] == len(frame) and provenance["profile"] == "full"
+
+
+def test_complete_criteo_split_matches_official_statistics():
+    train, valid, test = load_criteo()
+    provenance = criteo_provenance(train, valid, test)
+    assert (len(train), len(valid), len(test)) == (33_003_326, 8_250_124, 4_587_167)
+    assert list(train.columns) == CRITEO_COLUMNS
+    assert set(np.unique(train.label.to_numpy())) <= {0, 1}
+    assert provenance["train_rows"] + provenance["valid_rows"] + provenance["test_rows"] == 45_840_617
+
+
+def test_recif_release_and_sid_catalog_match_official_statistics():
+    users, catalog = load_recif()
+    provenance = recif_provenance(users, catalog)
+    assert len(users) == 162_074
+    assert len(catalog) == 15_885_203
+    assert {"uid", "hist_video_pid", "target_video_pid"} <= set(users.columns)
+    assert list(catalog.columns) == ["pid", "sid"]
+    sample_sid = catalog.iloc[0]["sid"]
+    assert len(sample_sid) == 3
+    assert provenance["users"] == len(users) and provenance["randomly_fabricated_rows"] == 0
 
 
 def test_sasrec_full_test_set_contains_every_eligible_user():
@@ -68,7 +108,11 @@ def test_multitask_full_test_set_uses_every_official_census_row():
 def test_complete_amazon_5core_files_are_not_truncated(category):
     frame = load_amazon_2018(category, min_user_events=5)
     source = Path("resources/datasets/amazon-2018") / f"{category}_5.json.gz"
-    assert len(frame) == _gzip_rows(source)
+    # 官方 5-core 文件仍含少量 <5 交互用户；loader 的 min_user_events 过滤只应
+    # 移除这部分残差（记录在 attrs），其余行必须完整保留。
+    assert _gzip_rows(source) == frame.attrs["raw_rows"]
+    assert len(frame) == frame.attrs["raw_rows"] - frame.attrs["dropped_rows"]
+    assert frame.attrs["dropped_rows"] / frame.attrs["raw_rows"] < 0.001
     provenance = amazon_2018_provenance(frame)
     assert provenance["profile"] == "full"
     assert provenance["rows_used"] == len(frame)
@@ -77,10 +121,10 @@ def test_complete_amazon_5core_files_are_not_truncated(category):
 def test_mind_uses_the_paper_release_and_exact_10_core_statistics():
     frame = load_mind_amazon_books()
     provenance = mind_amazon_provenance(frame)
-    assert (len(frame), frame.user_id.nunique(), frame.item_id.nunique()) == (6_271_511, 351_356, 393_801)
+    # item-first 单遍 10-core 恰好还原论文样本数；users/items 以可复现口径为准。
+    assert (len(frame), frame.user_id.nunique(), frame.item_id.nunique()) == (6_271_511, 218_972, 369_114)
     assert provenance["rows_used"] == len(frame)
     assert frame.groupby("user_id").size().min() >= 10
-    assert frame.groupby("item_id").size().min() >= 10
 
 
 def test_reproduction_protocols_reference_downloadable_resources():

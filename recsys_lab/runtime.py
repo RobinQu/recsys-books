@@ -21,6 +21,9 @@ from .data import (
     load_amazon_2018, load_amazon_2023, load_kuairand, load_movielens_1m,
     load_mind_amazon_books, mind_amazon_provenance, movielens_1m_provenance,
     load_census_income, census_income_provenance,
+    load_criteo, criteo_provenance,
+    load_movielens_20m, movielens_20m_provenance,
+    load_recif, recif_provenance,
 )
 
 
@@ -199,3 +202,25 @@ def real_multitask_dataset(max_users: int = 96, max_items: int = 2200):
     labels = np.c_[frame.is_click, frame.long_view].astype(np.float32)
     split = int(len(x) * .8)
     return x[:split], labels[:split], x[split:], labels[split:], provenance
+
+
+def real_criteo():
+    """CTR 论文同任务公开数据：full 档返回官方 7:2:1 切分与 provenance。"""
+    train, valid, test = load_criteo()
+    return train, valid, test, criteo_provenance(train, valid, test)
+
+
+def real_hstu_dataset(max_users: int = 128, max_items: int = 2500):
+    """HSTU：full 档切换到论文公开基准 MovieLens 20M；smoke 沿用 KuaiRand 序列。"""
+    if full_profile():
+        ratings = load_movielens_20m()
+        return ratings, None, movielens_20m_provenance(ratings)
+    return real_kuairand(max_users=max_users, max_items=max_items)
+
+
+def real_openonerec_dataset(max_users: int = 96, max_items: int = 2200):
+    """OpenOneRec：full 档读取授权的 RecIF-Bench 本地副本；smoke 沿用 KuaiRand 适配器。"""
+    if full_profile():
+        users, catalog = load_recif()
+        return users, catalog, recif_provenance(users, catalog)
+    return real_kuairand(max_users=max_users, max_items=max_items)

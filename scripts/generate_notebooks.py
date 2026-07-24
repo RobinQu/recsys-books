@@ -75,11 +75,11 @@ assert REAL_DATASET["randomly_fabricated_rows"] == 0
 
 def dataset_for_title(title: str) -> tuple[str, str]:
     if title.startswith(("3.", "4.")):
-        return "movielens", "GroupLens MovieLens latest-small：经典评分与邻域任务"
+        return "movielens", "MovieLens latest-small（smoke 确定性切片）；full 用官方完整 MovieLens latest（约 33M 评分）"
     if title.startswith("5.5 总结"):
         return "amazon-2023", "Amazon Reviews 2023 Video Games 5-core：召回章节结果汇总（不重新训练）"
     if "MIND" in title:
-        return "mind-amazon-books", "Amazon Books 2014：按 MIND 论文执行迭代 10-core，并核验 6,271,511 行"
+        return "mind-amazon-books", "Amazon Books 2014：按 MIND 论文协议（item-first 单遍 10-core）执行，并核验 6,271,511 行"
     if "DSSM" in title:
         return "amazon-books", "Amazon Reviews Books 5-core：DSSM 搜索日志不可公开时的完整电商迁移实验"
     if "SASRec" in title:
@@ -88,6 +88,12 @@ def dataset_for_title(title: str) -> tuple[str, str]:
         return "amazon-electronics", "Amazon Reviews Electronics 5-core：DIN/DIEN 公开复现实验数据"
     if "MMoE" in title or "PLE" in title:
         return "census-income", "Census-Income KDD：MMoE/PLE 论文公开多任务实验的完整官方 train/test"
+    if "DeepFM" in title:
+        return "kuairand", "KuaiRand-Pure（smoke 教学适配器）；full 档切换 Criteo_x1 官方 7:2:1 切分"
+    if "OpenOneRec" in title:
+        return "kuairand", "KuaiRand-Pure（smoke 教学适配器）；full 档读取授权的 RecIF-Bench 本地副本"
+    if "HSTU" in title:
+        return "kuairand", "KuaiRand-Pure（smoke 教学适配器）；full 档切换 MovieLens 20M 论文公开基准"
     if title.startswith("5."):
         return "amazon-2023", "Amazon Reviews 2023 Video Games 5-core：召回章节导读与汇总"
     return "kuairand", "KuaiRand-Pure：真实短视频曝光、点击、长播与多反馈序列"

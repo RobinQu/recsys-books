@@ -259,13 +259,25 @@ def ensure_resources(
             except Exception as error:
                 state.message = str(error)
         states.append(state)
+    # 合并历史锁文件：按 --id/--kind 过滤的调用只更新涉及条目，
+    # 不能整文件覆写，否则单次小范围调用会丢失其他资源的就绪记录。
+    merged: dict[str, dict] = {}
+    if LOCK_PATH.exists():
+        try:
+            merged = {
+                item["id"]: item
+                for item in json.loads(LOCK_PATH.read_text(encoding="utf-8")).get("items", [])
+            }
+        except json.JSONDecodeError:
+            merged = {}
+    merged.update({state.id: asdict(state) for state in states})
     payload = {
         "schema_version": 1,
         "generated_at": int(time.time()),
-        "ready": sum(state.status == "ready" for state in states),
-        "missing": sum(state.status != "ready" for state in states),
+        "ready": sum(item["status"] == "ready" for item in merged.values()),
+        "missing": sum(item["status"] != "ready" for item in merged.values()),
         "fetched": fetched,
-        "items": [asdict(state) for state in states],
+        "items": list(merged.values()),
     }
     LOCK_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     # Explicitly requested IDs are an execution contract even when the same

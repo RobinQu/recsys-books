@@ -10,10 +10,12 @@ from recsys_lab.data import clicked_sequences, positive_sequences, kuairand_sequ
 from recsys_lab.runtime import (
     real_amazon as _real_amazon,
     real_kuairand as _real_kuairand,
+    real_openonerec_dataset as _real_openonerec_dataset,
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
     train_binary as _train_binary,
+    full_profile,
 )
 
 def _semantic_catalog(videos):
@@ -45,10 +47,38 @@ def _training_device(cpu_smoke: bool) -> torch.device:
 def run_openonerec(epochs: int = 32, cpu_smoke: bool = False) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
     seed_everything(); device = _training_device(cpu_smoke)
-    interactions, videos, provenance = _real_kuairand(); item_to_code = _semantic_catalog(videos); catalog = set(item_to_code.values())
     sample_rows = 256 if device.type == "cpu" else 2000
-    positive = interactions[interactions.is_click == 1].sort_values("timestamp").tail(sample_rows)
-    sequences = np.asarray([item_to_code[int(item)] for item in positive.item_id], dtype=np.int64)
+    if full_profile():
+        users, catalog_frame, provenance = _real_openonerec_dataset()
+        # 官方 Semantic ID：pid → 三层整数编码，+1 偏移把 0 留给起始符。
+        item_to_code = {int(row.pid): tuple(int(value) + 1 for value in row.sid) for row in catalog_frame.itertuples()}
+        catalog = set(item_to_code.values())
+        # 训练序列来自 release 中真实 hist_video_pid（只保留有官方 SID 映射的物品）。
+        sequences = []
+        for row in users.itertuples():
+            for pid in list(row.hist_video_pid)[-9:]:
+                code = item_to_code.get(int(pid))
+                if code is not None:
+                    sequences.append(code)
+            if len(sequences) >= sample_rows:
+                break
+        sequences = np.asarray(sequences[:sample_rows], dtype=np.int64)
+        code_source = "official RecIF-Bench pid→Semantic ID mapping"
+        first = users.iloc[0]
+        chosen_pid = int(np.asarray(first["target_video_longview"]).ravel()[0]) if len(np.asarray(first["target_video_longview"]).ravel()) else None
+        rejected_pid = int(np.asarray(first["target_video_not_interested"]).ravel()[0]) if len(np.asarray(first["target_video_not_interested"]).ravel()) else None
+        dpo_pair = {
+            "chosen": item_to_code.get(chosen_pid, sequences[0].tolist()),
+            "rejected": item_to_code.get(rejected_pid, sequences[-1].tolist()),
+        }
+    else:
+        interactions, videos, provenance = _real_kuairand(); item_to_code = _semantic_catalog(videos); catalog = set(item_to_code.values())
+        positive = interactions[interactions.is_click == 1].sort_values("timestamp").tail(sample_rows)
+        sequences = np.asarray([item_to_code[int(item)] for item in positive.item_id], dtype=np.int64)
+        code_source = "observed KuaiRand video tag + music type + item id partition"
+        chosen_row = interactions[(interactions.is_click == 1) & (interactions.long_view == 1)].iloc[0]
+        rejected_row = interactions[interactions.is_click == 0].iloc[0]
+        dpo_pair = {"chosen": item_to_code[int(chosen_row.item_id)], "rejected": item_to_code[int(rejected_row.item_id)]}
     vocabulary_size = int(sequences.max()) + 2
     model_input = torch.tensor(np.c_[np.zeros((len(sequences), 1), dtype=np.int64), sequences[:, :-1]], device=device)
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
@@ -75,21 +105,18 @@ def run_openonerec(epochs: int = 32, cpu_smoke: bool = False) -> dict:
     while prefix + (invalid_token,) in catalog: invalid_token -= 1
     stress_logits[invalid_token] = float(stress_logits.max() + .5)
     unconstrained = int(stress_logits.argmax()); constrained = int(max(allowed, key=lambda token: stress_logits[token]))
-    chosen_row = interactions[(interactions.is_click == 1) & (interactions.long_view == 1)].iloc[0]
-    rejected_row = interactions[interactions.is_click == 0].iloc[0]
     return {
         "framework": "OpenOneRec contract + PyTorch executable proxy",
         "device": str(device), "cuda_device": torch.cuda.get_device_name(0) if device.type == "cuda" else None,
         "validation_mode": "cuda_accuracy" if device.type == "cuda" else "cpu_basic_smoke", "mixed_precision": amp_enabled,
         "dataset": provenance | {
             "semantic_catalog_size": len(catalog), "training_codes": len(sequences),
-            "code_source": "observed KuaiRand video tag + music type + item id partition",
-            "recif_bench_access": "official OpenOneRec-RecIF repository is gated; full profile requires authenticated acceptance",
+            "code_source": code_source,
         },
         "loss_curve": losses, "catalog_size": len(catalog), "prefix": prefix, "allowed_tokens": allowed,
         "unconstrained_token": unconstrained, "constrained_token": constrained,
         "invalid_unconstrained": float(prefix + (unconstrained,) not in catalog), "invalid_constrained": float(prefix + (constrained,) not in catalog),
-        "dpo_pair": {"chosen": item_to_code[int(chosen_row.item_id)], "rejected": item_to_code[int(rejected_row.item_id)]},
+        "dpo_pair": dpo_pair,
     }
 
 def train_and_evaluate(epochs: int = 4, cpu_smoke: bool = False) -> dict:

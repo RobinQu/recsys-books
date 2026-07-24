@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --locked
+      - name: Unit tests (no full-data / accuracy markers)
+        run: uv run pytest -q -m "not full_data and not accuracy and not cuda_accuracy"
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate, unit tests, notebook smoke execution, previews
+        run: docker compose run --rm test
+
+  full-data:
+    # 完整数据校验与 CPU 精度回归：数据量大，只在手动触发或每周定时运行。
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Full-profile data validation and CPU accuracy gates
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: docker compose --profile full run --rm test-accuracy
+
+  cuda-accuracy:
+    # 生成式精度门槛需要 NVIDIA GPU：GitHub 托管 runner 无 GPU，
+    # 该 job 仅在手动触发且配置了 self-hosted GPU runner 时执行。
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, gpu]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generative accuracy gates on CUDA
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: >-
+          docker compose -f docker-compose.yml -f docker-compose.cuda.yml
+          --profile cuda run --rm test-cuda-accuracy

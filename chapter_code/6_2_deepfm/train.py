@@ -7,17 +7,19 @@ import numpy as np
 import torch
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import log_loss
-from torch_rechub.basic.features import SparseFeature
+from torch_rechub.basic.features import DenseFeature, SparseFeature
 from torch_rechub.models.ranking import DeepFM
 from recsys_lab.data import clicked_sequences, positive_sequences, kuairand_sequence_classification_rows
 from recsys_lab.runtime import (
     real_amazon as _real_amazon,
+    real_criteo as _real_criteo,
     real_kuairand as _real_kuairand,
     recall_single_target as _recall_single_target,
     safe_auc as _safe_auc,
     seed_everything,
     train_binary as _train_binary,
     complete_or_recent,
+    full_profile,
 )
 
 def _ranking_fields(interactions):
@@ -31,9 +33,58 @@ def _ranking_fields(interactions):
         "duration_bucket": frame.duration_bucket.to_numpy() + 1,
     }, frame.is_click.to_numpy(dtype=np.float32), frame
 
+def _run_criteo_deepfm(epochs: int) -> dict:
+    """full 档论文协议：Criteo_x1 官方 7:2:1 切分，13 数值 + 26 类别特征。
+
+    45.8M 行的完整训练是 dispatch 级任务，需要大内存机器；类别词表只从
+    train 构建，测试集未见类别编码为 0。
+    """
+    train, _, test, provenance = _real_criteo()
+    dense = [f"I{index}" for index in range(1, 14)]
+    sparse_names = [f"C{index}" for index in range(1, 27)]
+    features = [DenseFeature(name) for name in dense]
+    train_x, test_x = {}, {}
+    for name in sparse_names:
+        categories = train[name].cat.categories
+        features.append(SparseFeature(name, len(categories) + 1, 16))
+        mapping = {value: code + 1 for code, value in enumerate(categories)}
+        train_x[name] = torch.tensor(train[name].cat.codes.to_numpy(dtype=np.int64) + 1, dtype=torch.long)
+        test_x[name] = torch.tensor(test[name].astype("object").map(mapping).fillna(0).to_numpy(dtype=np.int64), dtype=torch.long)
+    for name in dense:
+        train_x[name] = torch.tensor(train[name].fillna(0).to_numpy(dtype=np.float32))
+        test_x[name] = torch.tensor(test[name].fillna(0).to_numpy(dtype=np.float32))
+    labels_train = torch.tensor(train.label.to_numpy(dtype=np.float32))
+    labels_test = test.label.to_numpy(dtype=np.float32)
+    # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
+    model = DeepFM(features, features, {"dims": [64, 32], "activation": "relu", "dropout": 0.0})
+    # 4) 公共训练循环执行 forward、二元交叉熵、backward 和 optimizer.step。
+    losses = _train_binary(model, train_x, labels_train, epochs, .001, batch_size=100_000)
+    # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
+    with torch.no_grad():
+        probability = torch.cat([
+            model({name: value[start:start + 500_000] for name, value in test_x.items()})
+            for start in range(0, len(labels_test), 500_000)
+        ]).numpy()
+    # LR 基线只用前 200 万训练行拟合（口径写入 provenance），与论文的 LR 对照保持同任务。
+    baseline = LogisticRegression(max_iter=100).fit(
+        train[dense].fillna(0).to_numpy(dtype=np.float32)[:2_000_000], train.label.to_numpy()[:2_000_000],
+    )
+    baseline_probability = baseline.predict_proba(test[dense].fillna(0).to_numpy(dtype=np.float32))[:, 1]
+    return {
+        "framework": "torch_rechub.models.ranking.DeepFM",
+        "dataset": provenance | {"label": "observed Criteo click label", "lr_baseline": "first 2M train rows"},
+        "loss_curve": losses, "auc": _safe_auc(labels_test, probability),
+        "logloss": float(log_loss(labels_test, np.clip(probability, 1e-6, 1 - 1e-6))),
+        "lr_auc": _safe_auc(labels_test, baseline_probability), "probability_sample": probability[:8].round(3).tolist(),
+    }
+
+
 def run_deepfm(epochs: int = 28) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
-    seed_everything(); interactions, _, provenance = _real_kuairand(); fields, labels, frame = _ranking_fields(interactions); split = int(len(labels) * .8)
+    seed_everything()
+    if full_profile():
+        return _run_criteo_deepfm(epochs)
+    interactions, _, provenance = _real_kuairand(); fields, labels, frame = _ranking_fields(interactions); split = int(len(labels) * .8)
     features = [
         SparseFeature("user_id", int(max(fields["user_id"])) + 1, 12),
         SparseFeature("item_id", int(max(fields["item_id"])) + 1, 12),

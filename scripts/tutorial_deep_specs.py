@@ -338,7 +338,7 @@ for y,node in zip([.25,.5,.75],['1','2','3']):
     ax.text(.32,y,node,bbox=dict(boxstyle='round',fc='white')); ax.plot([.13,.30],[.5,y],color='#809070')
 ax.text(.58,.35,'prefix (1,2)',bbox=dict(boxstyle='round',fc='#ffe8d7')); ax.text(.88,.25,'3'); ax.text(.88,.48,'4')
 ax.plot([.72,.86],[.38,.27]); ax.plot([.72,.86],[.38,.49]); ax.set_title('Catalog trie allows valid next tokens'); plt.show()""",
-            "smoke_dataset": "KuaiRand-Pure 的真实视频 tag、music type 与 item 分区形成教学 Semantic ID；真实反馈只用于小型 token/约束链路。CUDA 与 CPU 都不自动获得 gated 的 RecIF-Bench，也不把本地 chosen/rejected 当成官方 reward 数据。",
+            "smoke_dataset": "KuaiRand-Pure 的真实视频 tag、music type 与 item 分区形成教学 Semantic ID；真实反馈只用于小型 token/约束链路。full 档读取已授权的 RecIF-Bench 本地副本（官方 pid→Semantic ID 目录与 release 交互），smoke 不把本地 chosen/rejected 当成官方 reward 数据。",
             "framework": "OpenOneRec 官方训练配置负责 full profile；本 Notebook 的 PyTorch 小生成器验证相同 token/trie 契约、训练损失和合法性。",
             "primary": "invalid_constrained", "secondary": "invalid_unconstrained", "baseline": None,
             "inference": "自回归每一步应用目录 trie、去重和长度约束；随后可用奖励模型或 DPO 调整整列价值。",
