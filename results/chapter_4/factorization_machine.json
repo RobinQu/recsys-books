@@ -6,7 +6,7 @@
       "metric": "AUC ↑",
       "value": 0.5408193094277329,
       "secondary_metric": "LogLoss ↓",
-      "secondary_value": 3.41032393170229,
+      "secondary_value": 3.4103241581248875,
       "status": "executed",
       "online_inference": "线性项 + 二阶隐向量交互",
       "source_notebook": "4_4_factorization_machine"

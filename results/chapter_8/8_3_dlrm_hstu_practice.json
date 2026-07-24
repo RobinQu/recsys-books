@@ -5,12 +5,12 @@
       "primary_metric": "hr@5",
       "primary_value": 0.0,
       "secondary_metric": "popularity_hr@5",
-      "secondary_value": 0.0,
+      "secondary_value": 0.017857142857142856,
       "baseline_metric": null,
       "baseline_value": null,
       "framework": "torch_rechub.models.generative.HSTUModel",
       "source_notebook": "8_3_dlrm_hstu_practice",
-      "validation_mode": "cpu_basic_smoke",
+      "validation_mode": "cuda_accuracy",
       "dataset": "KuaiRand-Pure (Kuaishou, CIKM 2022)",
       "randomly_fabricated_rows": 0
     }

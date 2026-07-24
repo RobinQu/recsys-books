@@ -55,8 +55,8 @@ services:
     command: >-
       sh -c "python scripts/generate_chapter_code.py &&
       python scripts/generate_notebooks.py &&
-      pytest -q &&
       python scripts/execute_notebooks.py --profile smoke &&
+      pytest -q &&
       python scripts/build_previews.py &&
       python scripts/verify_published_notebooks.py"
     environment:

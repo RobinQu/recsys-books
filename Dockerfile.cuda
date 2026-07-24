@@ -1,6 +1,7 @@
 # CUDA variant of the RecSys Atlas image: identical locked environment to the
 # CPU Dockerfile, but PyTorch resolves to the official CUDA build so generative
-# chapters can train on NVIDIA GPUs. Compose passes devices via `gpus: all`.
+# chapters can train on NVIDIA GPUs. Compose passes devices via the nvidia
+# runtime (runtime: nvidia + NVIDIA_VISIBLE_DEVICES: all) in docker-compose.cuda.yml.
 FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

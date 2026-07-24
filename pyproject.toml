@@ -68,3 +68,6 @@ markers = [
   "accuracy: full-profile effect thresholds on complete datasets (dispatch-level, heavy training)",
   "cuda_accuracy: generative accuracy gates that require a CUDA device and full-profile resources",
 ]
+filterwarnings = [
+  "ignore:.*the `disp` and `iprint` options of the L-BFGS-B solver:DeprecationWarning",
+]

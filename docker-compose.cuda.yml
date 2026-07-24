@@ -7,8 +7,9 @@ services:
       context: .
       dockerfile: Dockerfile.cuda
     image: recsys-atlas-cuda:latest
-    gpus: all
+    runtime: nvidia
     environment:
+      NVIDIA_VISIBLE_DEVICES: all
       RECSYS_CUDA_AVAILABLE: "1"
 
   jupyter:
@@ -16,34 +17,43 @@ services:
       context: .
       dockerfile: Dockerfile.cuda
     image: recsys-atlas-cuda:latest
-    gpus: all
+    runtime: nvidia
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
 
   test:
     build:
       context: .
       dockerfile: Dockerfile.cuda
     image: recsys-atlas-cuda:latest
-    gpus: all
+    runtime: nvidia
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
 
   test-full:
     build:
       context: .
       dockerfile: Dockerfile.cuda
     image: recsys-atlas-cuda:latest
-    gpus: all
+    runtime: nvidia
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
 
   test-accuracy:
     build:
       context: .
       dockerfile: Dockerfile.cuda
     image: recsys-atlas-cuda:latest
-    gpus: all
+    runtime: nvidia
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
 
   test-cuda-accuracy:
     build:
       context: .
       dockerfile: Dockerfile.cuda
     image: recsys-atlas-cuda:latest
-    gpus: all
+    runtime: nvidia
     environment:
+      NVIDIA_VISIBLE_DEVICES: all
       RECSYS_CUDA_AVAILABLE: "1"

@@ -424,7 +424,8 @@ def test_cuda_compose_override_builds_cuda_image_and_exposes_gpu():
     base = Path("docker-compose.yml").read_text(encoding="utf-8")
     cuda = Path("docker-compose.cuda.yml").read_text(encoding="utf-8")
     assert "RECSYS_CUDA_AVAILABLE: ${RECSYS_CUDA_AVAILABLE:-0}" in base
-    assert cuda.count("gpus: all") == 6
+    assert cuda.count("runtime: nvidia") == 6
+    assert cuda.count("NVIDIA_VISIBLE_DEVICES: all") == 6
     assert cuda.count("dockerfile: Dockerfile.cuda") == 6
     assert cuda.count("image: recsys-atlas-cuda:latest") == 6
     assert 'RECSYS_CUDA_AVAILABLE: "1"' in cuda

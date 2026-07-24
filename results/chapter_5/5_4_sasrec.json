@@ -3,9 +3,9 @@
     {
       "algorithm": "SASRec 序列召回",
       "primary_metric": "hr@10",
-      "primary_value": 0.0125,
+      "primary_value": 0.0,
       "secondary_metric": "popularity_hr@10",
-      "secondary_value": 0.00625,
+      "secondary_value": 0.0125,
       "baseline_metric": null,
       "baseline_value": null,
       "framework": "torch_rechub.models.matching.SASRec",
