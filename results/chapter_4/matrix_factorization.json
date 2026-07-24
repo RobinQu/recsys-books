@@ -4,7 +4,7 @@
       "algorithm": "BiasMF",
       "task": "评分预测",
       "metric": "RMSE ↓",
-      "value": 0.8901938994384913,
+      "value": 0.8901939060902975,
       "secondary_metric": "HR@10",
       "secondary_value": null,
       "secondary_status": "not_run",

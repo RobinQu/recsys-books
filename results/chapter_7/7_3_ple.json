@@ -3,9 +3,9 @@
     {
       "algorithm": "PLE 渐进式专家抽取",
       "primary_metric": "click_auc",
-      "primary_value": 0.6212066780317568,
+      "primary_value": 0.6424637849320326,
       "secondary_metric": "long_view_auc",
-      "secondary_value": 0.6226543626046407,
+      "secondary_value": 0.6142163885611552,
       "baseline_metric": null,
       "baseline_value": null,
       "framework": "torch_rechub.models.multi_task.PLE",

@@ -3,9 +3,9 @@
     {
       "algorithm": "DeepFM 排序",
       "primary_metric": "auc",
-      "primary_value": 0.6516072775263952,
+      "primary_value": 0.6781143947963801,
       "secondary_metric": "logloss",
-      "secondary_value": 0.9221381036840262,
+      "secondary_value": 0.9062320108442267,
       "baseline_metric": "lr_auc",
       "baseline_value": 0.615079715780543,
       "framework": "torch_rechub.models.ranking.DeepFM",

@@ -5,7 +5,7 @@
       "primary_metric": "recall@10",
       "primary_value": 0.0,
       "secondary_metric": "positive_top1",
-      "secondary_value": 0.9140625,
+      "secondary_value": 0.8984375,
       "baseline_metric": null,
       "baseline_value": null,
       "framework": "torch_rechub.models.matching.MIND",
