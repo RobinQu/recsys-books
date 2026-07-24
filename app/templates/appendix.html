@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="RecSys Atlas 附录：论文资料与可执行 Notebook 清单">
+  <title>附录 · 论文与 Notebook 清单 | RecSys Atlas</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/navigation.css">
+</head>
+<body>
+  {% include "_site_header.html" %}
+  {% include "_site_sidebar.html" %}
+
+  <main>
+    <section class="hero chapter-hero appendix-hero reveal">
+      <div class="eyebrow">A · APPENDIX</div>
+      <h1>论文证据与<br><em>可执行课程总表</em></h1>
+      <p class="lede">正文负责建立算法脉络；附录集中提供可核验的论文原文入口，以及覆盖第 3—8 章的全部 Notebook。</p>
+      <div class="hero-actions"><a class="button" href="#sources">查论文 ↓</a><a class="ghost button-like" href="#labs">查 Notebook ↓</a></div>
+      <div class="stats"><div><strong>{{ sources|length }}</strong><span>论文与官方资料</span></div><div><strong>{{ notebooks|length }}</strong><span>课程与实验</span></div><div><strong>4</strong><span>详情页核心模式</span></div><div><strong>0</strong><span>虚构交互数据</span></div></div>
+    </section>
+
+    <section id="sources" class="section appendix-subsection reveal">
+      <div class="section-kicker">A.1 · PAPER LEDGER</div>
+      <h2>论文清单</h2>
+      <p class="section-intro">优先原始论文、作者或公司官方代码与工程资料。带本地资源的论文可直接进入站内阅读器，并从算法页的证据锚点跳到对应页码。</p>
+      <div class="source-list">
+        {% for name,url,type in sources %}{% set local_url = source_paper_links.get(name) %}
+        <a href="{{ local_url or url }}" target="_blank" rel="noreferrer"><span>{{ "%02d"|format(loop.index) }}</span><b>{{ name }}</b><em>{{ type }}{% if local_url %} · 本地 PDF{% endif %}</em><i>↗</i></a>
+        {% endfor %}
+      </div>
+      <p class="footnote">更完整的来源注释与实验口径见 <a href="/research-ledger">research ledger</a>；教程内容验收标准见 <a href="/tutorial-requirements">教程编写规范</a>。</p>
+    </section>
+
+    <section id="labs" class="section appendix-subsection reveal">
+      <div class="section-kicker">A.2 · NOTEBOOK CATALOGUE</div>
+      <h2>Notebook 清单</h2>
+      <p class="section-intro">每个条目都可进入阅读友好的预览，或在 JupyterLab 中重新运行。数据口径按“算法 × 协议”记录：full 档使用论文指定的版本、过滤与切分，smoke 档只用真实数据的确定性适配器验证链路；两档结果不可直接相减。</p>
+      <div class="notebook-list appendix-notebook-list">
+        {% for n in notebooks %}
+        <article id="{{ n.slug }}" data-notebook-kind="{{ n.kind }}">
+          <div><span>{{ notebook_kind_labels[n.kind] }} · {{ n.framework }}</span><h3>{{ n.title }}</h3><p>{{ n.dataset }} · {{ n.runtime }}</p></div>
+          <div><a href="/notebooks/{{ n.slug }}">预览</a><a href="{{ jupyter_url }}/lab/tree/notebooks/{{ n.slug }}.ipynb?token=recsys" target="_blank" rel="noreferrer">{{ '练习' if n.kind == 'curriculum' else '运行' }} ↗</a></div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+
+  <footer><a href="/catalog">← 第 2 章：内容索引</a><a href="#sources">回到附录顶部 ↑</a></footer>
+  <script src="/static/app.js?v=20260724-2" defer></script>
+</body>
+</html>

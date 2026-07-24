@@ -4,9 +4,10 @@
       "algorithm": "GBDT+LR",
       "task": "CTR",
       "metric": "AUC ↑",
-      "value": 0.6376184814958592,
+      "value": 0.4455990920763023,
       "secondary_metric": "LogLoss ↓",
-      "secondary_value": 0.7414472447869105,
+      "secondary_value": 0.9079436454734647,
+      "status": "executed",
       "online_inference": "树叶编码 → LR 概率",
       "source_notebook": "4_5_gbdt_lr"
     }

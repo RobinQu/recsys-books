@@ -7517,7 +7517,7 @@ window.MathJax = {
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b390b806">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cb5a2417">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7530,7 +7530,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b3f0149f">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ea94a7a1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7540,14 +7540,14 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=657f5015">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=10dad974">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
@@ -7556,46 +7556,16 @@ window.MathJax = {
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
 <span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab.data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">load_movielens</span><span class="p">,</span> <span class="n">movielens_provenance</span><span class="p">,</span> <span class="n">load_amazon_2023</span><span class="p">,</span>
-                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">,</span>
-                             <span class="n">load_amazon_2018</span><span class="p">,</span> <span class="n">amazon_2018_provenance</span><span class="p">,</span>
-                             <span class="n">load_movielens_1m</span><span class="p">,</span> <span class="n">movielens_1m_provenance</span><span class="p">,</span>
-                             <span class="n">load_mind_amazon_books</span><span class="p">,</span> <span class="n">mind_amazon_provenance</span><span class="p">,</span>
-                             <span class="n">load_census_income</span><span class="p">,</span> <span class="n">census_income_provenance</span><span class="p">)</span>
 <span class="n">DATASET_KEY</span> <span class="o">=</span> <span class="s2">"movielens"</span>
-<span class="k">if</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens"</span><span class="p">:</span>
-    <span class="n">real_ratings</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_movielens</span><span class="p">()</span>
-    <span class="n">real_interactions</span> <span class="o">=</span> <span class="n">real_ratings</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-books"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Books"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"mind-amazon-books"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_mind_amazon_books</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">mind_amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-electronics"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Electronics"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens-1m"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_movielens_1m</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_1m_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"census-income"</span> <span class="ow">and</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span><span class="p">:</span>
-    <span class="n">census_train_x</span><span class="p">,</span> <span class="n">census_train_y</span><span class="p">,</span> <span class="n">census_test_x</span><span class="p">,</span> <span class="n">census_test_y</span> <span class="o">=</span> <span class="n">load_census_income</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span><span class="p">,</span> <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">census_train_x</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">census_train_x</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">census_income_provenance</span><span class="p">()</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-2023"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"project_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">),</span> <span class="s2">"artifact_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+<span class="c1"># Setup 只声明执行边界。完整数据由章节 runner 在 Train &amp; Inference 单元按需读取，</span>
+<span class="c1"># 避免仅打开 Notebook 就解析数千万行文件。</span>
+<span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"dataset"</span><span class="p">:</span> <span class="n">DATASET_KEY</span><span class="p">,</span>
+    <span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span>
+    <span class="s2">"loading"</span><span class="p">:</span> <span class="s2">"lazy: chapter runner owns loading and returns executed provenance"</span><span class="p">,</span>
+    <span class="s2">"randomly_fabricated_rows"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"project_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">),</span> <span class="s2">"artifact_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">),</span> <span class="s2">"dataset_boundary"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
        <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
        <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
@@ -7604,8 +7574,20 @@ window.MathJax = {
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=15eb3dd0">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>{'profile': 'smoke', 'project_root': '&lt;ARTIFACT_ROOT&gt;', 'artifact_root': '&lt;ARTIFACT_ROOT&gt;', 'dataset_boundary': {'dataset': 'movielens', 'profile': 'smoke', 'loading': 'lazy: chapter runner owns loading and returns executed provenance', 'randomly_fabricated_rows': 0}, 'cuda_available': False, 'cuda_device': None}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8d35af81">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7617,7 +7599,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9c6b653a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=49815af3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7635,31 +7617,42 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=76c4d35a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=12ef808b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Bounded teaching view：无论正式 PROFILE 是 smoke 还是 full，这一段公式演示都只读取</span>
+<span class="c1"># 仓库内的 MovieLens latest-small 确定性小视图。正式实验由后面的 chapter runner 单独加载。</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">log_loss</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab</span><span class="w"> </span><span class="kn">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">data_tools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">leave_last_out</span><span class="p">,</span> <span class="n">movielens_provenance</span>
 
 <span class="n">SEED</span> <span class="o">=</span> <span class="mi">2026</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">SEED</span><span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_movielens</span><span class="p">,</span> <span class="n">leave_last_out</span><span class="p">,</span> <span class="n">movielens_provenance</span>
+<span class="n">_formal_profile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"smoke"</span>
+    <span class="n">data_tools</span><span class="o">.</span><span class="n">_load_cached</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+    <span class="n">ratings</span><span class="p">,</span> <span class="n">movies</span> <span class="o">=</span> <span class="n">data_tools</span><span class="o">.</span><span class="n">load_movielens</span><span class="p">(</span><span class="n">max_users</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span> <span class="n">min_user_events</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_formal_profile</span>
+    <span class="n">data_tools</span><span class="o">.</span><span class="n">_load_cached</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
 
-<span class="n">ratings</span><span class="p">,</span> <span class="n">movies</span> <span class="o">=</span> <span class="n">load_movielens</span><span class="p">(</span><span class="n">max_users</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span> <span class="n">max_items</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span> <span class="n">min_user_events</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">train_ratings</span><span class="p">,</span> <span class="n">test_ratings</span> <span class="o">=</span> <span class="n">leave_last_out</span><span class="p">(</span><span class="n">ratings</span><span class="p">)</span>
 <span class="n">n_users</span><span class="p">,</span> <span class="n">n_items</span> <span class="o">=</span> <span class="n">ratings</span><span class="o">.</span><span class="n">user_id</span><span class="o">.</span><span class="n">nunique</span><span class="p">(),</span> <span class="n">ratings</span><span class="o">.</span><span class="n">item_id</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
-
+<span class="n">TEACHING_DATASET</span> <span class="o">=</span> <span class="n">movielens_provenance</span><span class="p">(</span><span class="n">ratings</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">TEACHING_DATASET</span><span class="p">[</span><span class="s2">"profile"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"smoke"</span>
+<span class="k">assert</span> <span class="n">TEACHING_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
 <span class="nb">print</span><span class="p">({</span>
-    <span class="s2">"rows"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">ratings</span><span class="p">),</span> <span class="s2">"users"</span><span class="p">:</span> <span class="n">ratings</span><span class="o">.</span><span class="n">user_id</span><span class="o">.</span><span class="n">nunique</span><span class="p">(),</span> <span class="s2">"items"</span><span class="p">:</span> <span class="n">ratings</span><span class="o">.</span><span class="n">item_id</span><span class="o">.</span><span class="n">nunique</span><span class="p">(),</span>
+    <span class="s2">"mode"</span><span class="p">:</span> <span class="s2">"bounded teaching view (not the formal experiment)"</span><span class="p">,</span>
+    <span class="s2">"rows"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">ratings</span><span class="p">),</span> <span class="s2">"users"</span><span class="p">:</span> <span class="n">n_users</span><span class="p">,</span> <span class="s2">"items"</span><span class="p">:</span> <span class="n">n_items</span><span class="p">,</span>
     <span class="s2">"train_rows"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_ratings</span><span class="p">),</span> <span class="s2">"test_rows"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_ratings</span><span class="p">),</span>
-    <span class="s2">"sparsity"</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_ratings</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n_users</span> <span class="o">*</span> <span class="n">n_items</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span>
-    <span class="s2">"source"</span><span class="p">:</span> <span class="n">movielens_provenance</span><span class="p">(</span><span class="n">ratings</span><span class="p">)[</span><span class="s2">"source"</span><span class="p">],</span> <span class="s2">"fabricated_rows"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">"source"</span><span class="p">:</span> <span class="n">TEACHING_DATASET</span><span class="p">[</span><span class="s2">"source"</span><span class="p">],</span> <span class="s2">"fabricated_rows"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">})</span>
 <span class="n">display</span><span class="p">(</span><span class="n">ratings</span><span class="p">[[</span><span class="s2">"userId"</span><span class="p">,</span> <span class="s2">"movieId"</span><span class="p">,</span> <span class="s2">"rating"</span><span class="p">,</span> <span class="s2">"timestamp"</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">,</span> <span class="s2">"genres"</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
 </pre></div>
@@ -7667,8 +7660,126 @@ window.MathJax = {
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=519a1628">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>{'mode': 'bounded teaching view (not the formal experiment)', 'rows': 10487, 'users': 48, 'items': 360, 'train_rows': 10439, 'test_rows': 48, 'source': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip', 'fabricated_rows': 0}
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>userId</th>
+<th>movieId</th>
+<th>rating</th>
+<th>timestamp</th>
+<th>title</th>
+<th>genres</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>140</td>
+<td>318</td>
+<td>4.0</td>
+<td>942840891</td>
+<td>Shawshank Redemption, The (1994)</td>
+<td>Crime|Drama</td>
+</tr>
+<tr>
+<th>1</th>
+<td>140</td>
+<td>527</td>
+<td>5.0</td>
+<td>942840891</td>
+<td>Schindler's List (1993)</td>
+<td>Drama|War</td>
+</tr>
+<tr>
+<th>2</th>
+<td>140</td>
+<td>1221</td>
+<td>3.0</td>
+<td>942840891</td>
+<td>Godfather: Part II, The (1974)</td>
+<td>Crime|Drama</td>
+</tr>
+<tr>
+<th>3</th>
+<td>140</td>
+<td>50</td>
+<td>3.0</td>
+<td>942840991</td>
+<td>Usual Suspects, The (1995)</td>
+<td>Crime|Mystery|Thriller</td>
+</tr>
+<tr>
+<th>4</th>
+<td>140</td>
+<td>595</td>
+<td>5.0</td>
+<td>942840991</td>
+<td>Beauty and the Beast (1991)</td>
+<td>Animation|Children|Fantasy|Musical|Romance|IMAX</td>
+</tr>
+<tr>
+<th>5</th>
+<td>140</td>
+<td>1198</td>
+<td>4.0</td>
+<td>942841170</td>
+<td>Raiders of the Lost Ark (Indiana Jones and the...</td>
+<td>Action|Adventure</td>
+</tr>
+<tr>
+<th>6</th>
+<td>140</td>
+<td>2028</td>
+<td>5.0</td>
+<td>942841170</td>
+<td>Saving Private Ryan (1998)</td>
+<td>Action|Drama|War</td>
+</tr>
+<tr>
+<th>7</th>
+<td>140</td>
+<td>1721</td>
+<td>4.0</td>
+<td>942841219</td>
+<td>Titanic (1997)</td>
+<td>Drama|Romance</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6ba42c89">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7682,14 +7793,14 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6d857a2b">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6c0e1f08">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">topk_items</span><span class="p">(</span><span class="n">score_matrix</span><span class="p">,</span> <span class="n">seen_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">topk_items</span><span class="p">(</span><span class="n">score_matrix</span><span class="p">,</span> <span class="n">seen_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="n">score_matrix</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">scores</span><span class="p">[</span><span class="n">seen_matrix</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">scores</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">]</span>
@@ -7707,7 +7818,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8571b450">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9335edf1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7753,7 +7864,7 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8bae4664">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=74123467">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7762,14 +7873,14 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7a8e8768">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e2c67a07">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="n">toy_R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">toy_R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
     <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># u0 看过 i0、i1</span>
     <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>  <span class="c1"># u1 看过 i0、i2</span>
     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>  <span class="c1"># u2 看过 i1、i2、i3</span>
@@ -7803,8 +7914,183 @@ $$</p>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=69c0cd74">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>i0</th>
+<th>i1</th>
+<th>i2</th>
+<th>i3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>u0</th>
+<td>1.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>u1</th>
+<td>1.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>u2</th>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>u0</th>
+<th>u1</th>
+<th>u2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>u0</th>
+<td>2.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>u1</th>
+<td>1.0</td>
+<td>2.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>u2</th>
+<td>1.0</td>
+<td>1.0</td>
+<td>3.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>i0</th>
+<th>i1</th>
+<th>i2</th>
+<th>i3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>i0</th>
+<td>2.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>0.0</td>
+</tr>
+<tr>
+<th>i1</th>
+<td>1.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>i2</th>
+<td>1.0</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<th>i3</th>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>u0 UserCF 未见物品分数: {'i2': np.float64(0.908), 'i3': np.float64(0.408)}
+u0 ItemCF 未见物品分数: {'i2': np.float64(1.0), 'i3': np.float64(0.707)}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d5250f42">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7813,14 +8099,14 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d45efa3a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=d1b3a4ca">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="c1"># 教学中把 rating &gt;= 3 视为正向隐式行为。</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># 教学中把 rating &gt;= 3 视为正向隐式行为。</span>
 <span class="n">train_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_users</span><span class="p">,</span> <span class="n">n_items</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">train_ratings</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
     <span class="n">train_matrix</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">item_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">rating</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">)</span>
@@ -7843,8 +8129,43 @@ $$</p>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7c77874d">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>{'user_similarity': (48, 48), 'item_similarity': (360, 360)}
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>&lt;KERNEL_TEMP&gt;:9: RuntimeWarning: divide by zero encountered in matmul
+  similarity = normalized @ normalized.T
+&lt;KERNEL_TEMP&gt;:9: RuntimeWarning: overflow encountered in matmul
+  similarity = normalized @ normalized.T
+&lt;KERNEL_TEMP&gt;:9: RuntimeWarning: invalid value encountered in matmul
+  similarity = normalized @ normalized.T
+&lt;KERNEL_TEMP&gt;:16: RuntimeWarning: divide by zero encountered in matmul
+  usercf_scores = user_similarity @ train_matrix
+&lt;KERNEL_TEMP&gt;:16: RuntimeWarning: overflow encountered in matmul
+  usercf_scores = user_similarity @ train_matrix
+&lt;KERNEL_TEMP&gt;:16: RuntimeWarning: invalid value encountered in matmul
+  usercf_scores = user_similarity @ train_matrix
+&lt;KERNEL_TEMP&gt;:17: RuntimeWarning: divide by zero encountered in matmul
+  itemcf_scores = train_matrix @ item_similarity
+&lt;KERNEL_TEMP&gt;:17: RuntimeWarning: overflow encountered in matmul
+  itemcf_scores = train_matrix @ item_similarity
+&lt;KERNEL_TEMP&gt;:17: RuntimeWarning: invalid value encountered in matmul
+  itemcf_scores = train_matrix @ item_similarity
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0ce0e292">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7853,14 +8174,14 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e2ea9499">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=c445bd9b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="n">usercf_top10</span> <span class="o">=</span> <span class="n">topk_items</span><span class="p">(</span><span class="n">usercf_scores</span><span class="p">,</span> <span class="n">train_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">usercf_top10</span> <span class="o">=</span> <span class="n">topk_items</span><span class="p">(</span><span class="n">usercf_scores</span><span class="p">,</span> <span class="n">train_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">itemcf_top10</span> <span class="o">=</span> <span class="n">topk_items</span><span class="p">(</span><span class="n">itemcf_scores</span><span class="p">,</span> <span class="n">train_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="n">cf_metrics</span> <span class="o">=</span> <span class="p">{</span>
@@ -7881,8 +8202,68 @@ $$</p>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c18d9ea7">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>UserCF HR@10</th>
+<td>0.125000</td>
+</tr>
+<tr>
+<th>ItemCF HR@10</th>
+<td>0.125000</td>
+</tr>
+<tr>
+<th>UserCF Coverage</th>
+<td>0.322222</td>
+</tr>
+<tr>
+<th>ItemCF Coverage</th>
+<td>0.327778</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>user 0 的历史 item: [0, 1, 2, 4, 6, 9, 10, 12, 13, 16, 18, 19, 22, 23, 24, 27, 29, 31, 35, 36, 37, 38, 40, 41, 43, 45, 46, 47, 49, 51, 54, 55, 56, 57, 61, 62, 65, 66, 68, 69, 70, 73, 76, 77, 82, 84, 86, 88, 89, 90, 91, 92, 93, 94, 96, 97, 98, 99, 103, 104, 107, 109, 113, 119, 120, 124, 126, 128, 130, 131, 132, 134, 135, 136, 137, 139, 140, 142, 143, 147, 148, 152, 153, 154, 161, 167, 168, 170, 174, 175, 180, 183, 184, 193, 196, 202, 204, 207, 209, 210, 212, 214, 216, 226, 230, 234, 239, 243, 248, 249, 251, 254, 259, 262, 264, 266, 267, 268, 271, 272, 273, 274, 275, 277, 278, 280, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 295, 297, 298, 299, 303, 304, 305, 306, 307, 308, 309, 310, 313, 314, 315, 317, 319, 320, 321, 322, 326, 333, 335, 336, 337, 339, 340, 342, 344, 346, 348, 350, 353, 354, 356, 357, 358, 359]
+UserCF 推荐: [102, 200, 194, 206, 324, 85, 145, 316, 118, 198]
+ItemCF 推荐: [102, 316, 194, 296, 200, 324, 311, 302, 206, 198]
+真实下一 item: 83
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b140405d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7895,23 +8276,130 @@ $$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8bb0f32d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bb20ba55">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Checks">Checks<a class="anchor-link" href="#Checks">¶</a></h2><p>检查相似度矩阵对角线、已见物品屏蔽、Top-K 范围以及 Coverage。</p>
+<h2 id="Train-&amp;-Inference%EF%BC%88%E6%AD%A3%E5%BC%8F%E5%AE%9E%E9%AA%8C%EF%BC%89">Train &amp; Inference（正式实验）<a class="anchor-link" href="#Train-&amp;-Inference%EF%BC%88%E6%AD%A3%E5%BC%8F%E5%AE%9E%E9%AA%8C%EF%BC%89">¶</a></h2><p>下方唯一的正式指标入口调用 <code>chapter_code/&lt;slug&gt;/train.py</code>。runner 会按 <code>PROFILE</code>
+惰性加载对应完整/CI 数据、执行内存受控训练与评测，并持续打印阶段进度。上面的
+bounded teaching view 只用于手算和理解代码，不会写入章节结果。</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=271a507f">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f560c8d4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">user_similarity</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">importlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab.runtime</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_progress</span>
+
+<span class="n">chapter_train</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="s2">"chapter_code.4_2_collaborative_filtering.train"</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">chapter_train</span><span class="o">.</span><span class="n">train_and_evaluate</span><span class="p">(</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="mi">8</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"smoke"</span> <span class="k">else</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="n">progress</span><span class="o">=</span><span class="n">print_progress</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">"dataset"</span><span class="p">]</span>
+<span class="n">_executed_fabricated_rows</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">REAL_DATASET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">REAL_DATASET</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="k">else</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">_executed_fabricated_rows</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"executed_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"dataset"</span><span class="p">,</span> <span class="s2">"loss_curve"</span><span class="p">}})</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>[data_prepare] 0/1 加载 MovieLens 并构造时间切分
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>[data_prepare] 1/1 rows=14714
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>[train] 0/1 拟合 ItemCF 相似度矩阵
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>[train] 1/1
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>[evaluate] 0/1 计算 Recall@5
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>[evaluate] 1/1 coverage=0.155556 recall@5=0.0375
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>{'profile': 'smoke', 'executed_dataset': 'MovieLens latest-small'}
+{'randomly_fabricated_rows': 0, 'recall@5': 0.0375, 'itemcf_recall@5': 0.0375, 'usercf_recall@5': None, 'coverage': 0.15555555555555556}
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>&lt;ARTIFACT_ROOT&gt;/chapter_code/4_2_collaborative_filtering/model.py:12: RuntimeWarning: divide by zero encountered in matmul
+  self.similarity = np.nan_to_num((values.T @ values) / denominator)
+&lt;ARTIFACT_ROOT&gt;/chapter_code/4_2_collaborative_filtering/model.py:12: RuntimeWarning: overflow encountered in matmul
+  self.similarity = np.nan_to_num((values.T @ values) / denominator)
+&lt;ARTIFACT_ROOT&gt;/chapter_code/4_2_collaborative_filtering/model.py:12: RuntimeWarning: invalid value encountered in matmul
+  self.similarity = np.nan_to_num((values.T @ values) / denominator)
+&lt;ARTIFACT_ROOT&gt;/chapter_code/4_2_collaborative_filtering/model.py:19: RuntimeWarning: divide by zero encountered in matmul
+  return np.asarray(interactions, dtype=np.float64) @ self.similarity
+&lt;ARTIFACT_ROOT&gt;/chapter_code/4_2_collaborative_filtering/model.py:19: RuntimeWarning: overflow encountered in matmul
+  return np.asarray(interactions, dtype=np.float64) @ self.similarity
+&lt;ARTIFACT_ROOT&gt;/chapter_code/4_2_collaborative_filtering/model.py:19: RuntimeWarning: invalid value encountered in matmul
+  return np.asarray(interactions, dtype=np.float64) @ self.similarity
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3f027a5b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Checks">Checks<a class="anchor-link" href="#Checks">¶</a></h2><p>bounded teaching view 检查相似度矩阵、已见物品屏蔽与指标范围；正式产物另行检查 runner 的反造假字段。</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8e8e9e28">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">user_similarity</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">item_similarity</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
 <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">cf_metrics</span><span class="p">[</span><span class="s1">'UserCF HR@10'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span>
 <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">cf_metrics</span><span class="p">[</span><span class="s1">'ItemCF Coverage'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span>
@@ -7921,18 +8409,37 @@ $$</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=33a068db">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>PASS：UserCF / ItemCF 训练、推理与评测均有效。
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=45641fe7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="n">result_dir</span> <span class="o">=</span> <span class="n">ARTIFACT_ROOT</span> <span class="o">/</span> <span class="s2">"results"</span> <span class="o">/</span> <span class="s2">"chapter_4"</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">result_dir</span> <span class="o">=</span> <span class="n">ARTIFACT_ROOT</span> <span class="o">/</span> <span class="s2">"results"</span> <span class="o">/</span> <span class="s2">"chapter_4"</span>
 <span class="n">result_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">usercf_value</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"usercf_hr@10"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"smoke"</span> <span class="k">else</span> <span class="kc">None</span>
+<span class="n">itemcf_value</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"itemcf_recall@5"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"recall@5"</span><span class="p">))</span>
 <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"records"</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">"algorithm"</span><span class="p">:</span><span class="s2">"UserCF"</span><span class="p">,</span> <span class="s2">"task"</span><span class="p">:</span><span class="s2">"Top-K"</span><span class="p">,</span> <span class="s2">"metric"</span><span class="p">:</span><span class="s2">"HR@10 ↑"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span><span class="n">cf_metrics</span><span class="p">[</span><span class="s2">"UserCF HR@10"</span><span class="p">],</span> <span class="s2">"secondary_metric"</span><span class="p">:</span><span class="s2">"Coverage"</span><span class="p">,</span> <span class="s2">"secondary_value"</span><span class="p">:</span><span class="n">cf_metrics</span><span class="p">[</span><span class="s2">"UserCF Coverage"</span><span class="p">],</span> <span class="s2">"online_inference"</span><span class="p">:</span><span class="s2">"聚合相似用户的历史"</span><span class="p">,</span> <span class="s2">"source_notebook"</span><span class="p">:</span><span class="s2">"4_2_collaborative_filtering"</span><span class="p">},</span>
-    <span class="p">{</span><span class="s2">"algorithm"</span><span class="p">:</span><span class="s2">"ItemCF"</span><span class="p">,</span> <span class="s2">"task"</span><span class="p">:</span><span class="s2">"Top-K"</span><span class="p">,</span> <span class="s2">"metric"</span><span class="p">:</span><span class="s2">"HR@10 ↑"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span><span class="n">cf_metrics</span><span class="p">[</span><span class="s2">"ItemCF HR@10"</span><span class="p">],</span> <span class="s2">"secondary_metric"</span><span class="p">:</span><span class="s2">"Coverage"</span><span class="p">,</span> <span class="s2">"secondary_value"</span><span class="p">:</span><span class="n">cf_metrics</span><span class="p">[</span><span class="s2">"ItemCF Coverage"</span><span class="p">],</span> <span class="s2">"online_inference"</span><span class="p">:</span><span class="s2">"聚合历史物品的近邻"</span><span class="p">,</span> <span class="s2">"source_notebook"</span><span class="p">:</span><span class="s2">"4_2_collaborative_filtering"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"algorithm"</span><span class="p">:</span><span class="s2">"UserCF"</span><span class="p">,</span> <span class="s2">"task"</span><span class="p">:</span><span class="s2">"Top-K"</span><span class="p">,</span> <span class="s2">"metric"</span><span class="p">:</span><span class="s2">"HR@10 ↑"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span><span class="n">usercf_value</span><span class="p">,</span>
+     <span class="s2">"secondary_metric"</span><span class="p">:</span><span class="s2">"Coverage"</span><span class="p">,</span> <span class="s2">"secondary_value"</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"usercf_coverage"</span><span class="p">),</span>
+     <span class="s2">"status"</span><span class="p">:</span><span class="s2">"not_run_full_dense_usercf"</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="p">(</span><span class="s2">"executed"</span> <span class="k">if</span> <span class="n">usercf_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"not_reported_by_runner"</span><span class="p">),</span>
+     <span class="s2">"online_inference"</span><span class="p">:</span><span class="s2">"聚合相似用户的历史"</span><span class="p">,</span> <span class="s2">"source_notebook"</span><span class="p">:</span><span class="s2">"4_2_collaborative_filtering"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"algorithm"</span><span class="p">:</span><span class="s2">"ItemCF"</span><span class="p">,</span> <span class="s2">"task"</span><span class="p">:</span><span class="s2">"Top-K"</span><span class="p">,</span> <span class="s2">"metric"</span><span class="p">:</span><span class="s2">"Recall@5 ↑"</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">:</span><span class="n">itemcf_value</span><span class="p">,</span>
+     <span class="s2">"secondary_metric"</span><span class="p">:</span><span class="s2">"Coverage"</span><span class="p">,</span> <span class="s2">"secondary_value"</span><span class="p">:</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"itemcf_coverage"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"coverage"</span><span class="p">)),</span>
+     <span class="s2">"status"</span><span class="p">:</span><span class="s2">"executed"</span><span class="p">,</span> <span class="s2">"online_inference"</span><span class="p">:</span><span class="s2">"聚合历史物品的近邻"</span><span class="p">,</span> <span class="s2">"source_notebook"</span><span class="p">:</span><span class="s2">"4_2_collaborative_filtering"</span><span class="p">},</span>
 <span class="p">]}</span>
 <span class="p">(</span><span class="n">result_dir</span> <span class="o">/</span> <span class="s2">"collaborative_filtering.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"已写出章节指标：collaborative_filtering.json"</span><span class="p">)</span>
@@ -7941,8 +8448,20 @@ $$</p>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5ffd8c76">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>已写出章节指标：collaborative_filtering.json
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=24a1cf77">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

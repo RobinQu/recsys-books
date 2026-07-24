@@ -4,9 +4,10 @@
       "algorithm": "FM",
       "task": "CTR",
       "metric": "AUC ↑",
-      "value": 0.596390560300207,
+      "value": 0.5408193094277329,
       "secondary_metric": "LogLoss ↓",
-      "secondary_value": 2.6060633407790834,
+      "secondary_value": 3.41032393170229,
+      "status": "executed",
       "online_inference": "线性项 + 二阶隐向量交互",
       "source_notebook": "4_4_factorization_machine"
     }

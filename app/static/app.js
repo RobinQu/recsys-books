@@ -81,13 +81,22 @@ const sectionLinks = sidebarLinks.filter((link) => {
   return url.origin === window.location.origin && url.pathname === window.location.pathname && url.hash && $(url.hash);
 });
 if (sectionLinks.length) {
-  const sectionObserver = new IntersectionObserver((entries) => {
-    const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-    if (!visible) return;
-    const link = sectionLinks.find((candidate) => candidate.hash === `#${visible.target.id}`);
-    if (link) setCurrentLink(link);
-  }, { rootMargin: '-15% 0px -70% 0px', threshold: [0, .2, .6] });
-  sectionLinks.forEach((link) => sectionObserver.observe($(link.hash)));
+  let sectionUpdateQueued = false;
+  const updateCurrentSection = () => {
+    sectionUpdateQueued = false;
+    const activationLine = window.innerHeight * .24;
+    const passed = sectionLinks.filter((link) => $(link.hash).getBoundingClientRect().top <= activationLine);
+    setCurrentLink(passed.at(-1) || sectionLinks[0]);
+  };
+  const queueSectionUpdate = () => {
+    if (sectionUpdateQueued) return;
+    sectionUpdateQueued = true;
+    requestAnimationFrame(updateCurrentSection);
+  };
+  window.addEventListener('scroll', queueSectionUpdate, { passive: true });
+  window.addEventListener('resize', queueSectionUpdate);
+  window.addEventListener('hashchange', queueSectionUpdate);
+  requestAnimationFrame(() => requestAnimationFrame(updateCurrentSection));
 }
 
 const sidebarToggle = $('.sidebar-toggle');
@@ -109,12 +118,22 @@ if (sidebar && sidebarToggle) {
   window.addEventListener('resize', () => { if (window.innerWidth > 980) setSidebarOpen(false); });
 }
 
-$$('.chip').forEach((chip) => chip.addEventListener('click', () => {
-  $$('.chip').forEach((item) => item.classList.remove('active'));
-  chip.classList.add('active');
-  $$('.model-card').forEach((card) => {
-    card.hidden = chip.dataset.filter !== 'all' && !card.dataset.stage.includes(chip.dataset.filter);
+$$('.chip[data-filter]').forEach((chip) => chip.addEventListener('click', () => {
+  const filter = chip.dataset.filter;
+  $$('.chip[data-filter]').forEach((item) => {
+    item.classList.remove('active');
+    item.setAttribute('aria-pressed', 'false');
   });
+  chip.classList.add('active');
+  chip.setAttribute('aria-pressed', 'true');
+  const cards = $$('.model-card');
+  cards.forEach((card) => {
+    card.hidden = filter !== 'all' && !card.dataset.stage.includes(filter);
+  });
+  const visibleCount = cards.filter((card) => !card.hidden).length;
+  const status = $('#model-filter-status');
+  if (status) status.textContent = filter === 'all' ? `显示全部 ${visibleCount} 个模型` : `${filter} · ${visibleCount} 个模型`;
+  window.dispatchEvent(new CustomEvent('model-filter-change', { detail: { filter } }));
 }));
 
 const compareDrawer = $('#compare-drawer');
@@ -148,7 +167,7 @@ if (search && results) {
     const query = search.value.trim().toLowerCase();
     if (!query) { results.hidden = true; return; }
     const hits = models.filter((model) => Object.values(model).join(' ').toLowerCase().includes(query)).slice(0, 6);
-    results.innerHTML = hits.length ? hits.map((model) => `<a href="/#model-explorer" data-hit="${model.id}"><b>${model.name}</b><span>${model.stage} · ${model.idea.slice(0, 42)}…</span></a>`).join('') : '<p>未找到匹配模型</p>';
+    results.innerHTML = hits.length ? hits.map((model) => `<a href="/catalog#model-explorer" data-hit="${model.id}"><b>${model.name}</b><span>${model.stage} · ${model.idea.slice(0, 42)}…</span></a>`).join('') : '<p>未找到匹配模型</p>';
     results.hidden = false;
   });
   results.addEventListener('click', (event) => {
@@ -156,6 +175,7 @@ if (search && results) {
     if (!link) return;
     results.hidden = true;
     search.value = '';
+    sessionStorage.setItem('model-search-hit', link.dataset.hit);
     setTimeout(() => $(`[data-model="${link.dataset.hit}"]`)?.classList.add('pulse'), 300);
   });
   document.addEventListener('click', (event) => { if (!event.target.closest('.search-wrap')) results.hidden = true; });
@@ -166,7 +186,7 @@ $$('.timeline-row').forEach((row) => row.addEventListener('click', () => {
   row.setAttribute('aria-expanded', String(expanded));
 }));
 
-// The home template publishes both graph hooks.  The server owns expansion and
+// Chapter 2 publishes the graph hooks.  The server owns expansion and
 // limits; this renderer only displays a bounded deterministic view and never
 // creates an unbounded client-side force graph.
 (() => {
@@ -183,9 +203,10 @@ $$('.timeline-row').forEach((row) => row.addEventListener('click', () => {
   }
 
   const MAX_VISIBLE_NODES = 16;
-  const VISUAL_EDGE_TYPES = new Set(['contains', 'emphasizes', 'evolves', 'prerequisite']);
+  const VISUAL_EDGE_TYPES = new Set(['contains', 'emphasizes', 'evolves', 'prerequisite', 'requires']);
   const defaultView = payload.default || payload;
   const views = payload.views || {};
+  const filterViews = payload.filters || {};
   let currentView = defaultView;
   let selectedId = null;
 
@@ -277,7 +298,12 @@ $$('.timeline-row').forEach((row) => row.addEventListener('click', () => {
     relations.replaceChildren();
     const heading = document.createElement('h4');
     const selected = currentView.nodes.find((node) => node.id === selectedId);
-    heading.textContent = selected ? `${selected.label} · 相关关系` : `当前显示 ${currentView.nodes.length} 个节点`;
+    const activeFilter = currentView.state?.filter;
+    heading.textContent = selected
+      ? `${selected.label} · 相关关系`
+      : activeFilter
+        ? `${activeFilter} · ${currentView.state?.model_count || 0} 个模型，${currentView.nodes.length} 个关系节点`
+        : `当前显示 ${currentView.nodes.length} 个节点`;
     relations.appendChild(heading);
     if (!selected) {
       const hint = document.createElement('p');
@@ -361,6 +387,12 @@ $$('.timeline-row').forEach((row) => row.addEventListener('click', () => {
     render(viewFor(focusId), focusId);
   });
   resetButton.addEventListener('click', resetGraph);
+  window.addEventListener('model-filter-change', (event) => {
+    const filter = event.detail?.filter;
+    chapterSelect.value = '';
+    if (!filter || filter === 'all' || !filterViews[filter]) render(viewFor(null));
+    else render(filterViews[filter], `filter:${filter}`);
+  });
   graphRoot.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -371,3 +403,13 @@ $$('.timeline-row').forEach((row) => row.addEventListener('click', () => {
   new ResizeObserver(() => requestAnimationFrame(drawEdges)).observe(stage);
   render(viewFor(null));
 })();
+
+const pendingModelHit = sessionStorage.getItem('model-search-hit');
+if (pendingModelHit) {
+  const hit = $(`[data-model="${CSS.escape(pendingModelHit)}"]`);
+  if (hit) {
+    sessionStorage.removeItem('model-search-hit');
+    hit.classList.add('pulse');
+    setTimeout(() => hit.classList.remove('pulse'), 1800);
+  }
+}

@@ -5,12 +5,13 @@ import math
 from importlib import import_module
 
 from .industrial_experiments import run_deepfm, run_dssm, run_mind, run_mmoe, run_openonerec
+from .runtime import ProgressCallback
 
 
-def run_classic(epochs: int = 8) -> dict:
+def run_classic(epochs: int = 8, *, progress: ProgressCallback | None = None) -> dict:
     """Aggregate chapter-local classic experiments for comparison notebooks."""
     def execute(slug: str):
-        return import_module(f"chapter_code.{slug}.train").train_and_evaluate(epochs)
+        return import_module(f"chapter_code.{slug}.train").train_and_evaluate(epochs, progress=progress)
 
     cf = execute("4_2_collaborative_filtering")
     mf = execute("4_3_matrix_factorization")
@@ -27,21 +28,22 @@ def run_classic(epochs: int = 8) -> dict:
     }
 
 
-def run_retrieval(epochs: int = 8) -> dict:
-    dssm, mind = run_dssm(epochs), run_mind(epochs)
+def run_retrieval(epochs: int = 8, *, progress: ProgressCallback | None = None) -> dict:
+    dssm = run_dssm(epochs, progress=progress)
+    mind = run_mind(epochs, progress=progress)
     return {"backend": "Torch-RecHub on Amazon Reviews 2023", "randomly_fabricated_rows": 0,
             "dssm_recall@10": round(dssm["recall@10"], 4), "mind_recall@10": round(mind["recall@10"], 4), "embedding_dim": 16}
 
 
-def run_ranking(epochs: int = 8) -> dict:
-    deepfm = run_deepfm(epochs)
+def run_ranking(epochs: int = 8, *, progress: ProgressCallback | None = None) -> dict:
+    deepfm = run_deepfm(epochs, progress=progress)
     return {"backend": "Torch-RecHub on KuaiRand-Pure", "randomly_fabricated_rows": 0,
             "deepfm_auc": round(deepfm["auc"], 4), "din_auc": round(deepfm["lr_auc"], 4),
             "dien_note": "DIN/DIEN notebooks use chronological real feed impressions"}
 
 
-def run_multitask(epochs: int = 8) -> dict:
-    result = run_mmoe(epochs)
+def run_multitask(epochs: int = 8, *, progress: ProgressCallback | None = None) -> dict:
+    result = run_mmoe(epochs, progress=progress)
     return {"backend": "Torch-RecHub on KuaiRand-Pure", "randomly_fabricated_rows": 0,
             "mmoe_click_auc": round(result["click_auc"], 4), "mmoe_conversion_auc": round(result["conversion_auc"], 4),
             "ple_delta": "PLE notebook uses the same observed click and long-view targets"}
@@ -57,8 +59,8 @@ def ndcg_at_k(ranked: list[int], relevant: set[int], k: int = 5) -> float:
     return dcg / ideal if ideal else 0.0
 
 
-def run_generative(cpu_smoke: bool = False) -> dict:
-    result = run_openonerec(epochs=4, cpu_smoke=cpu_smoke)
+def run_generative(cpu_smoke: bool = False, *, progress: ProgressCallback | None = None) -> dict:
+    result = run_openonerec(epochs=4, cpu_smoke=cpu_smoke, progress=progress)
     return {
         "dataset": "KuaiRand-Pure", "randomly_fabricated_rows": 0,
         "semantic_id_prefix": result["prefix"], "allowed_next_tokens": result["allowed_tokens"],

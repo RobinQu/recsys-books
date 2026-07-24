@@ -7517,7 +7517,7 @@ window.MathJax = {
 </head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9c8b8414">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ed0ba89b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7530,7 +7530,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1cb3aa8a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f9ffa21a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7540,14 +7540,14 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=77c98bc3">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=607ec97e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="n">PROJECT_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"notebooks"</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
@@ -7556,46 +7556,16 @@ window.MathJax = {
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">,</span> <span class="s2">"full"</span><span class="p">)</span>
 <span class="n">PROFILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"RECSYS_PROFILE"</span><span class="p">]</span>
 <span class="n">CUDA_AVAILABLE</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">recsys_lab.data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">load_movielens</span><span class="p">,</span> <span class="n">movielens_provenance</span><span class="p">,</span> <span class="n">load_amazon_2023</span><span class="p">,</span>
-                             <span class="n">amazon_provenance</span><span class="p">,</span> <span class="n">load_kuairand</span><span class="p">,</span> <span class="n">kuairand_provenance</span><span class="p">,</span>
-                             <span class="n">load_amazon_2018</span><span class="p">,</span> <span class="n">amazon_2018_provenance</span><span class="p">,</span>
-                             <span class="n">load_movielens_1m</span><span class="p">,</span> <span class="n">movielens_1m_provenance</span><span class="p">,</span>
-                             <span class="n">load_mind_amazon_books</span><span class="p">,</span> <span class="n">mind_amazon_provenance</span><span class="p">,</span>
-                             <span class="n">load_census_income</span><span class="p">,</span> <span class="n">census_income_provenance</span><span class="p">)</span>
 <span class="n">DATASET_KEY</span> <span class="o">=</span> <span class="s2">"movielens"</span>
-<span class="k">if</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens"</span><span class="p">:</span>
-    <span class="n">real_ratings</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_movielens</span><span class="p">()</span>
-    <span class="n">real_interactions</span> <span class="o">=</span> <span class="n">real_ratings</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-books"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Books"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"mind-amazon-books"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_mind_amazon_books</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">mind_amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-electronics"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2018</span><span class="p">(</span><span class="s2">"Electronics"</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_2018_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"movielens-1m"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_movielens_1m</span><span class="p">()</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">movielens_1m_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span> <span class="k">if</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span> <span class="k">else</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"census-income"</span> <span class="ow">and</span> <span class="n">PROFILE</span> <span class="o">==</span> <span class="s2">"full"</span><span class="p">:</span>
-    <span class="n">census_train_x</span><span class="p">,</span> <span class="n">census_train_y</span><span class="p">,</span> <span class="n">census_test_x</span><span class="p">,</span> <span class="n">census_test_y</span> <span class="o">=</span> <span class="n">load_census_income</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span><span class="p">,</span> <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">census_train_x</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">census_train_x</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">census_income_provenance</span><span class="p">()</span>
-<span class="k">elif</span> <span class="n">DATASET_KEY</span> <span class="o">==</span> <span class="s2">"amazon-2023"</span><span class="p">:</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">load_amazon_2023</span><span class="p">()</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">real_ratings</span><span class="p">,</span> <span class="kc">None</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">amazon_provenance</span><span class="p">(</span><span class="n">real_ratings</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">real_interactions</span><span class="p">,</span> <span class="n">real_movies</span> <span class="o">=</span> <span class="n">load_kuairand</span><span class="p">()</span>
-    <span class="n">real_ratings</span> <span class="o">=</span> <span class="n">real_interactions</span>
-    <span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="n">kuairand_provenance</span><span class="p">(</span><span class="n">real_interactions</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"project_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">),</span> <span class="s2">"artifact_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">),</span> <span class="s2">"real_dataset"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
+<span class="c1"># Setup 只声明执行边界。完整数据由章节 runner 在 Train &amp; Inference 单元按需读取，</span>
+<span class="c1"># 避免仅打开 Notebook 就解析数千万行文件。</span>
+<span class="n">REAL_DATASET</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"dataset"</span><span class="p">:</span> <span class="n">DATASET_KEY</span><span class="p">,</span>
+    <span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span>
+    <span class="s2">"loading"</span><span class="p">:</span> <span class="s2">"lazy: chapter runner owns loading and returns executed provenance"</span><span class="p">,</span>
+    <span class="s2">"randomly_fabricated_rows"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="nb">print</span><span class="p">({</span><span class="s2">"profile"</span><span class="p">:</span> <span class="n">PROFILE</span><span class="p">,</span> <span class="s2">"project_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">PROJECT_ROOT</span><span class="p">),</span> <span class="s2">"artifact_root"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">ARTIFACT_ROOT</span><span class="p">),</span> <span class="s2">"dataset_boundary"</span><span class="p">:</span> <span class="n">REAL_DATASET</span><span class="p">,</span>
        <span class="s2">"cuda_available"</span><span class="p">:</span> <span class="n">CUDA_AVAILABLE</span><span class="p">,</span>
        <span class="s2">"cuda_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">CUDA_AVAILABLE</span> <span class="k">else</span> <span class="kc">None</span><span class="p">})</span>
 <span class="k">assert</span> <span class="n">REAL_DATASET</span><span class="p">[</span><span class="s2">"randomly_fabricated_rows"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
@@ -7604,8 +7574,20 @@ window.MathJax = {
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=31b616d1">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>{'profile': 'smoke', 'project_root': '&lt;ARTIFACT_ROOT&gt;', 'artifact_root': '&lt;ARTIFACT_ROOT&gt;', 'dataset_boundary': {'dataset': 'movielens', 'profile': 'smoke', 'loading': 'lazy: chapter runner owns loading and returns executed provenance', 'randomly_fabricated_rows': 0}, 'cuda_available': False, 'cuda_device': None}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3409e986">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7652,7 +7634,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=42786a5d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a6a01db1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7671,7 +7653,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=94ba8be9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0a0d089f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7680,14 +7662,14 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a786b09b">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=bb58e962">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">paper_relationships</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span>
     <span class="p">{</span><span class="s2">"论文"</span><span class="p">:</span> <span class="s2">"Resnick 1994 GroupLens"</span><span class="p">,</span> <span class="s2">"出发点问题"</span><span class="p">:</span> <span class="s2">"netnews 信息过载，编辑过滤跟不上，让读者互评互助"</span><span class="p">,</span>
@@ -7715,8 +7697,95 @@ window.MathJax = {
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ec587130">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>论文</th>
+<th>出发点问题</th>
+<th>用户/物品表示</th>
+<th>训练信号</th>
+<th>交给下一步的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Resnick 1994 GroupLens</td>
+<td>netnews 信息过载，编辑过滤跟不上，让读者互评互助</td>
+<td>用户评分向量 + 皮尔逊近邻</td>
+<td>1–5 星显式评分</td>
+<td>邻域计算随规模变贵；评分稀疏时找不到邻居</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Sarwar 2001 ItemCF</td>
+<td>用户兴趣多变、用户邻域不稳定且难扩展</td>
+<td>物品列向量 + 物品间相似度</td>
+<td>同一批用户在物品上的共现评分</td>
+<td>仍是显式邻域，无法概括潜在口味结构</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Koren 2009 MF</td>
+<td>邻域无法表达潜在结构，Netflix 规模上难以扩展</td>
+<td>用户/物品各一个 d 维隐向量，内积打分</td>
+<td>已观察评分上的平方误差</td>
+<td>只认 ID，新实体冷启动；无法直接利用上下文特征</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Rendle 2010 FM</td>
+<td>MF 只认评分矩阵格式；稀疏特征交叉的独立参数学不到</td>
+<td>每个特征一个 k 维隐向量，内积共享交叉</td>
+<td>任意监督标签（评分或点击）</td>
+<td>只有二阶交叉，高阶模式需要更深的结构</td>
+</tr>
+<tr>
+<th>4</th>
+<td>He 2014 GBDT+LR</td>
+<td>工业 CTR 同时要非线性规则、校准概率与快速更新</td>
+<td>树叶子 one-hot（离散规则）</td>
+<td>曝光—点击日志的 log loss / NE</td>
+<td>两阶段非端到端，特征与树版本靠人工治理</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Mikolov 2013 word2vec</td>
+<td>词（物品）只是编号，需要可计算、可检索的相似度</td>
+<td>每个物品一个嵌入向量</td>
+<td>序列窗口内共现（负采样）</td>
+<td>单向量平均多兴趣、序列建模弱 → 3.2 双塔/多兴趣/序列召回</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=242f76e4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7725,14 +7794,14 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e5d9df41">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9970b741">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="n">future</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">future</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span>
     <span class="p">{</span><span class="s2">"维度"</span><span class="p">:</span> <span class="s2">"表示"</span><span class="p">,</span> <span class="s2">"3.1 经典做法"</span><span class="p">:</span> <span class="s2">"邻域、单隐向量、特征向量"</span><span class="p">,</span>
      <span class="s2">"3.2/3.3 深度做法"</span><span class="p">:</span> <span class="s2">"双塔 Embedding（DSSM）、多兴趣（MIND）、序列表示（SASRec）"</span><span class="p">,</span>
      <span class="s2">"仍待回答"</span><span class="p">:</span> <span class="s2">"表示如何随上下文实时变化，同时保持训练/服务一致？"</span><span class="p">},</span>
@@ -7752,8 +7821,74 @@ window.MathJax = {
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=288514cf">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>维度</th>
+<th>3.1 经典做法</th>
+<th>3.2/3.3 深度做法</th>
+<th>仍待回答</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>表示</td>
+<td>邻域、单隐向量、特征向量</td>
+<td>双塔 Embedding（DSSM）、多兴趣（MIND）、序列表示（SASRec）</td>
+<td>表示如何随上下文实时变化，同时保持训练/服务一致？</td>
+</tr>
+<tr>
+<th>1</th>
+<td>特征交互</td>
+<td>内积、FM 二阶交叉、树规则离散组合</td>
+<td>DeepFM 共享 embedding 端到端学高阶交叉；DIN/DIEN 候选感知兴趣激活与演化</td>
+<td>高阶交互的可解释性、计算成本与过拟合控制？</td>
+</tr>
+<tr>
+<th>2</th>
+<td>训练信号</td>
+<td>显式评分平方误差、点击 log loss、序列共现负采样</td>
+<td>in-batch softmax 召回目标、辅助损失、next-item 序列目标</td>
+<td>曝光/位置偏差纠正、多目标（点击/转化/时长）如何对齐？</td>
+</tr>
+<tr>
+<th>3</th>
+<td>服务</td>
+<td>离线近邻表、物品向量 ANN、两阶段树+LR</td>
+<td>用户/物品塔分离 + ANN 召回，统一排序模型在线打分</td>
+<td>索引新鲜度、级联一致性与 P99 成本如何工程化？</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d1bf716e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7799,7 +7934,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=33678575">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a2d1a389">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7808,14 +7943,14 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d282a112">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=02802017">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">result_dir</span> <span class="o">=</span> <span class="n">ARTIFACT_ROOT</span> <span class="o">/</span> <span class="s2">"results"</span> <span class="o">/</span> <span class="s2">"chapter_4"</span>
@@ -7833,8 +7968,136 @@ window.MathJax = {
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5ab567b8">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>algorithm</th>
+<th>task</th>
+<th>metric</th>
+<th>value</th>
+<th>secondary_metric</th>
+<th>secondary_value</th>
+<th>status</th>
+<th>online_inference</th>
+<th>source_notebook</th>
+<th>secondary_status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>UserCF</td>
+<td>Top-K</td>
+<td>HR@10 ↑</td>
+<td>NaN</td>
+<td>Coverage</td>
+<td>NaN</td>
+<td>not_reported_by_runner</td>
+<td>聚合相似用户的历史</td>
+<td>4_2_collaborative_filtering</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>1</th>
+<td>ItemCF</td>
+<td>Top-K</td>
+<td>Recall@5 ↑</td>
+<td>0.0375</td>
+<td>Coverage</td>
+<td>0.1556</td>
+<td>executed</td>
+<td>聚合历史物品的近邻</td>
+<td>4_2_collaborative_filtering</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>2</th>
+<td>FM</td>
+<td>CTR</td>
+<td>AUC ↑</td>
+<td>0.5408</td>
+<td>LogLoss ↓</td>
+<td>3.4103</td>
+<td>executed</td>
+<td>线性项 + 二阶隐向量交互</td>
+<td>4_4_factorization_machine</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>3</th>
+<td>GBDT+LR</td>
+<td>CTR</td>
+<td>AUC ↑</td>
+<td>0.4456</td>
+<td>LogLoss ↓</td>
+<td>0.9079</td>
+<td>executed</td>
+<td>树叶编码 → LR 概率</td>
+<td>4_5_gbdt_lr</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>4</th>
+<td>BiasMF</td>
+<td>评分预测</td>
+<td>RMSE ↓</td>
+<td>0.8902</td>
+<td>HR@10</td>
+<td>NaN</td>
+<td>executed</td>
+<td>user/item 向量内积</td>
+<td>4_3_matrix_factorization</td>
+<td>not_run</td>
+</tr>
+<tr>
+<th>5</th>
+<td>word2vec / Item2Vec</td>
+<td>Top-K</td>
+<td>Recall@5 ↑</td>
+<td>0.0500</td>
+<td>Coverage</td>
+<td>0.1833</td>
+<td>executed</td>
+<td>物品向量 ANN 召回</td>
+<td>4_6_word2vec</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>指标来源： ['collaborative_filtering.json', 'factorization_machine.json', 'gbdt_lr.json', 'matrix_factorization.json', 'word2vec.json']
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=845f6aec">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7887,7 +8150,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bbac3702">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=032d9b7f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7967,7 +8230,7 @@ window.MathJax = {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b3663d6d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f99805b2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7981,14 +8244,14 @@ window.MathJax = {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e2efee4a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a97f4079">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">comparison</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">comparison</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span>
 <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">comparison</span><span class="o">.</span><span class="n">task</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">'Top-K'</span><span class="p">,</span> <span class="s1">'评分预测'</span><span class="p">,</span> <span class="s1">'CTR'</span><span class="p">}</span>
 <span class="k">assert</span> <span class="n">comparison</span><span class="o">.</span><span class="n">source_notebook</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">==</span> <span class="mi">5</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'PASS：章节总结从五个独立实验聚合了全部经典算法与三类任务。'</span><span class="p">)</span>
@@ -7997,8 +8260,20 @@ window.MathJax = {
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=32c34870">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>PASS：章节总结从五个独立实验聚合了全部经典算法与三类任务。
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e4e55fbc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

@@ -8,6 +8,8 @@ import torch
 from .model import TinyListGenerator
 from recsys_lab.data import clicked_sequences, positive_sequences, kuairand_sequence_classification_rows
 from recsys_lab.runtime import (
+    ProgressCallback,
+    emit_progress,
     real_amazon as _real_amazon,
     real_kuairand as _real_kuairand,
     real_openonerec_dataset as _real_openonerec_dataset,
@@ -16,6 +18,7 @@ from recsys_lab.runtime import (
     seed_everything,
     train_binary as _train_binary,
     full_profile,
+    progress_due,
 )
 
 def _semantic_catalog(videos):
@@ -44,8 +47,14 @@ def _training_device(cpu_smoke: bool) -> torch.device:
     return torch.device("cpu")
 
 
-def run_openonerec(epochs: int = 32, cpu_smoke: bool = False) -> dict:
+def run_openonerec(
+    epochs: int = 32,
+    cpu_smoke: bool = False,
+    *,
+    progress: ProgressCallback | None = None,
+) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
+    emit_progress(progress, stage="data_prepare", current=0, total=1, message="加载数据并构造 Semantic ID 训练序列")
     seed_everything(); device = _training_device(cpu_smoke)
     sample_rows = 256 if device.type == "cpu" else 2000
     if full_profile():
@@ -79,6 +88,7 @@ def run_openonerec(epochs: int = 32, cpu_smoke: bool = False) -> dict:
         chosen_row = interactions[(interactions.is_click == 1) & (interactions.long_view == 1)].iloc[0]
         rejected_row = interactions[interactions.is_click == 0].iloc[0]
         dpo_pair = {"chosen": item_to_code[int(chosen_row.item_id)], "rejected": item_to_code[int(rejected_row.item_id)]}
+    emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"training_codes": len(sequences)})
     vocabulary_size = int(sequences.max()) + 2
     model_input = torch.tensor(np.c_[np.zeros((len(sequences), 1), dtype=np.int64), sequences[:, :-1]], device=device)
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
@@ -88,23 +98,35 @@ def run_openonerec(epochs: int = 32, cpu_smoke: bool = False) -> dict:
     scaler = torch.amp.GradScaler(device.type, enabled=amp_enabled)
     effective_epochs = min(epochs, 2) if device.type == "cpu" else epochs
     # 4) 一个 epoch：前向计算 → loss → 梯度清零 → 反向传播 → 参数更新。
-    for _ in range(effective_epochs):
+    emit_progress(progress, stage="train", current=0, total=effective_epochs, message="训练生成式列表代理模型")
+    for epoch in range(effective_epochs):
         optimizer.zero_grad(set_to_none=True)
         with torch.autocast(device_type=device.type, dtype=torch.float16, enabled=amp_enabled):
             logits = model(model_input)
             loss = torch.nn.functional.cross_entropy(logits.reshape(-1, logits.shape[-1]), target.reshape(-1))
         scaler.scale(loss).backward(); scaler.step(optimizer); scaler.update(); losses.append(float(loss.detach().cpu()))
+        if progress_due(epoch + 1, effective_epochs):
+            emit_progress(progress, stage="train", current=epoch + 1, total=effective_epochs, metrics={"loss": losses[-1]})
     prefix_counts = {}
     for code in catalog: prefix_counts.setdefault(code[:2], set()).add(code[2])
     prefix = sorted(prefix_counts, key=lambda value: (-len(prefix_counts[value]), value))[0]
     allowed = sorted(prefix_counts[prefix])
     # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
+    emit_progress(progress, stage="inference", current=0, total=1, message="生成下一层 Semantic ID logits")
+    model.eval()
     with torch.inference_mode():
         next_logits = model(torch.tensor([[0, *prefix]], device=device))[0, -1].float().cpu().numpy()
+    emit_progress(progress, stage="inference", current=1, total=1)
+    emit_progress(progress, stage="baseline", current=0, total=1, message="构造无约束 argmax 对照")
     stress_logits = next_logits.copy(); invalid_token = vocabulary_size - 1
     while prefix + (invalid_token,) in catalog: invalid_token -= 1
     stress_logits[invalid_token] = float(stress_logits.max() + .5)
     unconstrained = int(stress_logits.argmax()); constrained = int(max(allowed, key=lambda token: stress_logits[token]))
+    emit_progress(progress, stage="baseline", current=1, total=1)
+    emit_progress(progress, stage="evaluate", current=0, total=1, message="校验目录约束")
+    invalid_unconstrained = float(prefix + (unconstrained,) not in catalog)
+    invalid_constrained = float(prefix + (constrained,) not in catalog)
+    emit_progress(progress, stage="evaluate", current=1, total=1, metrics={"invalid_constrained": invalid_constrained})
     return {
         "framework": "OpenOneRec contract + PyTorch executable proxy",
         "device": str(device), "cuda_device": torch.cuda.get_device_name(0) if device.type == "cuda" else None,
@@ -115,10 +137,15 @@ def run_openonerec(epochs: int = 32, cpu_smoke: bool = False) -> dict:
         },
         "loss_curve": losses, "catalog_size": len(catalog), "prefix": prefix, "allowed_tokens": allowed,
         "unconstrained_token": unconstrained, "constrained_token": constrained,
-        "invalid_unconstrained": float(prefix + (unconstrained,) not in catalog), "invalid_constrained": float(prefix + (constrained,) not in catalog),
+        "invalid_unconstrained": invalid_unconstrained, "invalid_constrained": invalid_constrained,
         "dpo_pair": dpo_pair,
     }
 
-def train_and_evaluate(epochs: int = 4, cpu_smoke: bool = False) -> dict:
+def train_and_evaluate(
+    epochs: int = 4,
+    cpu_smoke: bool = False,
+    *,
+    progress: ProgressCallback | None = None,
+) -> dict:
     """CUDA-first tutorial entry; CPU smoke only validates the basic contract."""
-    return run_openonerec(epochs=epochs, cpu_smoke=cpu_smoke)
+    return run_openonerec(epochs=epochs, cpu_smoke=cpu_smoke, progress=progress)

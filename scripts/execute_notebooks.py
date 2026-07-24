@@ -102,6 +102,7 @@ def main():
     if args.only:
         paths = [notebook_dir / f"{args.only}.ipynb"]
     for path in paths:
+        print(f"executing {path.name} ...", flush=True)
         nb = nbformat.read(path, as_version=4)
         client = NotebookClient(
             nb,

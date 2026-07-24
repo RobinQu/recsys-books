@@ -15,6 +15,7 @@ from app.knowledge_graph import (
     MAX_MODELS_PER_CHAPTER,
     MODEL_EVOLUTION,
     build_knowledge_graph,
+    build_model_filter_graph,
 )
 
 
@@ -140,6 +141,17 @@ def test_invalid_references_fail_before_rendering() -> None:
         build_knowledge_graph(CHAPTERS, MODELS, MATH_PREREQUISITES, focus_id="paper:unknown")
 
 
+def test_stage_filter_projection_keeps_matching_models_and_resolved_dependencies() -> None:
+    graph = build_model_filter_graph(CHAPTERS, MODELS, MATH_PREREQUISITES, "排序")
+    model_nodes = [node for node in graph["nodes"] if node["type"] == "model"]
+    assert [node["key"] for node in model_nodes] == ["fm", "gbdtlr", "deepfm", "din", "dien"]
+    assert graph["state"]["filter"] == "排序"
+    assert graph["state"]["model_count"] == 5
+    assert len(graph["nodes"]) <= FOCUS_VISIBLE_LIMIT
+    _assert_resolved_visible_edges(graph)
+    assert any(edge["type"] == "requires" for edge in graph["edges"])
+
+
 def test_dormant_frontend_uses_requested_columns_and_bounded_mobile_grid() -> None:
     javascript = Path("app/static/app.js").read_text(encoding="utf-8")
     css = Path("app/static/app.css").read_text(encoding="utf-8")
@@ -147,7 +159,7 @@ def test_dormant_frontend_uses_requested_columns_and_bounded_mobile_grid() -> No
     assert "if (node.type === 'math') return 1" in javascript
     assert "if (node.type === 'chapter') return 2" in javascript
     assert "const MAX_VISIBLE_NODES = 16" in javascript
-    assert "const VISUAL_EDGE_TYPES = new Set(['contains', 'emphasizes', 'evolves', 'prerequisite'])" in javascript
+    assert "const VISUAL_EDGE_TYPES = new Set(['contains', 'emphasizes', 'evolves', 'prerequisite', 'requires'])" in javascript
     assert "edge.source !== currentView.state?.focus" in javascript
     assert "grid-template-columns:repeat(2,minmax(0,1fr))" in css
     assert "grid-column:auto!important" in css and "grid-row:auto!important" in css

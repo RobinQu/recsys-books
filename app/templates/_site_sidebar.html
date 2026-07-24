@@ -1,11 +1,16 @@
 <aside class="sidebar" aria-label="章节导航">
   <nav>
-    <a href="/#overview" data-section="overview">导读</a>
+    <details open class="{{ 'current-section' if active == 'introduction' else '' }}"><summary><b>1</b><span>教程导读</span></summary>
+      <div class="sidebar-subnav"><a href="/#overview" data-section="overview">1.1 技术演进与教程定位</a><a href="/#reading-guide" data-section="reading-guide">1.2 阅读建议与章节导览</a></div>
+    </details>
+    <details open class="{{ 'current-section' if active == 'catalog' else '' }}"><summary><b>2</b><span>内容索引</span></summary>
+      <div class="sidebar-subnav"><a href="/catalog#foundations" data-section="foundations">2.1 公式直觉索引</a><a href="/catalog#model-explorer" data-section="model-explorer">2.2 主流算法知识地图</a></div>
+    </details>
     {% for group in course_groups %}<details open><summary><b>{{ group.number }}</b><span>{{ group.title }}</span></summary>
       <div class="sidebar-subnav">{% for item in group['items'] %}<a href="/notebooks/{{ item.slug }}" class="{{ 'active' if item.slug == current_notebook_slug else '' }}" {% if item.slug == current_notebook_slug %}aria-current="page"{% endif %}>{{ item.title }}</a>{% endfor %}</div>
     </details>{% endfor %}
-    <details open class="appendix-nav"><summary><b>A</b><span>附录</span></summary>
-      <div class="sidebar-subnav"><a href="/#sources" data-section="sources">A.1 论文清单</a><a href="/#datasets" data-section="datasets">A.2 数据集清单</a><a href="/#labs" data-section="labs">A.3 Notebook 清单</a><a href="/#math-map" data-section="math-map">A.4 教程知识图谱</a></div>
+    <details open class="appendix-nav {{ 'current-section' if active == 'appendix' else '' }}"><summary><b>A</b><span>附录</span></summary>
+      <div class="sidebar-subnav"><a href="/appendix#sources" data-section="sources">A.1 论文清单</a><a href="/appendix#labs" data-section="labs">A.2 Notebook 清单</a></div>
     </details>
   </nav>
 </aside>

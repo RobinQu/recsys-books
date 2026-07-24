@@ -3,9 +3,9 @@
     {
       "algorithm": "DIN 候选感知排序",
       "primary_metric": "auc",
-      "primary_value": 0.593822919367384,
+      "primary_value": 0.6165197476449744,
       "secondary_metric": "logloss",
-      "secondary_value": 1.4411136668019218,
+      "secondary_value": 0.5230537896862847,
       "baseline_metric": "static_overlap_auc",
       "baseline_value": 0.5019229107250885,
       "framework": "torch_rechub.models.ranking.DIN",

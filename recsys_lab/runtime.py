@@ -11,6 +11,7 @@ import json
 import os
 import random
 from pathlib import Path
+from typing import Callable, Mapping
 
 import numpy as np
 import torch
@@ -28,6 +29,71 @@ from .data import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
+ProgressCallback = Callable[[dict[str, object]], None]
+
+
+def emit_progress(
+    progress: ProgressCallback | None,
+    *,
+    stage: str,
+    current: int | None = None,
+    total: int | None = None,
+    message: str | None = None,
+    metrics: Mapping[str, object] | None = None,
+) -> None:
+    """Send one deterministic progress event when a callback is configured."""
+    if progress is None:
+        return
+    event: dict[str, object] = {"stage": stage}
+    if current is not None:
+        event["current"] = current
+    if total is not None:
+        event["total"] = total
+    if message is not None:
+        event["message"] = message
+    if metrics is not None:
+        event["metrics"] = dict(metrics)
+    progress(event)
+
+
+def progress_due(current: int, total: int, max_updates: int = 20) -> bool:
+    """Return whether a bounded loop should publish its current progress.
+
+    Boundaries are always reported. Between them, at most roughly
+    ``max_updates`` evenly spaced checkpoints are selected.
+    """
+    if max_updates <= 0:
+        raise ValueError("max_updates must be positive")
+    if current <= 0 or current >= total:
+        return True
+    if total <= 0:
+        return False
+    interval = max(1, (total + max_updates - 1) // max_updates)
+    return current % interval == 0
+
+
+def print_progress(event: dict[str, object]) -> None:
+    """Print a stable single-line representation suitable for notebooks."""
+    stage = str(event.get("stage", "progress")).replace("\n", " ")
+    parts = [f"[{stage}]"]
+    current, total = event.get("current"), event.get("total")
+    if current is not None and total is not None:
+        parts.append(f"{current}/{total}")
+    elif current is not None:
+        parts.append(str(current))
+    message = event.get("message")
+    if message is not None:
+        parts.append(str(message).replace("\n", " "))
+    metrics = event.get("metrics")
+    if isinstance(metrics, Mapping):
+        parts.extend(f"{key}={_format_progress_value(metrics[key])}" for key in sorted(metrics))
+    print(" ".join(parts), flush=True)
+
+
+def _format_progress_value(value: object) -> str:
+    if isinstance(value, float):
+        return f"{value:.6g}"
+    return str(value).replace("\n", " ")
 
 
 def full_profile() -> bool:
@@ -44,7 +110,20 @@ def seed_everything(seed: int = 2026) -> None:
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.set_num_threads(1)
+    if not full_profile():
+        torch.set_num_threads(1)
+        return
+    configured = os.getenv("RECSYS_TORCH_THREADS")
+    if configured is not None:
+        try:
+            thread_count = int(configured)
+        except ValueError as error:
+            raise ValueError("RECSYS_TORCH_THREADS must be a positive integer") from error
+        if thread_count <= 0:
+            raise ValueError("RECSYS_TORCH_THREADS must be a positive integer")
+    else:
+        thread_count = min(8, os.cpu_count() or 1)
+    torch.set_num_threads(thread_count)
 
 
 def save_records(chapter: str, name: str, records: list[dict]) -> Path:
@@ -124,11 +203,17 @@ def train_binary(
     lr: float,
     dien: bool = False,
     batch_size: int = 4096,
+    *,
+    progress: ProgressCallback | None = None,
 ) -> list[float]:
     """Mini-batch BCE loop that can consume complete public datasets."""
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     losses: list[float] = []
-    for _ in range(epochs):
+    steps_per_epoch = (len(labels) + batch_size - 1) // batch_size
+    total_steps = epochs * steps_per_epoch
+    emit_progress(progress, stage="train", current=0, total=total_steps, message="starting")
+    step = 0
+    for epoch in range(epochs):
         weighted_loss = 0.0
         for start in range(0, len(labels), batch_size):
             stop = min(start + batch_size, len(labels))
@@ -143,7 +228,26 @@ def train_binary(
             loss.backward()
             optimizer.step()
             weighted_loss += float(loss.detach()) * (stop - start)
+            step += 1
+            if step < total_steps and progress_due(step, total_steps):
+                emit_progress(
+                    progress,
+                    stage="train",
+                    current=step,
+                    total=total_steps,
+                    message=f"epoch {epoch + 1}/{epochs}",
+                    metrics={"batch_loss": float(loss.detach())},
+                )
         losses.append(weighted_loss / len(labels))
+    if total_steps:
+        emit_progress(
+            progress,
+            stage="train",
+            current=total_steps,
+            total=total_steps,
+            message=f"epoch {epochs}/{epochs}",
+            metrics={"loss": losses[-1]},
+        )
     return losses
 
 

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="RecSys Atlas 第 2 章：数学直觉索引与可交互主流算法知识地图">
+  <title>第 2 章 · 内容索引 | RecSys Atlas</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/navigation.css">
+  <link rel="stylesheet" href="/static/foundations.css">
+  <link rel="stylesheet" href="/static/flat-navigation.css">
+</head>
+<body>
+  {% include "_site_header.html" %}
+  {% include "_site_sidebar.html" %}
+
+  <main>
+    <section class="hero chapter-hero catalog-hero reveal">
+      <div class="eyebrow">02 · CONTENT INDEX</div>
+      <h1>从一个问题出发，<br><em>找到模型与先修知识</em></h1>
+      <p class="lede">2.1 把常见公式翻译成可手算的学习路线；2.2 把模型讲解、横向对比与知识图谱合并为同一个可筛选索引。</p>
+      <div class="hero-actions"><a class="button" href="#foundations">先看公式直觉 ↓</a><a class="ghost button-like" href="#model-explorer">直接筛选模型 ↓</a></div>
+      <div class="catalog-chapter-links" aria-label="第 3 至第 8 章快速入口">
+        {% for key, chapter in chapters.items() %}<a href="/notebooks/{{ chapter.opening }}"><b>{{ chapter.number }}</b><span>{{ chapter.title }}</span></a>{% endfor %}
+      </div>
+    </section>
+
+    <section id="foundations" class="section reveal">
+      <div class="section-kicker">2.1 · MATH INTUITION INDEX</div>
+      <h2>先把公式翻译成可以手算的直觉</h2>
+      <p class="section-intro">八步路线只负责导航：每一步给出“现在要理解什么”和稳定课程入口，详细推导、手算示例与练习留在第 3 章的独立 Notebook 中。</p>
+      {% set foundation_steps = [
+        ('3_1_math_foundations', '01', '共同语言', '用小矩阵、向量、概率和指标建立教程共同语言。'),
+        ('3_2_data_ml_basics', '02', '数据与机器学习', '分清样本、特征、标签、反馈、切分与泛化。'),
+        ('3_3_linear_algebra', '03', '线性代数', '从形状、点积和矩阵乘法走到低秩表示与 Q/K/V。'),
+        ('3_4_calculus', '04', '微积分', '从函数与斜率走到梯度、链式法则和反向传播。'),
+        ('3_5_probability_statistics', '05', '概率统计', '理解条件概率、期望方差、似然、采样与校准。'),
+        ('3_6_information_theory', '06', '信息论目标', '读懂熵、交叉熵、KL、序列 NLL 与 DPO。'),
+        ('3_7_optimization', '07', '优化', '掌握 SGD、Adam、学习率、正则化和梯度冲突。'),
+        ('3_8_data_pipeline', '08', '可信实验', '接入真实行为数据、训练循环、指标与防泄漏检查。')
+      ] %}
+      <div class="compact-foundation-index" aria-label="推荐算法数学八步学习路径">
+        {% for step_slug, step_number, step_title, step_intro in foundation_steps %}
+          {% for item in notebooks if item.slug == step_slug %}
+          <a href="/notebooks/{{ item.slug }}"><span>{{ step_number }}</span><div><b>{{ step_title }}</b><p>{{ step_intro }}</p></div><i>→</i></a>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </section>
+
+    <section id="model-explorer" class="section reveal">
+      <div class="section-kicker">2.2 · INTERACTIVE MODEL KNOWLEDGE MAP</div>
+      <h2>主流算法的知识地图</h2>
+      <p class="section-intro">筛选项同时控制下方模型清单与知识图谱。图谱保留章节归属、模型演进和共性数学依赖；选择节点可查看文字关系并跳到对应课程。</p>
+
+      <div class="filters model-map-filters" role="group" aria-label="模型阶段筛选">
+        <button class="chip active" data-filter="all" aria-pressed="true">全部</button>
+        <button class="chip" data-filter="经典" aria-pressed="false">经典</button>
+        <button class="chip" data-filter="召回" aria-pressed="false">召回</button>
+        <button class="chip" data-filter="排序" aria-pressed="false">排序</button>
+        <button class="chip" data-filter="多目标" aria-pressed="false">多目标</button>
+        <button class="chip" data-filter="Transformer" aria-pressed="false">Transformer</button>
+        <button class="chip" data-filter="生成式" aria-pressed="false">生成式</button>
+        <span id="model-filter-status" class="filter-status" aria-live="polite">显示全部 {{ models|length }} 个模型</span>
+      </div>
+
+      <script id="knowledge-graph-data" type="application/json">{{ knowledge_graph | tojson }}</script>
+      <div id="knowledge-graph" aria-label="筛选后的章节、模型与数学知识关系图"></div>
+      <noscript><p class="appendix-intro">启用 JavaScript 后可联动筛选知识图谱；所有课程仍可从左侧章节导航进入。</p></noscript>
+
+      <div id="model-grid" class="model-grid model-index-grid">
+        {% for model in models %}
+        <article class="model-card" data-stage="{{ model.stage }}" data-model="{{ model.id }}">
+          <div class="model-meta"><span>{{ model.stage }}</span><button class="compare-toggle" data-compare="{{ model.id }}" aria-label="将 {{ model.name }} 加入对比">＋ 对比</button></div>
+          <h3>{{ model.name }}</h3><p>{{ model.idea }}</p>
+          <dl><div><dt>优势</dt><dd>{{ model.pros }}</dd></div><div><dt>短板</dt><dd>{{ model.cons }}</dd></div><div><dt>评测</dt><dd>{{ model.metric }}</dd></div></dl>
+          <a href="/notebooks/{{ model.notebook }}">进入算法章节 →</a>
+        </article>
+        {% endfor %}
+      </div>
+
+      <div id="compare-drawer" class="compare-drawer" hidden><div><b>模型对比</b><span id="compare-count">0/3</span></div><button id="compare-open">展开对比</button><button id="compare-clear" class="ghost">清空</button></div>
+      <dialog id="compare-dialog"><form method="dialog"><button class="dialog-close" aria-label="关闭">×</button><h2>典型模型横向对比</h2><div id="compare-table"></div></form></dialog>
+    </section>
+  </main>
+
+  <footer><a href="/">← 第 1 章：教程导读</a><a href="/notebooks/3_1_math_foundations">下一章：共性基础课程 →</a></footer>
+  <script src="/static/app.js?v=20260724-2" defer></script>
+</body>
+</html>

@@ -9,6 +9,8 @@ from torch_rechub.basic.features import SequenceFeature
 from torch_rechub.models.matching import SASRec
 from recsys_lab.data import clicked_sequences, positive_sequences, kuairand_sequence_classification_rows
 from recsys_lab.runtime import (
+    ProgressCallback,
+    emit_progress,
     real_sasrec_dataset as _real_amazon,
     real_kuairand as _real_kuairand,
     recall_single_target as _recall_single_target,
@@ -17,6 +19,7 @@ from recsys_lab.runtime import (
     train_binary as _train_binary,
     full_profile,
     sampled_embedding_rank_metrics,
+    progress_due,
 )
 
 def _sequence_windows_from_sequences(sequences, length=12):
@@ -48,8 +51,9 @@ def _sample_unobserved_negatives(user_ids, sequences, rows, vocab):
             candidate = candidate % (vocab - 1) + 1
     return negatives
 
-def run_sasrec(epochs: int | None = None) -> dict:
+def run_sasrec(epochs: int | None = None, *, progress: ProgressCallback | None = None) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
+    emit_progress(progress, stage="data_prepare", current=0, total=1, message="加载数据并构造 SASRec 序列窗口")
     seed_everything(); ratings, provenance = _real_amazon(max_users=160)
     epochs = (201 if full_profile() else 30) if epochs is None else epochs
     length = 200 if full_profile() else 20
@@ -66,10 +70,14 @@ def run_sasrec(epochs: int | None = None) -> dict:
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = SASRec([seq, pos, neg], max_len=length, dropout_rate=.2 if full_profile() else .1, num_blocks=2 if full_profile() else 1, num_heads=1 if full_profile() else 2)
     data = {"seq": torch.tensor(train_input), "pos": torch.tensor(train_target), "neg": torch.tensor(negative)}
+    emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"sequence_users": len(train_input)})
     # 3) optimizer 只在训练阶段更新参数；推理阶段不应再调用它。
     optimizer = torch.optim.Adam(model.parameters(), lr=.001 if full_profile() else .008); losses=[]
     # 4) 一个 epoch：前向计算 → loss → 梯度清零 → 反向传播 → 参数更新。
     batch_size = 128 if full_profile() else 2048
+    total_batches = epochs * ((len(train_input) + batch_size - 1) // batch_size)
+    completed = 0
+    emit_progress(progress, stage="train", current=0, total=total_batches, message="训练 SASRec")
     for _ in range(epochs):
         epoch_loss = 0.0
         for start in range(0, len(train_input), batch_size):
@@ -79,10 +87,16 @@ def run_sasrec(epochs: int | None = None) -> dict:
             loss = torch.nn.functional.softplus(-pos_logits[valid]).mean() + torch.nn.functional.softplus(neg_logits[valid]).mean()
             optimizer.zero_grad(); loss.backward(); optimizer.step()
             epoch_loss += float(loss.detach()) * (stop - start)
+            completed += 1
+            if progress_due(completed, total_batches):
+                emit_progress(progress, stage="train", current=completed, total=total_batches)
         losses.append(epoch_loss / len(train_input))
     # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
     model.eval()
-    with torch.no_grad():
+    inference_chunks = (len(eval_input) + batch_size - 1) // batch_size
+    emit_progress(progress, stage="inference", current=0, total=inference_chunks, message="分批提取序列向量")
+    completed = 0
+    with torch.inference_mode():
         user_batches = []
         for start in range(0, len(eval_input), batch_size):
             batch = {"seq": torch.tensor(eval_input[start:start + batch_size])}
@@ -92,20 +106,27 @@ def run_sasrec(epochs: int | None = None) -> dict:
             # ``count(nonzero)-1`` (right-padding semantics), which selects a
             # wrong position for short users and materially depresses HR/NDCG.
             user_batches.append(model.seq_forward(batch, sequence_embedding)[:, -1])
+            completed += 1
+            if progress_due(completed, inference_chunks):
+                emit_progress(progress, stage="inference", current=completed, total=inference_chunks)
         user_vectors = torch.cat(user_batches)
         item_vectors = model.item_emb.embed_dict["seq"].weight[1:]
         user_vectors = np.nan_to_num(user_vectors.numpy(), nan=0.0, posinf=0.0, neginf=0.0)
         item_vectors = np.nan_to_num(item_vectors.numpy(), nan=0.0, posinf=0.0, neginf=0.0)
     seen = [set(row[row > 0] - 1) for row in eval_input]
+    emit_progress(progress, stage="baseline", current=0, total=1, message="计算热门物品基线")
     popularity = np.bincount(train_input.ravel(), minlength=vocab)[1:]
     popularity_top10 = np.argsort(-popularity)[:10]
     popularity_hr = float(np.mean([target - 1 in popularity_top10 for target in eval_target]))
+    emit_progress(progress, stage="baseline", current=1, total=1, metrics={"popularity_hr@10": popularity_hr})
+    emit_progress(progress, stage="evaluate", current=0, total=1, message="计算 SASRec 排序指标")
     sampled = sampled_embedding_rank_metrics(user_vectors, item_vectors, eval_target - 1, 10, 100, seen)
     if full_profile():
         hr = float(sampled["hr@10"])
     else:
         scores = user_vectors @ item_vectors.T
         hr = _recall_single_target(scores, eval_target - 1, 10, seen)
+    emit_progress(progress, stage="evaluate", current=1, total=1, metrics={"hr@10": hr})
     # 6) 返回真实测试切分上的指标和必要诊断信息，供章节总结统一读取。
     return {
         "framework": "torch_rechub.models.matching.SASRec",
@@ -116,6 +137,6 @@ def run_sasrec(epochs: int | None = None) -> dict:
         "popularity_hr@10": popularity_hr, "embedding_dim": embedding_dim,
     }
 
-def train_and_evaluate(epochs: int = 4) -> dict:
+def train_and_evaluate(epochs: int = 4, *, progress: ProgressCallback | None = None) -> dict:
     """Small default for learning/CI; increase epochs for the full experiment."""
-    return run_sasrec(epochs=epochs)
+    return run_sasrec(epochs=epochs, progress=progress)

@@ -39,7 +39,7 @@ def test_notebook_kind_schema_is_explicit_and_visible_in_catalogue():
         "foundation", "curriculum", "curriculum", "curriculum",
         "curriculum", "curriculum", "curriculum", "foundation",
     ]
-    html = client.get("/").text
+    html = client.get("/appendix").text
     for kind in {notebook["kind"] for notebook in NOTEBOOKS}:
         assert f'data-notebook-kind="{kind}"' in html
         assert NOTEBOOK_KIND_LABELS[kind] in html
@@ -65,7 +65,7 @@ def test_curriculum_page_uses_course_source_instead_of_chapter_code():
     assert source.status_code == 307
     assert source.headers["location"] == f'/notebooks/{curriculum["slug"]}#source'
 
-    catalogue = client.get("/").text
+    catalogue = client.get("/appendix").text
     assert 'data-notebook-kind="curriculum"' in catalogue
     assert "数学课程 · pandas / NumPy" in catalogue and ">练习 ↗</a>" in catalogue
 
@@ -99,8 +99,10 @@ def test_curriculum_kind_never_gets_a_paper_guide():
 
 def test_home_contains_required_sections():
     html = client.get("/").text
+    catalogue = client.get("/catalog").text
+    appendix = client.get("/appendix").text
     for token in ["DSSM", "MIND", "DeepFM", "DIN", "DIEN", "MMoE", "PLE", "SASRec", "BERT4Rec", "OpenOneRec", "DLRM HSTU"]:
-        assert token in html
+        assert token in html or token in catalogue
     assert "<iframe" not in html
     assert "/notebooks/4_1_classic_foundations" in html
     assert "/notebooks/5_1_retrieval_foundations" in html
@@ -113,22 +115,36 @@ def test_home_contains_required_sections():
     assert "/notebooks/5_2_dssm" in html
     assert "/notebooks/6_2_deepfm" in html
     assert "/notebooks/7_2_mmoe" in html
-    assert "先把公式翻译成可以手算的直觉" in html
+    assert "先把公式翻译成可以手算的直觉" in catalogue
     assert 'class="sidebar-subnav"' in html
     assert "/notebooks/8_2_openonerec_practice" in html
     assert "/notebooks/8_3_dlrm_hstu_practice" in html
-    assert "查看 33 个 Notebook" in html
+    assert "可执行 Notebook" in html
     assert "/notebooks/3_8_data_pipeline" in html
     assert "/notebooks/3_2_data_ml_basics" in html
-    assert "Amazon Reviews 2023" in html and "KuaiRand" in html
-    assert "开源数据集清单" in html
-    assert 'href="/papers/deepfm"' in html
-    assert "本地 PDF" in html
-    assert 'id="appendix"' in html
-    assert "A.1 论文清单" in html and "A.2 数据集清单" in html and "A.3 Notebook 清单" in html
-    assert html.index('id="sources"') < html.index('id="datasets"') < html.index('id="labs"')
-    assert 'id="frameworks"' not in html
-    assert "TorchEasyRec vs Torch-RecHub" not in html
+    assert "Amazon Reviews 2023" in appendix and "KuaiRand" in appendix
+    assert 'href="/papers/deepfm"' in appendix
+    assert "本地 PDF" in appendix
+    assert "A.1 论文清单" in html and "A.2 Notebook 清单" in html
+    assert appendix.index('id="sources"') < appendix.index('id="labs"')
+    assert 'id="datasets"' not in appendix and 'id="math-map"' not in appendix
+    assert 'id="frameworks"' not in html + catalogue + appendix
+    assert "TorchEasyRec vs Torch-RecHub" not in html + catalogue + appendix
+
+
+def test_intro_catalogue_and_appendix_are_independent_chapter_pages():
+    intro = client.get("/")
+    catalogue = client.get("/catalog")
+    appendix = client.get("/appendix")
+    assert intro.status_code == catalogue.status_code == appendix.status_code == 200
+    assert "第 1 章 · 教程导读" in intro.text
+    assert "第 2 章 · 内容索引" in catalogue.text
+    assert "附录 · 论文与 Notebook 清单" in appendix.text
+    assert "召回与排序双视角的完整技术演进" in intro.text
+    assert "按你的目标选择阅读路径" in intro.text
+    assert 'id="knowledge-graph-data"' not in intro.text
+    assert 'id="knowledge-graph-data"' in catalogue.text
+    assert 'id="sources"' not in intro.text and 'id="sources"' in appendix.text
 
 
 def test_full_and_smoke_dataset_protocols_are_explicit_in_catalogue_and_headers():
@@ -151,11 +167,11 @@ def test_full_and_smoke_dataset_protocols_are_explicit_in_catalogue_and_headers(
         detail = client.get(f"/notebooks/{slug}").text
         assert all(phrase in detail for phrase in phrases)
 
-    home = client.get("/").text
-    assert "数据口径按“算法 × 协议”记录，不把一个数据集套给整章" in home
-    assert "两档结果不可直接相减" in home
-    assert "深度召回与 SASRec 使用 Amazon Reviews 2023" not in home
-    assert "CTR、行为序列、多目标和 HSTU 使用 KuaiRand" not in home
+    appendix = client.get("/appendix").text
+    assert "数据口径按“算法 × 协议”记录" in appendix
+    assert "两档结果不可直接相减" in appendix
+    assert "深度召回与 SASRec 使用 Amazon Reviews 2023" not in appendix
+    assert "CTR、行为序列、多目标和 HSTU 使用 KuaiRand" not in appendix
     assert not hasattr(content, "_LEGACY_MATH_PREREQUISITES")
 
 
@@ -224,11 +240,11 @@ def test_math_map_covers_all_models_with_valid_acyclic_curriculum_links():
     for topic_id in graph:
         visit(topic_id)
 
-    html = client.get("/").text
-    assert 'id="math-map"' in html
+    html = client.get("/catalog").text
+    assert 'id="model-explorer"' in html
     assert 'id="knowledge-graph-data"' in html
-    assert "A.4 · KNOWLEDGE GRAPH" in html
-    assert "两跳和有限节点" in html
+    assert "2.2 · INTERACTIVE MODEL KNOWLEDGE MAP" in html
+    assert "筛选项同时控制下方模型清单与知识图谱" in html
 
 
 def test_page_context_exposes_default_and_six_focused_knowledge_graph_views():
@@ -243,8 +259,9 @@ def test_page_context_exposes_default_and_six_focused_knowledge_graph_views():
         "client": ("test", 50000), "server": ("testserver", 80), "app": app,
     })
     graph_payload = page_context(request)["knowledge_graph"]
-    assert set(graph_payload) == {"default", "views"}
+    assert set(graph_payload) == {"default", "views", "filters"}
     assert set(graph_payload["views"]) == {f"chapter:{key}" for key in CHAPTERS}
+    assert set(graph_payload["filters"]) == {"经典", "召回", "排序", "多目标", "Transformer", "生成式"}
     assert [node["id"] for node in graph_payload["default"]["nodes"]] == [
         f"chapter:{key}" for key in CHAPTERS
     ]
@@ -256,6 +273,11 @@ def test_page_context_exposes_default_and_six_focused_knowledge_graph_views():
     classic = graph_payload["views"]["chapter:classic"]
     assert len(classic["nodes"]) > len(graph_payload["default"]["nodes"])
     assert {node["type"] for node in classic["nodes"]} == {"chapter", "model", "math"}
+    retrieval_filter = graph_payload["filters"]["召回"]
+    assert retrieval_filter["state"]["filter"] == "召回"
+    assert {node["key"] for node in retrieval_filter["nodes"] if node["type"] == "model"} == {
+        "word2vec", "dssm", "mind", "sasrec",
+    }
 
 
 def test_legacy_chapter_routes_redirect_to_math_openings():
@@ -318,7 +340,7 @@ def test_notebook_preview_uses_application_shell_and_raw_content_route():
 def test_home_and_detail_share_the_same_global_navigation():
     home = client.get("/").text
     detail = client.get("/notebooks/5_2_dssm").text
-    for token in ["搜索模型", "启动实验室 ↗", "导读", "附录", "论文清单", "数据集清单", "Notebook 清单"]:
+    for token in ["搜索模型", "启动实验室 ↗", "教程导读", "内容索引", "附录", "论文清单", "Notebook 清单"]:
         assert token in home and token in detail
     assert "框架选型" not in home and "框架选型" not in detail
     assert home.count('<header class="topbar">') == detail.count('<header class="topbar">') == 1

@@ -282,6 +282,67 @@ def test_notebooks_default_to_formal_full_profile():
         assert 'RECSYS_PROFILE", "full"' in setup, path.name
 
 
+def test_algorithm_setup_is_lazy_and_classic_formal_results_ignore_teaching_metrics():
+    loader_calls = [
+        "load_movielens(",
+        "load_amazon_2018(",
+        "load_mind_amazon_books(",
+        "load_movielens_1m(",
+        "load_movielens_20m(",
+        "load_census_income(",
+        "load_kuairand(",
+    ]
+    for slug, kind in NOTEBOOK_KIND_BY_SLUG.items():
+        if kind == "curriculum":
+            continue
+        notebook = nbformat.read(Path("notebooks") / f"{slug}.ipynb", as_version=4)
+        setup = notebook.cells[2].source
+        assert "lazy: chapter runner owns loading" in setup, slug
+        assert not any(call in setup for call in loader_calls), slug
+
+    gbdt = nbformat.read(Path("notebooks/4_5_gbdt_lr.ipynb"), as_version=4)
+    gbdt_setup = gbdt.cells[2].source
+    assert 'DATASET_KEY = "criteo-x1"' in gbdt_setup
+    assert "Criteo_x1 官方 7:2:1" in _source(gbdt)
+
+    teaching_metric_names = {
+        "cf_metrics", "mf_rmse", "mf_hr10", "fm_auc", "fm_logloss",
+        "gbdt_lr_auc", "gbdt_lr_logloss", "word2vec_recall_at_5",
+        "word2vec_coverage",
+    }
+    for slug in [
+        "4_2_collaborative_filtering",
+        "4_3_matrix_factorization",
+        "4_4_factorization_machine",
+        "4_5_gbdt_lr",
+        "4_6_word2vec",
+    ]:
+        notebook = nbformat.read(Path("notebooks") / f"{slug}.ipynb", as_version=4)
+        formal_index = next(
+            index for index, cell in enumerate(notebook.cells)
+            if cell.cell_type == "markdown" and "Train & Inference（正式实验）" in cell.source
+        )
+        formal_source = "\n".join(cell.source for cell in notebook.cells[formal_index:])
+        assert "chapter_train.train_and_evaluate(" in formal_source, slug
+        assert "progress=print_progress" in formal_source, slug
+        assert "np.zeros((n_users, n_items)" not in formal_source, slug
+
+        persist_cells = [
+            cell.source for cell in notebook.cells
+            if cell.cell_type == "code" and "write_text(json.dumps(payload" in cell.source
+        ]
+        assert len(persist_cells) == 1, slug
+        persist_source = persist_cells[0]
+        assert 'result[' in persist_source or "result.get(" in persist_source, slug
+        assert not any(name in persist_source for name in teaching_metric_names), slug
+
+    for slug in ["4_2_collaborative_filtering", "4_3_matrix_factorization"]:
+        source = _source(nbformat.read(Path("notebooks") / f"{slug}.ipynb", as_version=4))
+        assert "bounded teaching view (not the formal experiment)" in source
+        assert 'os.environ["RECSYS_PROFILE"] = "smoke"' in source
+        assert "np.zeros((n_users, n_items)" in source
+
+
 def test_3_math_curriculum_has_complete_teaching_structure():
     registered_curriculum = {
         slug for slug, kind in NOTEBOOK_KIND_BY_SLUG.items() if kind == "curriculum"

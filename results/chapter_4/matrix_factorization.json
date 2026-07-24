@@ -4,9 +4,11 @@
       "algorithm": "BiasMF",
       "task": "评分预测",
       "metric": "RMSE ↓",
-      "value": 1.1905284314110052,
+      "value": 0.8901939074834548,
       "secondary_metric": "HR@10",
-      "secondary_value": 0.20833333333333334,
+      "secondary_value": null,
+      "secondary_status": "not_run",
+      "status": "executed",
       "online_inference": "user/item 向量内积",
       "source_notebook": "4_3_matrix_factorization"
     }

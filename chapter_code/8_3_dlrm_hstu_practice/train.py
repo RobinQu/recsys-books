@@ -8,6 +8,8 @@ import torch
 from torch_rechub.models.generative import HSTUModel
 from recsys_lab.data import clicked_sequences, positive_sequences, kuairand_sequence_classification_rows
 from recsys_lab.runtime import (
+    ProgressCallback,
+    emit_progress,
     real_amazon as _real_amazon,
     real_hstu_dataset as _real_hstu_dataset,
     real_kuairand as _real_kuairand,
@@ -16,6 +18,7 @@ from recsys_lab.runtime import (
     seed_everything,
     train_binary as _train_binary,
     full_profile,
+    progress_due,
 )
 
 def _sequence_windows_from_sequences(sequences, length=12):
@@ -39,8 +42,14 @@ def _training_device(cpu_smoke: bool) -> torch.device:
     return torch.device("cpu")
 
 
-def run_hstu(epochs: int = 26, cpu_smoke: bool = False) -> dict:
+def run_hstu(
+    epochs: int = 26,
+    cpu_smoke: bool = False,
+    *,
+    progress: ProgressCallback | None = None,
+) -> dict:
     # 1) 固定参数初始化，并读取本章指定的真实数据切片。
+    emit_progress(progress, stage="data_prepare", current=0, total=1, message="加载数据并构造 HSTU 序列窗口")
     seed_everything(); device = _training_device(cpu_smoke)
     max_users, max_items, length = (32, 800, 8) if device.type == "cpu" else (128, 2500, 24)
     if full_profile():
@@ -53,6 +62,7 @@ def run_hstu(epochs: int = 26, cpu_smoke: bool = False) -> dict:
     train_input, train_target, eval_input, eval_target = _sequence_windows_from_sequences(sequences, length)
     vocab = interactions.item_id.nunique() + 1
     inputs = torch.tensor(train_input, device=device); targets = torch.tensor(train_target, device=device)
+    emit_progress(progress, stage="data_prepare", current=1, total=1, metrics={"sequence_users": len(train_input), "vocab": vocab})
     # 2) 按论文结构实例化模型；这里是理解层尺寸和特征契约的入口。
     model = HSTUModel(vocab, d_model=32, n_heads=2, n_layers=1, dqk=8, dv=8, max_seq_len=length, dropout=0.0, use_time_embedding=False).to(device)
     # 3) optimizer 只在训练阶段更新参数；推理阶段不应再调用它。
@@ -64,6 +74,10 @@ def run_hstu(epochs: int = 26, cpu_smoke: bool = False) -> dict:
     # 训练与评估（CPU 档 512、CUDA 档 4096），论文工业实现的对应手段是 sampled softmax。
     batch = 512 if device.type == "cpu" else 4096
     # 4) 一个 epoch：前向计算 → loss → 梯度清零 → 反向传播 → 参数更新。
+    batches_per_epoch = (len(inputs) + batch - 1) // batch
+    total_batches = effective_epochs * batches_per_epoch
+    completed = 0
+    emit_progress(progress, stage="train", current=0, total=total_batches, message="分批训练 HSTU")
     for _ in range(effective_epochs):
         weighted = 0.0
         for start in range(0, len(inputs), batch):
@@ -74,17 +88,28 @@ def run_hstu(epochs: int = 26, cpu_smoke: bool = False) -> dict:
                 loss = torch.nn.functional.cross_entropy(logits.reshape(-1, vocab), targets[start:stop].reshape(-1))
             scaler.scale(loss).backward(); scaler.step(optimizer); scaler.update()
             weighted += float(loss.detach().cpu()) * (stop - start)
+            completed += 1
+            if progress_due(completed, total_batches):
+                emit_progress(progress, stage="train", current=completed, total=total_batches)
         losses.append(weighted / len(inputs))
     # 5) 关闭梯度进入推理阶段，降低显存占用并防止误更新参数。
     top5_chunks = []
+    inference_chunks = (len(eval_input) + batch - 1) // batch
+    emit_progress(progress, stage="inference", current=0, total=inference_chunks, message="分批执行 HSTU Top-5 推理")
     with torch.inference_mode():
-        for start in range(0, len(eval_input), batch):
+        for chunk_index, start in enumerate(range(0, len(eval_input), batch), start=1):
             final_logits = model(torch.tensor(eval_input[start:start + batch], device=device))[:, -1]
             top5_chunks.append(final_logits.topk(5, dim=1).indices)
+            if progress_due(chunk_index, inference_chunks):
+                emit_progress(progress, stage="inference", current=chunk_index, total=inference_chunks)
     top5 = torch.cat(top5_chunks)
     hit = (top5 == torch.tensor(eval_target, device=device)[:, None]).any(1).float().mean().item()
+    emit_progress(progress, stage="baseline", current=0, total=1, message="计算热门物品基线")
     popularity = np.bincount(train_input.ravel(), minlength=vocab); popular_top5 = np.argsort(-popularity[1:])[:5] + 1
     baseline = float(np.isin(eval_target, popular_top5).mean())
+    emit_progress(progress, stage="baseline", current=1, total=1, metrics={"popularity_hr@5": baseline})
+    emit_progress(progress, stage="evaluate", current=0, total=1, message="计算 HSTU HR@5")
+    emit_progress(progress, stage="evaluate", current=1, total=1, metrics={"hr@5": hit})
     # 6) 返回真实测试切分上的指标和必要诊断信息，供章节总结统一读取。
     return {
         "framework": "torch_rechub.models.generative.HSTUModel",
@@ -94,6 +119,11 @@ def run_hstu(epochs: int = 26, cpu_smoke: bool = False) -> dict:
         "loss_curve": losses, "hr@5": hit, "popularity_hr@5": baseline, "logits_shape": list(top5.shape),
     }
 
-def train_and_evaluate(epochs: int = 4, cpu_smoke: bool = False) -> dict:
+def train_and_evaluate(
+    epochs: int = 4,
+    cpu_smoke: bool = False,
+    *,
+    progress: ProgressCallback | None = None,
+) -> dict:
     """CUDA-first tutorial entry; CPU smoke only validates the basic contract."""
-    return run_hstu(epochs=epochs, cpu_smoke=cpu_smoke)
+    return run_hstu(epochs=epochs, cpu_smoke=cpu_smoke, progress=progress)

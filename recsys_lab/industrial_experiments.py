@@ -9,7 +9,7 @@ from __future__ import annotations
 from importlib import import_module
 from typing import Callable
 
-from .runtime import save_records
+from .runtime import ProgressCallback, save_records
 
 
 CHAPTER_RUNNERS = {
@@ -33,20 +33,54 @@ def load_runner(name: str) -> Callable[..., dict]:
     return getattr(module, name)
 
 
-def run_dssm(epochs: int = 24) -> dict: return load_runner("run_dssm")(epochs)
-def run_mind(epochs: int = 26) -> dict: return load_runner("run_mind")(epochs)
-def run_sasrec(epochs: int = 30) -> dict: return load_runner("run_sasrec")(epochs)
-def run_deepfm(epochs: int = 28) -> dict: return load_runner("run_deepfm")(epochs)
-def run_din(epochs: int = 26) -> dict: return load_runner("run_din")(epochs)
-def run_dien(epochs: int = 30) -> dict: return load_runner("run_dien")(epochs)
-def run_mmoe(epochs: int = 28) -> dict: return load_runner("run_mmoe")(epochs)
-def run_ple(epochs: int = 28) -> dict: return load_runner("run_ple")(epochs)
-def run_openonerec(epochs: int = 32, cpu_smoke: bool = False) -> dict:
-    return load_runner("run_openonerec")(epochs, cpu_smoke=cpu_smoke)
+def run_dssm(epochs: int = 24, *, progress: ProgressCallback | None = None) -> dict:
+    return load_runner("run_dssm")(epochs, progress=progress)
 
 
-def run_hstu(epochs: int = 26, cpu_smoke: bool = False) -> dict:
-    return load_runner("run_hstu")(epochs, cpu_smoke=cpu_smoke)
+def run_mind(epochs: int = 26, *, progress: ProgressCallback | None = None) -> dict:
+    return load_runner("run_mind")(epochs, progress=progress)
+
+
+def run_sasrec(epochs: int = 30, *, progress: ProgressCallback | None = None) -> dict:
+    return load_runner("run_sasrec")(epochs, progress=progress)
+
+
+def run_deepfm(epochs: int = 28, *, progress: ProgressCallback | None = None) -> dict:
+    return load_runner("run_deepfm")(epochs, progress=progress)
+
+
+def run_din(epochs: int = 26, *, progress: ProgressCallback | None = None) -> dict:
+    return load_runner("run_din")(epochs, progress=progress)
+
+
+def run_dien(epochs: int = 30, *, progress: ProgressCallback | None = None) -> dict:
+    return load_runner("run_dien")(epochs, progress=progress)
+
+
+def run_mmoe(epochs: int = 28, *, progress: ProgressCallback | None = None) -> dict:
+    return load_runner("run_mmoe")(epochs, progress=progress)
+
+
+def run_ple(epochs: int = 28, *, progress: ProgressCallback | None = None) -> dict:
+    return load_runner("run_ple")(epochs, progress=progress)
+
+
+def run_openonerec(
+    epochs: int = 32,
+    cpu_smoke: bool = False,
+    *,
+    progress: ProgressCallback | None = None,
+) -> dict:
+    return load_runner("run_openonerec")(epochs, cpu_smoke=cpu_smoke, progress=progress)
+
+
+def run_hstu(
+    epochs: int = 26,
+    cpu_smoke: bool = False,
+    *,
+    progress: ProgressCallback | None = None,
+) -> dict:
+    return load_runner("run_hstu")(epochs, cpu_smoke=cpu_smoke, progress=progress)
 
 
 __all__ = [*CHAPTER_RUNNERS, "load_runner", "save_records"]

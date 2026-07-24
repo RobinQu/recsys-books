@@ -15,6 +15,7 @@ FOCUS_VISIBLE_LIMIT = 16
 MAX_EXPANSION_DEPTH = 2
 MAX_MODELS_PER_CHAPTER = 5
 MAX_CONCEPTS_PER_CHAPTER = 5
+MAX_FILTER_CONCEPTS = 3
 
 
 # Stable editorial priorities.  A chapter may own more registry entries later,
@@ -332,6 +333,135 @@ def build_knowledge_graph(
             "depth": effective_depth,
             "visible_limit": effective_limit,
             "truncated": len(visible) == effective_limit and len(nodes) > effective_limit,
+        },
+        "limits": {
+            "default": DEFAULT_VISIBLE_LIMIT,
+            "focus": FOCUS_VISIBLE_LIMIT,
+            "max_depth": MAX_EXPANSION_DEPTH,
+        },
+    }
+
+
+def build_model_filter_graph(
+    chapters: Mapping[str, Mapping[str, Any]],
+    models: Sequence[Mapping[str, Any]],
+    math_prerequisites: Sequence[Mapping[str, Any]],
+    stage_filter: str,
+    *,
+    limit: int = FOCUS_VISIBLE_LIMIT,
+) -> dict[str, Any]:
+    """Project the model index into the graph for one visible stage filter.
+
+    Unlike ``build_knowledge_graph``'s single-focus neighbourhood, this view
+    keeps every matching model (within the same 16-node visual bound), the
+    chapters that own those models, and the most widely shared prerequisite
+    concepts.  It is used by chapter 2 so one filter controls both the model
+    catalogue and its knowledge graph.
+    """
+
+    model_rows = [dict(model) for model in models]
+    topic_rows = [dict(topic) for topic in math_prerequisites]
+    model_by_id = {str(model["id"]): model for model in model_rows}
+    if len(model_by_id) != len(model_rows):
+        raise ValueError("Duplicate model id in knowledge-graph input")
+
+    matching_models = [
+        model for model in model_rows
+        if stage_filter.casefold() in str(model.get("stage", "")).casefold()
+    ]
+    matching_ids = [str(model["id"]) for model in matching_models]
+    matching_id_set = set(matching_ids)
+    chapter_keys = [
+        chapter_key for chapter_key, chapter in chapters.items()
+        if matching_id_set.intersection(str(model_id) for model_id in chapter.get("model_ids", ()))
+    ]
+
+    nodes: list[dict[str, Any]] = []
+    for order, chapter_key in enumerate(chapter_keys):
+        chapter = chapters[chapter_key]
+        nodes.append({
+            "id": f"chapter:{chapter_key}",
+            "type": "chapter",
+            "key": chapter_key,
+            "label": str(chapter.get("title", chapter_key)),
+            "number": str(chapter.get("number", "")),
+            "summary": str(chapter.get("intro", "")),
+            "url": "/catalog#model-explorer",
+            "order": order,
+        })
+    for order, model in enumerate(matching_models):
+        nodes.append({
+            "id": f"model:{model['id']}",
+            "type": "model",
+            "key": str(model["id"]),
+            "label": str(model.get("name", model["id"])),
+            "chapter": str(model.get("chapter", "")),
+            "stage": str(model.get("stage", "")),
+            "summary": str(model.get("idea", "")),
+            "url": f"/notebooks/{model['notebook']}",
+            "order": order,
+        })
+
+    remaining = max(0, min(FOCUS_VISIBLE_LIMIT, max(DEFAULT_VISIBLE_LIMIT, int(limit))) - len(nodes))
+    related_topics = [
+        topic for topic in topic_rows
+        if matching_id_set.intersection(str(model_id) for model_id in topic.get("model_ids", ()))
+    ]
+    related_topics.sort(key=lambda topic: (
+        -len(matching_id_set.intersection(str(model_id) for model_id in topic.get("model_ids", ()))),
+        topic_rows.index(topic),
+    ))
+    # A stage filter can match models from multiple chapters.  Showing every
+    # shared prerequisite produces a dense cross-column mesh, so keep the three
+    # most widely shared concepts and expose the rest through each node's
+    # linked curriculum page.
+    selected_topics = related_topics[: min(MAX_FILTER_CONCEPTS, remaining)]
+    for order, topic in enumerate(selected_topics):
+        nodes.append({
+            "id": f"math:{topic['id']}",
+            "type": "math",
+            "key": str(topic["id"]),
+            "label": str(topic.get("topic", topic["id"])),
+            "area": str(topic.get("area", "")),
+            "summary": str(topic.get("intuition", "")),
+            "url": f"/notebooks/{topic['notebook']}#{topic['anchor']}",
+            "order": order,
+        })
+
+    visible_ids = {node["id"] for node in nodes}
+    edges: list[dict[str, str]] = []
+    for chapter_key in chapter_keys:
+        for model_id in chapters[chapter_key].get("model_ids", ()):
+            if str(model_id) in matching_id_set:
+                edges.append(_edge("contains", f"chapter:{chapter_key}", f"model:{model_id}", "章节算法"))
+    for topic in selected_topics:
+        topic_id = str(topic["id"])
+        for model_id in topic.get("model_ids", ()):
+            if str(model_id) in matching_id_set:
+                edges.append(_edge("requires", f"model:{model_id}", f"math:{topic_id}", "依赖"))
+        for prerequisite in topic.get("prerequisites", ()):
+            edge = _edge("prerequisite", f"math:{prerequisite}", f"math:{topic_id}", "先修于")
+            if edge["source"] in visible_ids:
+                edges.append(edge)
+    for chapter_key, relations in MODEL_EVOLUTION.items():
+        for source, target, label in relations:
+            if source in matching_id_set and target in matching_id_set:
+                edges.append(_edge("evolves", f"model:{source}", f"model:{target}", label))
+
+    edges = [
+        edge for edge in edges
+        if edge["source"] in visible_ids and edge["target"] in visible_ids
+    ]
+    return {
+        "nodes": nodes,
+        "edges": edges,
+        "state": {
+            "focus": f"filter:{stage_filter}",
+            "depth": MAX_EXPANSION_DEPTH,
+            "visible_limit": FOCUS_VISIBLE_LIMIT,
+            "truncated": len(related_topics) > len(selected_topics),
+            "filter": stage_filter,
+            "model_count": len(matching_models),
         },
         "limits": {
             "default": DEFAULT_VISIBLE_LIMIT,

@@ -26,7 +26,7 @@ from app.content import (
     notebook_has_paper_guide,
 )
 from app.evidence import paper_guide, paper_payload, source_paper_links
-from app.knowledge_graph import build_knowledge_graph
+from app.knowledge_graph import build_knowledge_graph, build_model_filter_graph
 from app.notebook_preview import polish_preview
 from app.source_browser import chapter_source_slug, source_files
 from recsys_lab.resources import RESOURCE_ROOT, ensure_resources
@@ -139,6 +139,10 @@ def page_context(request: Request, active: str = "overview") -> dict:
             )
             for key in CHAPTERS
         },
+        "filters": {
+            stage: build_model_filter_graph(CHAPTERS, MODELS, MATH_PREREQUISITES, stage)
+            for stage in ("经典", "召回", "排序", "多目标", "Transformer", "生成式")
+        },
     }
     return {
         "request": request,
@@ -164,7 +168,17 @@ def page_context(request: Request, active: str = "overview") -> dict:
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    return templates.TemplateResponse(request, "index.html", page_context(request))
+    return templates.TemplateResponse(request, "index.html", page_context(request, "introduction"))
+
+
+@app.get("/catalog", response_class=HTMLResponse)
+def catalog(request: Request):
+    return templates.TemplateResponse(request, "catalog.html", page_context(request, "catalog"))
+
+
+@app.get("/appendix", response_class=HTMLResponse)
+def appendix(request: Request):
+    return templates.TemplateResponse(request, "appendix.html", page_context(request, "appendix"))
 
 
 @app.get("/chapters/{slug}")
