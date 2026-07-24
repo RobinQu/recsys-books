@@ -84,18 +84,16 @@ def _parse_prose_links(text: str, paper_id: str | None) -> list[dict]:
 
 
 def _family_prefix(slug: str) -> str:
-    if slug.startswith("3_0_"):
-        return "3_0_"
-    if slug.startswith("4_"):
-        return "4_"
-    return "_".join(slug.split("_")[:2]) + "_"
+    if slug.startswith("3_"):
+        return "3_"
+    return slug.split("_")[0] + "_"
 
 
 def _fallback_evidence(slug: str, evidence: dict[str, Any]) -> list[dict]:
     """Give every detail page a useful paper route, including openings and summaries."""
     prefix = _family_prefix(slug)
-    if prefix == "3_0_":
-        keys = ["3_1_2_matrix_factorization", "3_1_3_factorization_machine", "3_2_1_dssm"]
+    if prefix == "3_":
+        keys = ["4_3_matrix_factorization", "4_4_factorization_machine", "5_2_dssm"]
     else:
         keys = [key for key in evidence if key.startswith(prefix)]
     return [item for key in keys for item in _chapter_items(evidence.get(key))][:6]

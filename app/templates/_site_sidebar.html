@@ -1,8 +1,6 @@
 <aside class="sidebar" aria-label="章节导航">
   <nav>
-    <a href="/#overview" data-section="overview">总览</a>
-    <a href="/#evolution" data-section="evolution"><b>1</b><span>召回 × 排序演进</span></a>
-    <a href="/#history" data-section="history"><b>2</b><span>发展历程综述</span></a>
+    <a href="/#overview" data-section="overview">导读</a>
     {% for group in course_groups %}<details open><summary><b>{{ group.number }}</b><span>{{ group.title }}</span></summary>
       <div class="sidebar-subnav">{% for item in group['items'] %}<a href="/notebooks/{{ item.slug }}" class="{{ 'active' if item.slug == current_notebook_slug else '' }}" {% if item.slug == current_notebook_slug %}aria-current="page"{% endif %}>{{ item.title }}</a>{% endfor %}</div>
     </details>{% endfor %}

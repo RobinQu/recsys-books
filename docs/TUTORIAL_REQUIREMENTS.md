@@ -19,7 +19,7 @@
    - 3.2 召回模型：DSSM 双塔、MIND 多兴趣、SASRec Transformer 序列召回；同时比较 BERT4Rec、HSTU 的任务边界。
    - 3.3 排序模型：DeepFM、DIN、DIEN。
    - 3.4 多目标模型：MMoE、PLE。
-4. 生成式推荐：4.1 OpenOneRec；4.2 DLRM HSTU；4.3 生成式召回/排序/召排融合总结与工业实践。
+4. 生成式推荐：8.2 OpenOneRec；8.3 DLRM HSTU；4.3 生成式召回/排序/召排融合总结与工业实践。
 5. 论文与官方资料证据清单。
 
 ## 3. 每个大章节的固定结构

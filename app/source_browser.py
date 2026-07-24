@@ -14,15 +14,15 @@ ROOT = Path(__file__).resolve().parents[1]
 CHAPTER_ROOT = ROOT / "chapter_code"
 
 FRAMEWORK_MODULES = {
-    "3_2_1_dssm": ["torch_rechub.models.matching.dssm", "torch_rechub.trainers.match_trainer"],
-    "3_2_2_mind": ["torch_rechub.models.matching.mind", "torch_rechub.trainers.match_trainer"],
-    "3_2_3_sasrec": ["torch_rechub.models.matching.sasrec", "torch_rechub.trainers.seq_trainer"],
-    "3_3_1_deepfm": ["torch_rechub.models.ranking.deepfm", "torch_rechub.trainers.ctr_trainer"],
-    "3_3_2_din": ["torch_rechub.models.ranking.din", "torch_rechub.trainers.ctr_trainer"],
-    "3_3_3_dien": ["torch_rechub.models.ranking.dien", "torch_rechub.trainers.ctr_trainer"],
-    "3_4_1_mmoe": ["torch_rechub.models.multi_task.mmoe", "torch_rechub.trainers.mtl_trainer"],
-    "3_4_2_ple": ["torch_rechub.models.multi_task.ple", "torch_rechub.trainers.mtl_trainer"],
-    "4_2_dlrm_hstu_practice": ["torch_rechub.models.generative.hstu", "torch_rechub.trainers.seq_trainer"],
+    "5_2_dssm": ["torch_rechub.models.matching.dssm", "torch_rechub.trainers.match_trainer"],
+    "5_3_mind": ["torch_rechub.models.matching.mind", "torch_rechub.trainers.match_trainer"],
+    "5_4_sasrec": ["torch_rechub.models.matching.sasrec", "torch_rechub.trainers.seq_trainer"],
+    "6_2_deepfm": ["torch_rechub.models.ranking.deepfm", "torch_rechub.trainers.ctr_trainer"],
+    "6_3_din": ["torch_rechub.models.ranking.din", "torch_rechub.trainers.ctr_trainer"],
+    "6_4_dien": ["torch_rechub.models.ranking.dien", "torch_rechub.trainers.ctr_trainer"],
+    "7_2_mmoe": ["torch_rechub.models.multi_task.mmoe", "torch_rechub.trainers.mtl_trainer"],
+    "7_3_ple": ["torch_rechub.models.multi_task.ple", "torch_rechub.trainers.mtl_trainer"],
+    "8_3_dlrm_hstu_practice": ["torch_rechub.models.generative.hstu", "torch_rechub.trainers.seq_trainer"],
 }
 
 CURRICULUM_SOURCE_PATHS = (
@@ -79,7 +79,7 @@ def source_files(slug: str) -> list[dict]:
 
     groups: list[dict] = []
     shared_paths = [ROOT / "recsys_lab" / "data.py", ROOT / "recsys_lab" / "runtime.py"]
-    if slug.startswith("3_1_"):
+    if slug.startswith("4_"):
         shared_paths.append(ROOT / "recsys_lab" / "experiments.py")
     shared_paths.append(ROOT / "tests" / "test_experiments.py")
     groups.append({"name": "Notebook 公用代码", "files": [_file(path, path.name, "shared") for path in shared_paths]})

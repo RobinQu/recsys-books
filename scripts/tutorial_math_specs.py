@@ -6,8 +6,8 @@ def build_math_specs(md, code, curriculum_notebook):
 
     specs = {}
 
-    specs["3_0_1_data_ml_basics"] = curriculum_notebook(
-        "3.0.1 数据与机器学习基础：一行数据到底代表什么",
+    specs["3_2_data_ml_basics"] = curriculum_notebook(
+        "3.2 数据与机器学习基础：一行数据到底代表什么",
         "从真实 MovieLens 行出发，分清观察、实体、特征、标签、隐式反馈、切分与泄漏，并建立监督、自监督、多任务、基线与泛化的共同语言。",
         [
             md(r"""
@@ -97,11 +97,11 @@ assert set(sample.high_rating_label.unique()).issubset({0, 1})
 
 ## 算法回链
 
-- [GBDT+LR：曝光标签与校准](/notebooks/3_1_4_gbdt_lr)
-- [DSSM：负采样与训练/服务分布](/notebooks/3_2_1_dssm)
-- [SASRec：严格的时间序列切分](/notebooks/3_2_3_sasrec)
-- [DIN：候选与行为历史的语义](/notebooks/3_3_2_din)
-- [MMoE：点击和长播多任务](/notebooks/3_4_1_mmoe)
+- [GBDT+LR：曝光标签与校准](/notebooks/4_5_gbdt_lr)
+- [DSSM：负采样与训练/服务分布](/notebooks/5_2_dssm)
+- [SASRec：严格的时间序列切分](/notebooks/5_4_sasrec)
+- [DIN：候选与行为历史的语义](/notebooks/6_3_din)
+- [MMoE：点击和长播多任务](/notebooks/7_2_mmoe)
 
 ## Checks
 
@@ -122,8 +122,8 @@ print("PASS：真实行可追溯；标签、实体计数和按用户时间切分
         uses_movielens=True,
     )
 
-    specs["3_0_2_linear_algebra"] = curriculum_notebook(
-        "3.0.2 线性代数：把推荐数据放进有形状的盒子",
+    specs["3_3_linear_algebra"] = curriculum_notebook(
+        "3.3 线性代数：把推荐数据放进有形状的盒子",
         "理解标量、向量、矩阵、张量及其轴和形状，亲手计算逐元素乘法、点积、矩阵乘法、范数、余弦、embedding、低秩分解与注意力形状。",
         [
             md(r"""
@@ -226,11 +226,11 @@ plt.tight_layout(); plt.show()
 
 ## 算法回链
 
-- [ItemCF：矩阵共现与余弦](/notebooks/3_1_1_collaborative_filtering)
-- [BiasMF：低秩分解](/notebooks/3_1_2_matrix_factorization)
-- [DSSM：批量 user-item 点积](/notebooks/3_2_1_dssm)
-- [MIND：多个兴趣的加权聚合](/notebooks/3_2_2_mind)
-- [SASRec：Q/K/V 与因果注意力](/notebooks/3_2_3_sasrec)
+- [ItemCF：矩阵共现与余弦](/notebooks/4_2_collaborative_filtering)
+- [BiasMF：低秩分解](/notebooks/4_3_matrix_factorization)
+- [DSSM：批量 user-item 点积](/notebooks/5_2_dssm)
+- [MIND：多个兴趣的加权聚合](/notebooks/5_3_mind)
+- [SASRec：Q/K/V 与因果注意力](/notebooks/5_4_sasrec)
 
 ## Checks
 
@@ -249,8 +249,8 @@ print("PASS：轴、点积、矩阵乘法、低秩和注意力形状检查通过
         ],
     )
 
-    specs["3_0_3_calculus"] = curriculum_notebook(
-        "3.0.3 微积分：参数动一点，损失会怎样",
+    specs["3_4_calculus"] = curriculum_notebook(
+        "3.4 微积分：参数动一点，损失会怎样",
         "从斜率和有限差分进入导数、偏导、梯度、方向导数、链式法则、计算图、反向传播与激活饱和。",
         [
             md(r"""
@@ -343,10 +343,10 @@ print({"numeric": numeric, "analytic": analytic})
 
 ## 算法回链
 
-- [BiasMF：评分误差对隐向量的梯度](/notebooks/3_1_2_matrix_factorization)
-- [DeepFM：共享 embedding 的两条梯度路径](/notebooks/3_3_1_deepfm)
-- [DIEN：序列网络与辅助损失反传](/notebooks/3_3_3_dien)
-- [HSTU：深层序列模型的梯度稳定性](/notebooks/4_2_dlrm_hstu_practice)
+- [BiasMF：评分误差对隐向量的梯度](/notebooks/4_3_matrix_factorization)
+- [DeepFM：共享 embedding 的两条梯度路径](/notebooks/6_2_deepfm)
+- [DIEN：序列网络与辅助损失反传](/notebooks/6_4_dien)
+- [HSTU：深层序列模型的梯度稳定性](/notebooks/8_3_dlrm_hstu_practice)
 
 ## Checks
 
@@ -366,8 +366,8 @@ print("PASS：有限差分、链式法则与负梯度下降检查通过。")
         ],
     )
 
-    specs["3_0_4_probability_statistics"] = curriculum_notebook(
-        "3.0.4 概率与统计：把不确定性说清楚",
+    specs["3_5_probability_statistics"] = curriculum_notebook(
+        "3.5 概率与统计：把不确定性说清楚",
         "理解事件、随机变量、Bernoulli/类别分布、联合/边缘/条件概率、独立性、链式法则、期望、方差、odds、likelihood、采样偏差与校准。",
         [
             md(r"""
@@ -461,11 +461,11 @@ plt.xlabel("mean prediction"); plt.ylabel("positive rate"); plt.legend(); plt.gr
 
 ## 算法回链
 
-- [GBDT+LR：logit 与点击概率](/notebooks/3_1_4_gbdt_lr)
-- [DSSM：条件概率与负采样](/notebooks/3_2_1_dssm)
-- [DIN：候选条件下的点击概率](/notebooks/3_3_2_din)
-- [MMoE：多个 Bernoulli 任务](/notebooks/3_4_1_mmoe)
-- [OpenOneRec：序列条件概率](/notebooks/4_1_openonerec_practice)
+- [GBDT+LR：logit 与点击概率](/notebooks/4_5_gbdt_lr)
+- [DSSM：条件概率与负采样](/notebooks/5_2_dssm)
+- [DIN：候选条件下的点击概率](/notebooks/6_3_din)
+- [MMoE：多个 Bernoulli 任务](/notebooks/7_2_mmoe)
+- [OpenOneRec：序列条件概率](/notebooks/8_2_openonerec_practice)
 
 ## Checks
 
@@ -484,8 +484,8 @@ print("PASS：联合/条件、期望/方差、似然计算检查通过。")
         ],
     )
 
-    specs["3_0_6_optimization"] = curriculum_notebook(
-        "3.0.6 优化：怎样让模型稳定地下山",
+    specs["3_7_optimization"] = curriculum_notebook(
+        "3.7 优化：怎样让模型稳定地下山",
         "区分训练目标与评测指标，理解 GD/SGD/mini-batch、学习率、Momentum/Adam、凸与非凸、初始化、L1/L2、早停、梯度裁剪和多任务梯度冲突。",
         [
             md(r"""
@@ -579,11 +579,11 @@ g=np.array([6.,8.]); clipped=g*min(1,5/np.linalg.norm(g)); print("clipped",clipp
 
 ## 算法回链
 
-- [BiasMF：SGD 与 L2](/notebooks/3_1_2_matrix_factorization)
-- [DeepFM：mini-batch 与共享参数](/notebooks/3_3_1_deepfm)
-- [MMoE：gate 与任务冲突](/notebooks/3_4_1_mmoe)
-- [PLE：共享/专属专家缓解负迁移](/notebooks/3_4_2_ple)
-- [HSTU：长序列训练稳定性](/notebooks/4_2_dlrm_hstu_practice)
+- [BiasMF：SGD 与 L2](/notebooks/4_3_matrix_factorization)
+- [DeepFM：mini-batch 与共享参数](/notebooks/6_2_deepfm)
+- [MMoE：gate 与任务冲突](/notebooks/7_2_mmoe)
+- [PLE：共享/专属专家缓解负迁移](/notebooks/7_3_ple)
+- [HSTU：长序列训练稳定性](/notebooks/8_3_dlrm_hstu_practice)
 
 ## Checks
 
@@ -598,12 +598,12 @@ assert g1@g2 < 0
 assert np.isclose(2 + .1*(3**2+4**2),4.5)
 print("PASS：学习率、L2、裁剪与梯度冲突检查通过。")
 """),
-            md("## Next Steps\n\n继续进入 3.0.7 数据与实验基础，把数据切分、张量化、训练、推理和测试连接成完整工程管线。"),
+            md("## Next Steps\n\n继续进入 3.8 数据与实验基础，把数据切分、张量化、训练、推理和测试连接成完整工程管线。"),
         ],
     )
 
-    specs["3_0_5_information_theory"] = curriculum_notebook(
-        "3.0.5 信息论：一次意外有多少信息",
+    specs["3_6_information_theory"] = curriculum_notebook(
+        "3.6 信息论：一次意外有多少信息",
         "从信息量和熵进入二元/多类交叉熵、CE=H+KL、KL 非对称、Softmax/温度、Normalized Entropy、序列 NLL、perplexity 与 DPO log-ratio。",
         [
             md(r"""
@@ -700,11 +700,11 @@ print({"sequence_probability":token_p.prod(),"NLL":nll,"perplexity":ppl,"DPO_mar
 
 ## 算法回链
 
-- [word2vec：负采样二元交叉熵](/notebooks/3_1_5_word2vec)
-- [DSSM：sampled softmax](/notebooks/3_2_1_dssm)
-- [SASRec：next-item NLL](/notebooks/3_2_3_sasrec)
-- [OpenOneRec：序列生成与 DPO](/notebooks/4_1_openonerec_practice)
-- [HSTU：序列预测与 Normalized Entropy](/notebooks/4_2_dlrm_hstu_practice)
+- [word2vec：负采样二元交叉熵](/notebooks/4_6_word2vec)
+- [DSSM：sampled softmax](/notebooks/5_2_dssm)
+- [SASRec：next-item NLL](/notebooks/5_4_sasrec)
+- [OpenOneRec：序列生成与 DPO](/notebooks/8_2_openonerec_practice)
+- [HSTU：序列预测与 Normalized Entropy](/notebooks/8_3_dlrm_hstu_practice)
 
 ## Checks
 
@@ -719,16 +719,16 @@ assert np.isclose(token_p.prod(),.1)
 assert np.isclose(nll,-np.log(.1)) and ppl > 1
 print("PASS：熵、CE/KL、Softmax、序列 NLL 与 DPO margin 检查通过。")
 """),
-            md("## Next Steps\n\n下一课进入 3.0.6 优化，学习怎样用 mini-batch、学习率、正则化和早停稳定地降低这些损失。"),
+            md("## Next Steps\n\n下一课进入 3.7 优化，学习怎样用 mini-batch、学习率、正则化和早停稳定地降低这些损失。"),
         ],
     )
 
     canonical_order = (
-        "3_0_1_data_ml_basics",
-        "3_0_2_linear_algebra",
-        "3_0_3_calculus",
-        "3_0_4_probability_statistics",
-        "3_0_5_information_theory",
-        "3_0_6_optimization",
+        "3_2_data_ml_basics",
+        "3_3_linear_algebra",
+        "3_4_calculus",
+        "3_5_probability_statistics",
+        "3_6_information_theory",
+        "3_7_optimization",
     )
     return {slug: specs[slug] for slug in canonical_order}

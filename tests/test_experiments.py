@@ -91,7 +91,7 @@ def test_bundled_dataset_slices_have_auditable_provenance():
 def test_sasrec_inference_respects_left_padding_and_disables_dropout():
     from pathlib import Path
 
-    source = Path("chapter_code/3_2_3_sasrec/train.py").read_text(encoding="utf-8")
+    source = Path("chapter_code/5_4_sasrec/train.py").read_text(encoding="utf-8")
     assert "model.eval()" in source
     assert "seq_forward(batch, sequence_embedding)[:, -1]" in source
     assert "count(nonzero)-1" in source  # documents the upstream right-padding mismatch

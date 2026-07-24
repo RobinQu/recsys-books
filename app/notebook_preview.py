@@ -45,7 +45,7 @@ window.MathJax = {
   }
 };
 </script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@5.3/es5/tex-chtml.js"></script>
 <!-- End of mathjax configuration -->"""
 
 _V2_START = "<!-- Load mathjax -->"

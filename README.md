@@ -112,14 +112,14 @@ docker compose --profile full run --rm test-full
 ---
 目前章节页面的notebook预览版本页面中，使用了 iframe 对 notebook 页面进行嵌入。但在iframe里部分链接引用了本教程的其他页面，然后导致了双重页面框架的展示。
 
-比如，[3.0章节](http://localhost:8010/notebooks/3_0_math_foundations) 点击 notebook 里 “一行数据、特征与标签” ，会打开完整版本”3.0.1“的页面，导致出现了两个侧边栏等内容。
+比如，[3.0章节](http://localhost:8010/notebooks/3_1_math_foundations) 点击 notebook 里 “一行数据、特征与标签” ，会打开完整版本”3.2“的页面，导致出现了两个侧边栏等内容。
 
 请思考优化方案，比如每个章节的页面能够感知是否处于嵌入模式，并自动隐藏sidebar、topbar 等附属模块。
 
 
 ---
 
-http://localhost:8010/notebooks/3_0_1_data_ml_basics#implicit-feedback
+http://localhost:8010/notebooks/3_2_data_ml_basics#implicit-feedback
 
 该notebook的预览结果里有大量 warning 日志，且图表上的中文字符显示未乱码。请修复。
 

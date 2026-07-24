@@ -9,7 +9,7 @@ Keep exactly two information levels: the home page and an algorithm/notebook det
 The four tabs live in a single tab bar under the page header (`app/templates/notebook_shell.html`).
 
 1. **论文导读 (Paper Evidence)**
-   - Shown only when `show_paper_guide` is true. `app/content.py:notebook_has_paper_guide` returns `False` for the foundations chapter (3.0), every chapter opening/导读 page, and every summary page (3_x_summary / 4_3_generative_summary); only algorithm detail pages keep it. Summary pages do their cross-paper comparison (论文关联关系, 实验数据审计, 未来发展) inside the summary notebook instead.
+   - Shown only when `show_paper_guide` is true. `app/content.py:notebook_has_paper_guide` returns `False` for the foundations chapter (3), every chapter opening/导读 page, and every summary page (4_7_classic_summary / 5_5_retrieval_summary / 6_5_ranking_summary / 7_4_multitask_summary / 8_4_generative_summary); only algorithm detail pages keep it. Summary pages do their cross-paper comparison (论文关联关系, 实验数据审计, 未来发展) inside the summary notebook instead.
    - Default active tab when available; otherwise the default falls back to 实验预览.
    - Split-pane layout on desktop: left prose, right embedded PDF viewer.
    - **Left pane (prose):**
@@ -41,7 +41,7 @@ The four tabs live in a single tab bar under the page header (`app/templates/not
 4. **代码实现 (Implementation Source)**
    - Always present.
    - Two-column source browser (`app/source_browser.py`):
-     - **Notebook 公用代码**: `recsys_lab/data.py`, `recsys_lab/runtime.py`, `recsys_lab/experiments.py` (for 3.1), and `tests/test_experiments.py`.
+     - **Notebook 公用代码**: `recsys_lab/data.py`, `recsys_lab/runtime.py`, `recsys_lab/experiments.py` (for chapter 4 classic), and `tests/test_experiments.py`.
      - **本章节独立目录**: files under `chapter_code/{slug}/` in fixed order (`model.py`, `train.py`, `inference.py`, `test_model.py`, `__init__.py`).
      - **Torch-RecHub 框架源码**: third-party framework modules mapped in `FRAMEWORK_MODULES` (e.g., `torch_rechub.models.matching.dssm`).
    - Syntax highlighting via Pygments with inline line numbers and highlighted landmark lines (`class `, `def forward`, `def run_`, `loss.backward`, `with torch.no_grad`, etc.).
@@ -54,11 +54,11 @@ The four tabs live in a single tab bar under the page header (`app/templates/not
 - Mobile (`<=680px`): tab buttons compact, source browser stacks vertically, frames use viewport height.
 - When CUDA is unavailable for generative notebooks, the execute tab button is disabled and shows a tooltip.
 
-### 3.0 curriculum and Appendix math map (A.4)
+### Chapter 3 curriculum and Appendix math map (A.4)
 
-The first eight registered notebooks are the contiguous 3.0 foundation sequence: the overview, six `kind="curriculum"` lessons (`3_0_1` through `3_0_6`), and the `3_0_7` data/experiment pipeline. The lessons teach reusable concepts at high-school-graduate level; algorithm notebooks link to their stable anchors and derive only paper-specific mathematics.
+The first eight registered notebooks are the contiguous chapter 3 foundation sequence: the overview, six `kind="curriculum"` lessons (`3_2_data_ml_basics` through `3_7_optimization`), and the `3_8_data_pipeline` data/experiment pipeline. The lessons teach reusable concepts at high-school-graduate level; algorithm notebooks link to their stable anchors and derive only paper-specific mathematics.
 
-`app/content.py:MATH_PREREQUISITES` is the tracked list behind the home page's A.4 数学知识地图. Each entry includes a plain-language intuition, a valid 3.0 curriculum notebook and anchor, prerequisite topic ids, and the algorithms/models that use it. A.4 is a bounded graph projection, not another course hierarchy: its default view contains the six chapters; focused views contain at most 16 nodes and expand at most two relationship steps. The list must cover every algorithm.
+`app/content.py:MATH_PREREQUISITES` is the tracked list behind the home page's A.4 数学知识地图. Each entry includes a plain-language intuition, a valid chapter 3 curriculum notebook and anchor, prerequisite topic ids, and the algorithms/models that use it. A.4 is a bounded graph projection, not another course hierarchy: its default view contains the six chapters; focused views contain at most 16 nodes and expand at most two relationship steps. The list must cover every algorithm.
 
 ## Tutorial contract
 
@@ -88,13 +88,13 @@ The generator also inserts numbered training landmarks ("1) 固定参数初始�
 
 Top-level orchestrator that:
 
-1. Builds the 3.1 classic notebooks from a single source spec and then renames `3_1_overview` to `3_1_summary`.
+1. Builds the chapter 4 classic notebooks from a single source spec and then renames `3_1_overview` to `4_7_classic_summary`.
 2. Merges opening notebooks from `scripts/tutorial_opening_specs.py`.
 3. Merges deep/generative notebooks and summaries from `scripts/tutorial_deep_specs.py`.
 4. Writes all `notebooks/*.ipynb` files.
-5. Sets notebook metadata: `kernelspec`, `language_info`, and `recsys.profile="full"`, `recsys.requires_cuda=true` for chapter 4.
+5. Sets notebook metadata: `kernelspec`, `language_info`, and `recsys.profile="full"`, `recsys.requires_cuda=true` for chapter 8.
 
-The `notebook(title, goal, source, cells)` helper chooses the dataset based on the title (`dataset_for_title`) and prepends a standard setup cell that loads the real dataset and asserts `randomly_fabricated_rows == 0`. `curriculum_notebook` builds the six 3.0 concept lessons without pretending their labeled teaching arrays are user behavior. Curriculum setup cells end with `CURRICULUM_FONT_SETUP`: matplotlib's default DejaVu Sans has no CJK glyphs, so charts pick the first available font from Noto CJK (installed via `fonts-noto-cjk` in the images) or common host Chinese fonts — fix the font, never silence missing-glyph warnings with `warnings.filterwarnings`.
+The `notebook(title, goal, source, cells)` helper chooses the dataset based on the title (`dataset_for_title`) and prepends a standard setup cell that loads the real dataset and asserts `randomly_fabricated_rows == 0`. `curriculum_notebook` builds the six chapter 3 concept lessons without pretending their labeled teaching arrays are user behavior. Curriculum setup cells end with `CURRICULUM_FONT_SETUP`: matplotlib's default DejaVu Sans has no CJK glyphs, so charts pick the first available font from Noto CJK (installed via `fonts-noto-cjk` in the images) or common host Chinese fonts — fix the font, never silence missing-glyph warnings with `warnings.filterwarnings`.
 
 ### Opening specs (`scripts/tutorial_opening_specs.py`)
 
@@ -125,7 +125,7 @@ Each algorithm notebook contains, in order:
 13. Save records to `results/chapter_*/{slug}.json`.
 14. Checks and Next Steps.
 
-Summary notebooks add a **Paper Evidence Map** cell that loads `config/paper_evidence.json` and displays the aggregated evidence rows, plus a results aggregation cell, a bar chart, and (for 3.2/3.3) a paper-comparability audit table.
+Summary notebooks add a **Paper Evidence Map** cell that loads `config/paper_evidence.json` and displays the aggregated evidence rows, plus a results aggregation cell, a bar chart, and (for 5/6) a paper-comparability audit table.
 
 ## External resources
 

@@ -13,16 +13,16 @@ from .runtime import save_records
 
 
 CHAPTER_RUNNERS = {
-    "run_dssm": "3_2_1_dssm",
-    "run_mind": "3_2_2_mind",
-    "run_sasrec": "3_2_3_sasrec",
-    "run_deepfm": "3_3_1_deepfm",
-    "run_din": "3_3_2_din",
-    "run_dien": "3_3_3_dien",
-    "run_mmoe": "3_4_1_mmoe",
-    "run_ple": "3_4_2_ple",
-    "run_openonerec": "4_1_openonerec_practice",
-    "run_hstu": "4_2_dlrm_hstu_practice",
+    "run_dssm": "5_2_dssm",
+    "run_mind": "5_3_mind",
+    "run_sasrec": "5_4_sasrec",
+    "run_deepfm": "6_2_deepfm",
+    "run_din": "6_3_din",
+    "run_dien": "6_4_dien",
+    "run_mmoe": "7_2_mmoe",
+    "run_ple": "7_3_ple",
+    "run_openonerec": "8_2_openonerec_practice",
+    "run_hstu": "8_3_dlrm_hstu_practice",
 }
 
 

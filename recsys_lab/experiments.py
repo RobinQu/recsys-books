@@ -12,11 +12,11 @@ def run_classic(epochs: int = 8) -> dict:
     def execute(slug: str):
         return import_module(f"chapter_code.{slug}.train").train_and_evaluate(epochs)
 
-    cf = execute("3_1_1_collaborative_filtering")
-    mf = execute("3_1_2_matrix_factorization")
-    fm = execute("3_1_3_factorization_machine")
-    gbdt_lr = execute("3_1_4_gbdt_lr")
-    word2vec = execute("3_1_5_word2vec")
+    cf = execute("4_2_collaborative_filtering")
+    mf = execute("4_3_matrix_factorization")
+    fm = execute("4_4_factorization_machine")
+    gbdt_lr = execute("4_5_gbdt_lr")
+    word2vec = execute("4_6_word2vec")
     return {
         "dataset": "MovieLens latest-small",
         "randomly_fabricated_rows": 0,

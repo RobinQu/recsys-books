@@ -96,7 +96,7 @@ def main():
     artifact_root.mkdir(parents=True, exist_ok=True)
     os.environ["RECSYS_ARTIFACT_ROOT"] = str(artifact_root)
     slugs = [item["slug"] for item in NOTEBOOKS]
-    summary_slugs = {"3_1_summary", "3_2_summary", "3_3_summary", "3_4_summary", "4_3_generative_summary"}
+    summary_slugs = {"4_7_classic_summary", "5_5_retrieval_summary", "6_5_ranking_summary", "7_4_multitask_summary", "8_4_generative_summary"}
     execution_order = [slug for slug in slugs if slug not in summary_slugs] + [slug for slug in slugs if slug in summary_slugs]
     paths = [notebook_dir / f"{slug}.ipynb" for slug in execution_order]
     if args.only:

@@ -1,0 +1,18 @@
+{
+  "records": [
+    {
+      "algorithm": "OpenOneRec：受约束列表生成实战",
+      "primary_metric": "invalid_constrained",
+      "primary_value": 0.0,
+      "secondary_metric": "invalid_unconstrained",
+      "secondary_value": 1.0,
+      "baseline_metric": null,
+      "baseline_value": null,
+      "framework": "OpenOneRec contract + PyTorch executable proxy",
+      "source_notebook": "8_2_openonerec_practice",
+      "validation_mode": "cpu_basic_smoke",
+      "dataset": "KuaiRand-Pure (Kuaishou, CIKM 2022)",
+      "randomly_fabricated_rows": 0
+    }
+  ]
+}

@@ -17,9 +17,9 @@ ROOT = Path(__file__).resolve().parent.parent
 LINK_RE = re.compile(r"\[\[([^|\]]+)\|(\d+)\|([^|\]]+)\]\]")
 
 # 历史问题均已修复：
-# - 3_1_2 的论文 id 是 mf，paper_annotations.json 现已通过 OUTPUT_ALIASES 写入 mf 键；
-# - 3_1_1 的 scalability 证据与标注已对齐到第 9 页同一段话；
-# - 3_1_summary 的 mf 合成 id 随 mf 键修复而通过。
+# - 4.3 的论文 id 是 mf，paper_annotations.json 现已通过 OUTPUT_ALIASES 写入 mf 键；
+# - 4.2 的 scalability 证据与标注已对齐到第 9 页同一段话；
+# - 4_7_classic_summary 的 mf 合成 id 随 mf 键修复而通过。
 # 修复新章节时优先修数据，不要往这个集合里加新条目。
 KNOWN_ISSUES: set[tuple[str, str]] = set()
 

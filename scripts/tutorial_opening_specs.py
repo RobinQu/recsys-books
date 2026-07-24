@@ -6,20 +6,20 @@ def build_opening_specs(md, code, notebook):
 
     chapters = [
         {
-            "slug": "3_1_0_classic_foundations",
-            "title": "3.1 导读与数学基础：经典算法",
+            "slug": "4_1_classic_foundations",
+            "title": "4.1 导读与数学基础：经典算法",
             "goal": "在进入协同过滤、MF、FM、GBDT+LR 与 word2vec 前，建立邻域、低秩、特征交互、二分类概率和序列嵌入的共同数学地图。",
             "source": "[GroupLens](https://dl.acm.org/doi/10.1145/192844.192905) · [ItemCF](https://dl.acm.org/doi/10.1145/371920.372071) · [MF](https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf) · [FM](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf) · [GBDT+LR](https://research.facebook.com/publications/practical-lessons-from-predicting-clicks-on-ads-at-facebook/) · [word2vec](https://arxiv.org/abs/1301.3781)",
             "layout": """## 本章布局与选型地图
 
 | 子章节 | 解决的问题 | 共同数学 | 典型位置 |
 |---|---|---|---|
-| 3.1.1 UserCF / ItemCF | 借相似用户或物品的行为推荐 | 矩阵、点积、余弦、加权和 | 召回、相关推荐 |
-| 3.1.2 BiasMF | 用低维坐标压缩稀疏评分矩阵 | 矩阵乘法、内积、均方误差 | 召回、评分预测 |
-| 3.1.3 FM | 学习稀疏 field 的二阶交互 | one-hot、向量内积、LogLoss | CTR 排序 |
-| 3.1.4 GBDT+LR | 用树规则产生特征并预测点击概率 | 条件分支、one-hot、Sigmoid | CTR 排序 |
-| 3.1.5 word2vec / Item2Vec | 把行为序列学成物品向量做召回 | 中心-上下文内积、负采样、Sigmoid | 向量召回 |
-| 3.1 总结 | 从实际 JSON 汇总指标 | 指标方向与公平比较 | 选型 |
+| 4.2 UserCF / ItemCF | 借相似用户或物品的行为推荐 | 矩阵、点积、余弦、加权和 | 召回、相关推荐 |
+| 4.3 BiasMF | 用低维坐标压缩稀疏评分矩阵 | 矩阵乘法、内积、均方误差 | 召回、评分预测 |
+| 4.4 FM | 学习稀疏 field 的二阶交互 | one-hot、向量内积、LogLoss | CTR 排序 |
+| 4.5 GBDT+LR | 用树规则产生特征并预测点击概率 | 条件分支、one-hot、Sigmoid | CTR 排序 |
+| 4.6 word2vec / Item2Vec | 把行为序列学成物品向量做召回 | 中心-上下文内积、负采样、Sigmoid | 向量召回 |
+| 4.7 总结 | 从实际 JSON 汇总指标 | 指标方向与公平比较 | 选型 |
 
 应用场景并非互斥：ItemCF 常作为可解释兜底通道；MF 是向量召回的最小原型；FM 与 GBDT+LR 是成熟 CTR 基线；word2vec 把序列共现压成可 ANN 的物品向量，衔接后续 DSSM、SASRec。学习顺序建议从矩阵共现开始，再进入可训练表示、概率模型和序列嵌入。""",
             "papers": """## 来源论文解读
@@ -64,18 +64,18 @@ assert (2,3) in w2v_pairs and (3,2) in w2v_pairs
 print('PASS：共现、低秩近似、概率变换与序列共现对的基础形状正确。')""",
         },
         {
-            "slug": "3_2_0_retrieval_foundations",
-            "title": "3.2 导读与数学基础：向量、多兴趣与序列召回",
+            "slug": "5_1_retrieval_foundations",
+            "title": "5.1 导读与数学基础：向量、多兴趣与序列召回",
             "goal": "在进入 DSSM、MIND 与 SASRec 前，理解向量空间、对比学习、ANN、多兴趣、位置编码、因果注意力和 Top-K 指标。",
             "source": "[DSSM](https://www.microsoft.com/en-us/research/publication/learning-deep-structured-semantic-models-for-web-search-using-clickthrough-data/) · [MIND](https://arxiv.org/abs/1904.08030) · [SASRec](https://arxiv.org/abs/1808.09781) · [BERT4Rec](https://arxiv.org/abs/1904.06690) · [HSTU](https://arxiv.org/abs/2402.17152) · [YouTube DNN](https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/)",
             "layout": """## 本章布局与选型地图
 
 | 子章节 | 用户表示 | 检索次数 | 优势 | 主要代价 |
 |---|---:|---:|---|---|
-| 3.2.1 DSSM | 1 个向量 | 1 | 简单、低延迟、ANN 友好 | 多兴趣被平均 |
-| 3.2.2 MIND | K 个兴趣向量 | K | 覆盖多意图与长尾 | 路由、合并、去重成本 |
-| 3.2.3 SASRec | 1 个时序向量 | 1 | 捕捉近期转移与顺序依赖 | Attention 成本与序列延迟 |
-| 3.2 总结 | 读取三个实验结果 | — | 同口径看 Recall 与成本 | smoke 不是 benchmark |
+| 5.2 DSSM | 1 个向量 | 1 | 简单、低延迟、ANN 友好 | 多兴趣被平均 |
+| 5.3 MIND | K 个兴趣向量 | K | 覆盖多意图与长尾 | 路由、合并、去重成本 |
+| 5.4 SASRec | 1 个时序向量 | 1 | 捕捉近期转移与顺序依赖 | Attention 成本与序列延迟 |
+| 5.5 总结 | 读取三个实验结果 | — | 同口径看 Recall 与成本 | smoke 不是 benchmark |
 
 DSSM 适合通用亿级目录；MIND 适合同时存在多个意图；SASRec 适合下一行为受先后顺序和近期行为影响明显的场景。三者最终都能产生可用于全库检索的用户表示。""",
             "papers": """## 来源论文解读
@@ -151,18 +151,18 @@ assert recall_at_k([2,5,1,7],[1,2,8],3)==2/3
 print('PASS：Softmax 概率、单/多兴趣分数与 Recall 示例正确。')""",
         },
         {
-            "slug": "3_3_0_ranking_foundations",
-            "title": "3.3 导读与数学基础：CTR 排序",
+            "slug": "6_1_ranking_foundations",
+            "title": "6.1 导读与数学基础：CTR 排序",
             "goal": "在进入 DeepFM、DIN 与 DIEN 前，理解 logit、概率、交叉熵、AUC、特征交互、注意力和时序状态。",
             "source": "[DeepFM](https://arxiv.org/abs/1703.04247) · [DIN](https://arxiv.org/abs/1706.06978) · [DIEN](https://arxiv.org/abs/1809.03672)",
             "layout": """## 本章布局与选型地图
 
 | 子章节 | 主要信号 | 关键机制 | 适用场景 |
 |---|---|---|---|
-| 3.3.1 DeepFM | 静态 sparse/dense fields | FM 二阶 + DNN 高阶 | 通用 CTR 基线 |
-| 3.3.2 DIN | 候选 + 行为集合 | target-aware attention | 强历史、候选相关性 |
-| 3.3.3 DIEN | 候选 + 有序行为 | GRU、辅助损失、AUGRU | 兴趣变化明显 |
-| 3.3 总结 | 各实验 JSON | AUC、LogLoss、baseline | 效果—成本选型 |
+| 6.2 DeepFM | 静态 sparse/dense fields | FM 二阶 + DNN 高阶 | 通用 CTR 基线 |
+| 6.3 DIN | 候选 + 行为集合 | target-aware attention | 强历史、候选相关性 |
+| 6.4 DIEN | 候选 + 有序行为 | GRU、辅助损失、AUGRU | 兴趣变化明显 |
+| 6.5 总结 | 各实验 JSON | AUC、LogLoss、baseline | 效果—成本选型 |
 
 由 DeepFM 到 DIN/DIEN，不是简单增加网络深度，而是逐步加入“当前候选”和“行为顺序”这两类结构先验。""",
             "papers": """## 来源论文解读
@@ -200,17 +200,17 @@ assert 0<=auc<=1 and np.isclose(weight.sum(),1)
 print({'AUC_as_pairwise_win_rate':round(float(auc),3),'attention_sum':round(float(weight.sum()),3)})""",
         },
         {
-            "slug": "3_4_0_multitask_foundations",
-            "title": "3.4 导读与数学基础：多目标学习",
+            "slug": "7_1_multitask_foundations",
+            "title": "7.1 导读与数学基础：多目标学习",
             "goal": "在进入 MMoE 与 PLE 前，理解多任务损失、共享与专属参数、Softmax gate、梯度冲突和负迁移。",
             "source": "[MMoE](https://dl.acm.org/doi/10.1145/3219819.3220007) · [PLE](https://dl.acm.org/doi/10.1145/3383313.3412236)",
             "layout": """## 本章布局与选型地图
 
 | 子章节 | 共享方式 | 任务专属结构 | 主要风险 |
 |---|---|---|---|
-| 3.4.1 MMoE | 所有任务共享专家 | 每任务 gate 与 tower | 专家塌缩、梯度冲突 |
-| 3.4.2 PLE | 逐层共享专家 | 每层保留任务专属专家 | 参数与调参成本 |
-| 3.4 总结 | 相同 KuaiRand 曝光切片 | 逐任务指标 | 平均值掩盖跷跷板 |
+| 7.2 MMoE | 所有任务共享专家 | 每任务 gate 与 tower | 专家塌缩、梯度冲突 |
+| 7.3 PLE | 逐层共享专家 | 每层保留任务专属专家 | 参数与调参成本 |
+| 7.4 总结 | 相同 KuaiRand 曝光切片 | 逐任务指标 | 平均值掩盖跷跷板 |
 
 MMoE 适合相关任务的灵活共享；PLE 适合确有负迁移且数据足够支撑更复杂结构的场景。上线仍需明确最终业务效用函数。""",
             "papers": """## 来源论文解读
@@ -241,17 +241,17 @@ assert -1<=cosine<=1
 print('PASS：任务 gate 是合法权重，梯度夹角位于合法范围。')""",
         },
         {
-            "slug": "4_0_generative_foundations",
-            "title": "4.0 导读与数学基础：生成式推荐",
+            "slug": "8_1_generative_foundations",
+            "title": "8.1 导读与数学基础：生成式推荐",
             "goal": "在进入 OpenOneRec 与 HSTU 前，理解 token、Semantic ID、自回归概率、交叉熵、因果 mask、约束解码与列表指标。",
             "source": "[TIGER](https://arxiv.org/abs/2305.05065) · [OpenOneRec](https://github.com/Kuaishou-OneRec/OpenOneRec) · [HSTU](https://arxiv.org/abs/2402.17152)",
             "layout": """## 本章布局与选型地图
 
 | 子章节 | 输出对象 | 核心数学 | 系统难点 |
 |---|---|---|---|
-| 4.1 OpenOneRec | Semantic ID / 推荐列表 | 自回归、trie、偏好优化 | 合法性、重复、解码 P99 |
-| 4.2 DLRM HSTU | 下一 item / 行为序列 | 因果序列建模、交叉熵 | 长序列吞吐与状态缓存 |
-| 4.3 总结 | 两个实验结果 | 指标方向与 ROI | 不同任务不能只看单一分数 |
+| 8.2 OpenOneRec | Semantic ID / 推荐列表 | 自回归、trie、偏好优化 | 合法性、重复、解码 P99 |
+| 8.3 DLRM HSTU | 下一 item / 行为序列 | 因果序列建模、交叉熵 | 长序列吞吐与状态缓存 |
+| 8.4 总结 | 两个实验结果 | 指标方向与 ROI | 不同任务不能只看单一分数 |
 
 生成式召回生成 item 标识；生成式排序输出分数、标签或排列；召排融合直接生成列表/session。三者的输入、输出和成本并不相同。""",
             "papers": """## 来源论文与工业路径

@@ -49,7 +49,7 @@ def test_complete_movielens_files_are_not_truncated():
 def test_sasrec_full_test_set_contains_every_eligible_user():
     ratings = load_movielens_1m()
     sequences = positive_sequences(ratings, threshold=-float("inf"), min_length=5)
-    chapter = importlib.import_module("chapter_code.3_2_3_sasrec.train")
+    chapter = importlib.import_module("chapter_code.5_4_sasrec.train")
     user_ids, _, _, eval_input, eval_target = chapter._sequence_windows_from_sequences(sequences, length=200)
     assert len(user_ids) == len(eval_input) == len(eval_target) == 6_040
     assert len(set(user_ids)) == 6_040

@@ -16,6 +16,6 @@ def test_original_paper_figure_excerpts_are_readable_assets():
 
 
 def test_preview_html_has_formula_overflow_guards():
-    html = Path("notebook_previews/3_0_math_foundations.html").read_text(encoding="utf-8")
+    html = Path("notebook_previews/3_1_math_foundations.html").read_text(encoding="utf-8")
     assert 'id="recsys-preview-style"' in html
     assert 'mjx-container[display="true"]' in html

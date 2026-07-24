@@ -76,13 +76,13 @@ services:
       --id amazon-video-games-full --id kuairand-pure-full &&
       RECSYS_PROFILE=full pytest -q -m full_data &&
       python scripts/generate_notebooks.py &&
-      python scripts/execute_notebooks.py --profile full --only 3_2_1_dssm &&
-      python scripts/execute_notebooks.py --profile full --only 3_2_2_mind &&
-      python scripts/execute_notebooks.py --profile full --only 3_2_3_sasrec &&
-      python scripts/execute_notebooks.py --profile full --only 3_3_2_din &&
-      python scripts/execute_notebooks.py --profile full --only 3_3_3_dien &&
-      python scripts/execute_notebooks.py --profile full --only 3_4_1_mmoe &&
-      python scripts/execute_notebooks.py --profile full --only 3_4_2_ple &&
+      python scripts/execute_notebooks.py --profile full --only 5_2_dssm &&
+      python scripts/execute_notebooks.py --profile full --only 5_3_mind &&
+      python scripts/execute_notebooks.py --profile full --only 5_4_sasrec &&
+      python scripts/execute_notebooks.py --profile full --only 6_3_din &&
+      python scripts/execute_notebooks.py --profile full --only 6_4_dien &&
+      python scripts/execute_notebooks.py --profile full --only 7_2_mmoe &&
+      python scripts/execute_notebooks.py --profile full --only 7_3_ple &&
       python scripts/build_previews.py"
     environment:
       RECSYS_PROFILE: full

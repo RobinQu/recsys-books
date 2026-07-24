@@ -22,9 +22,9 @@ def test_resource_manifest_has_safe_unique_paths_and_resolvable_sources():
     assert kuai["url"].endswith("?download=1")
     assert "video_features_basic_pure.csv" in kuai["expected_members"]
     protocol = json.loads(Path("config/reproduction_protocols.json").read_text(encoding="utf-8"))
-    assert protocol["3_2_2_mind"]["resource"] == "amazon-books-2014-ratings"
-    assert protocol["3_2_3_sasrec"]["resource"] == "movielens-1m-full"
-    assert protocol["3_3_1_deepfm"]["resource"] == "criteo-x1-full"
+    assert protocol["5_3_mind"]["resource"] == "amazon-books-2014-ratings"
+    assert protocol["5_4_sasrec"]["resource"] == "movielens-1m-full"
+    assert protocol["6_2_deepfm"]["resource"] == "criteo-x1-full"
     dataset_ids = {item["id"] for kind, item in rows if kind == "datasets"}
     assert "aliccp-x1-full" not in dataset_ids
     criteo = next(item for kind, item in rows if kind == "datasets" and item["id"] == "criteo-x1-full")

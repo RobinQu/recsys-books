@@ -22,7 +22,7 @@ CLOSING = "阅读源码时按“张量形状 → 前向计算 → score → loss
 
 # slug -> (optional svg figure replacing the ```text block, new 公式到代码 body)
 SECTIONS: dict[str, tuple[str | None, str]] = {
-    "3_2_1_dssm": (
+    "5_2_dssm": (
         "![DSSM 双塔数据流：两塔独立编码，最后才计算相似度](/static/diagrams/flow-dssm.svg)",
         """### 公式到代码：一次前向传播发生了什么
 
@@ -36,7 +36,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 推理时不再需要损失：物品塔离线对全库计算 $v$ 并建立 ANN 索引；线上只运行用户塔一次，再查询最近邻。Notebook 中 `run_dssm` 用 Torch-RecHub 的 `DSSM` 模型类承载第 1–4 步（它内部就是“embedding 表 + 双塔 MLP”），训练循环、评估与索引导出由本章节代码完成。""",
     ),
-    "3_2_2_mind": (
+    "5_3_mind": (
         "![MIND 多兴趣数据流：动态路由把行为序列聚成 K 个兴趣向量](/static/diagrams/flow-mind.svg)",
         """### 公式到代码：一次前向传播发生了什么
 
@@ -48,7 +48,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_mind` 中 Torch-RecHub 的 `MIND`（内部为 `CapsuleNetwork`）实现第 2–4 步；序列截断、mask 与评估在本章节代码中。""",
     ),
-    "3_2_3_sasrec": (
+    "5_4_sasrec": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 
@@ -60,7 +60,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_sasrec` 用 Torch-RecHub 的 `SASRec` 实现第 1–4 步；序列窗口生成、负采样与指标计算在本章节代码中。""",
     ),
-    "3_3_1_deepfm": (
+    "6_2_deepfm": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 
@@ -72,7 +72,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_deepfm` 用 Torch-RecHub 的 `DeepFM` 实现第 1–5 步；field 构造与标签生成在本章节代码中。""",
     ),
-    "3_3_2_din": (
+    "6_3_din": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 
@@ -83,7 +83,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_din` 用 Torch-RecHub 的 `DIN` 实现第 1–4 步；历史截断、mask 与“只用当前曝光之前的行为”的防泄漏逻辑在本章节代码中。""",
     ),
-    "3_3_3_dien": (
+    "6_4_dien": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 
@@ -94,7 +94,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_dien` 用 Torch-RecHub 的 `DIEN` 实现第 1–4 步；正/负历史序列构造与 mask 在本章节代码中。""",
     ),
-    "3_4_1_mmoe": (
+    "7_2_mmoe": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 
@@ -105,7 +105,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_mmoe` 用 Torch-RecHub 的 `MMOE` 实现第 1–4 步；同一条曝光生成 click / long-view 两个真实标签的逻辑在本章节代码中。""",
     ),
-    "3_4_2_ple": (
+    "7_3_ple": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 
@@ -116,7 +116,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_ple` 用 Torch-RecHub 的 `PLE` 实现第 1–4 步；数据与标签与 MMoE 章节完全一致，便于对照结构差异。""",
     ),
-    "4_1_openonerec_practice": (
+    "8_2_openonerec_practice": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 
@@ -128,7 +128,7 @@ SECTIONS: dict[str, tuple[str | None, str]] = {
 
 `run_openonerec` 在教程规模下实现第 1–4 步的接口契约；官方完整训练配置与 IPA 流程在 OpenOneRec 框架中。""",
     ),
-    "4_2_dlrm_hstu_practice": (
+    "8_3_dlrm_hstu_practice": (
         None,
         """### 公式到代码：一次前向传播发生了什么
 

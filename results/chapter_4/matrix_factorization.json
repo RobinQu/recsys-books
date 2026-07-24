@@ -1,0 +1,14 @@
+{
+  "records": [
+    {
+      "algorithm": "BiasMF",
+      "task": "评分预测",
+      "metric": "RMSE ↓",
+      "value": 1.1905284314110052,
+      "secondary_metric": "HR@10",
+      "secondary_value": 0.20833333333333334,
+      "online_inference": "user/item 向量内积",
+      "source_notebook": "4_3_matrix_factorization"
+    }
+  ]
+}

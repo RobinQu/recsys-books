@@ -33,23 +33,57 @@ from recsys_lab.resources import RESOURCE_ROOT, ensure_resources
 
 ROOT = Path(__file__).resolve().parents[1]
 LEGACY_NOTEBOOKS = {
-    "3_1_classic_models": "3_1_summary",
-    "3_1_overview": "3_1_summary",
-    "3_2_retrieval_dssm_mind": "3_2_summary",
-    "3_3_ranking_deepfm_din_dien": "3_3_summary",
-    "3_4_multitask_mmoe_ple": "3_4_summary",
-    "3_0_1_data_and_experiment_pipeline": "3_0_7_data_pipeline",
-    "3_0_data_pipeline": "3_0_7_data_pipeline",
-    "4_1_generative_overview": "4_3_generative_summary",
-    "4_2_openonerec_practice": "4_1_openonerec_practice",
-    "4_3_dlrm_hstu_practice": "4_2_dlrm_hstu_practice",
-    "4_4_generative_summary": "4_3_generative_summary",
-    "a_4_1_data_ml_basics": "3_0_1_data_ml_basics",
-    "a_4_2_linear_algebra": "3_0_2_linear_algebra",
-    "a_4_3_calculus": "3_0_3_calculus",
-    "a_4_4_probability_statistics": "3_0_4_probability_statistics",
-    "a_4_5_optimization": "3_0_6_optimization",
-    "a_4_6_information_theory": "3_0_5_information_theory",
+    "3_1_classic_models": "4_7_classic_summary",
+    "3_1_overview": "4_7_classic_summary",
+    "3_2_retrieval_dssm_mind": "5_5_retrieval_summary",
+    "3_3_ranking_deepfm_din_dien": "6_5_ranking_summary",
+    "3_4_multitask_mmoe_ple": "7_4_multitask_summary",
+    "3_0_1_data_and_experiment_pipeline": "3_8_data_pipeline",
+    "3_0_data_pipeline": "3_8_data_pipeline",
+    "4_1_generative_overview": "8_4_generative_summary",
+    "4_2_openonerec_practice": "8_2_openonerec_practice",
+    "4_3_dlrm_hstu_practice": "8_3_dlrm_hstu_practice",
+    "4_4_generative_summary": "8_4_generative_summary",
+    "a_4_1_data_ml_basics": "3_2_data_ml_basics",
+    "a_4_2_linear_algebra": "3_3_linear_algebra",
+    "a_4_3_calculus": "3_4_calculus",
+    "a_4_4_probability_statistics": "3_5_probability_statistics",
+    "a_4_5_optimization": "3_7_optimization",
+    "a_4_6_information_theory": "3_6_information_theory",
+    # 章节重编号（旧两层/三层编号 -> 新两层编号）之前的 slug
+    "3_0_math_foundations": "3_1_math_foundations",
+    "3_0_1_data_ml_basics": "3_2_data_ml_basics",
+    "3_0_2_linear_algebra": "3_3_linear_algebra",
+    "3_0_3_calculus": "3_4_calculus",
+    "3_0_4_probability_statistics": "3_5_probability_statistics",
+    "3_0_5_information_theory": "3_6_information_theory",
+    "3_0_6_optimization": "3_7_optimization",
+    "3_0_7_data_pipeline": "3_8_data_pipeline",
+    "3_1_0_classic_foundations": "4_1_classic_foundations",
+    "3_1_1_collaborative_filtering": "4_2_collaborative_filtering",
+    "3_1_2_matrix_factorization": "4_3_matrix_factorization",
+    "3_1_3_factorization_machine": "4_4_factorization_machine",
+    "3_1_4_gbdt_lr": "4_5_gbdt_lr",
+    "3_1_5_word2vec": "4_6_word2vec",
+    "3_1_summary": "4_7_classic_summary",
+    "3_2_0_retrieval_foundations": "5_1_retrieval_foundations",
+    "3_2_1_dssm": "5_2_dssm",
+    "3_2_2_mind": "5_3_mind",
+    "3_2_3_sasrec": "5_4_sasrec",
+    "3_2_summary": "5_5_retrieval_summary",
+    "3_3_0_ranking_foundations": "6_1_ranking_foundations",
+    "3_3_1_deepfm": "6_2_deepfm",
+    "3_3_2_din": "6_3_din",
+    "3_3_3_dien": "6_4_dien",
+    "3_3_summary": "6_5_ranking_summary",
+    "3_4_0_multitask_foundations": "7_1_multitask_foundations",
+    "3_4_1_mmoe": "7_2_mmoe",
+    "3_4_2_ple": "7_3_ple",
+    "3_4_summary": "7_4_multitask_summary",
+    "4_0_generative_foundations": "8_1_generative_foundations",
+    "4_1_openonerec_practice": "8_2_openonerec_practice",
+    "4_2_dlrm_hstu_practice": "8_3_dlrm_hstu_practice",
+    "4_3_generative_summary": "8_4_generative_summary",
 }
 @asynccontextmanager
 async def lifespan(application: FastAPI):
@@ -137,7 +171,7 @@ def index(request: Request):
 def legacy_chapter_redirect(slug: str):
     """Compatibility only: categories live on the home page, not on a third page level."""
     if slug == "transformer":
-        return RedirectResponse("/notebooks/3_2_0_retrieval_foundations", status_code=307)
+        return RedirectResponse("/notebooks/5_1_retrieval_foundations", status_code=307)
     chapter = CHAPTERS.get(slug)
     if chapter is None:
         raise HTTPException(404, "Unknown chapter")

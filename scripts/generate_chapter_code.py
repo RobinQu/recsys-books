@@ -14,65 +14,65 @@ from app.content import CHAPTER_CODE_NOTEBOOK_KINDS, NOTEBOOKS
 OUTPUT = ROOT / "chapter_code"
 
 MODEL_IMPORTS = {
-    "3_2_1_dssm": ("torch_rechub.models.matching", "DSSM"),
-    "3_2_2_mind": ("torch_rechub.models.matching", "MIND"),
-    "3_2_3_sasrec": ("torch_rechub.models.matching", "SASRec"),
-    "3_3_1_deepfm": ("torch_rechub.models.ranking", "DeepFM"),
-    "3_3_2_din": ("torch_rechub.models.ranking", "DIN"),
-    "3_3_3_dien": ("torch_rechub.models.ranking", "DIEN"),
-    "3_4_1_mmoe": ("torch_rechub.models.multi_task", "MMOE"),
-    "3_4_2_ple": ("torch_rechub.models.multi_task", "PLE"),
-    "4_2_dlrm_hstu_practice": ("torch_rechub.models.generative", "HSTUModel"),
+    "5_2_dssm": ("torch_rechub.models.matching", "DSSM"),
+    "5_3_mind": ("torch_rechub.models.matching", "MIND"),
+    "5_4_sasrec": ("torch_rechub.models.matching", "SASRec"),
+    "6_2_deepfm": ("torch_rechub.models.ranking", "DeepFM"),
+    "6_3_din": ("torch_rechub.models.ranking", "DIN"),
+    "6_4_dien": ("torch_rechub.models.ranking", "DIEN"),
+    "7_2_mmoe": ("torch_rechub.models.multi_task", "MMOE"),
+    "7_3_ple": ("torch_rechub.models.multi_task", "PLE"),
+    "8_3_dlrm_hstu_practice": ("torch_rechub.models.generative", "HSTUModel"),
 }
 
 RUNNERS = {
-    "3_2_1_dssm": "run_dssm", "3_2_2_mind": "run_mind", "3_2_3_sasrec": "run_sasrec",
-    "3_3_1_deepfm": "run_deepfm", "3_3_2_din": "run_din", "3_3_3_dien": "run_dien",
-    "3_4_1_mmoe": "run_mmoe", "3_4_2_ple": "run_ple",
-    "4_1_openonerec_practice": "run_openonerec", "4_2_dlrm_hstu_practice": "run_hstu",
+    "5_2_dssm": "run_dssm", "5_3_mind": "run_mind", "5_4_sasrec": "run_sasrec",
+    "6_2_deepfm": "run_deepfm", "6_3_din": "run_din", "6_4_dien": "run_dien",
+    "7_2_mmoe": "run_mmoe", "7_3_ple": "run_ple",
+    "8_2_openonerec_practice": "run_openonerec", "8_3_dlrm_hstu_practice": "run_hstu",
 }
 
 RUN_BLOCKS = {
-    "3_2_1_dssm": ["run_dssm"],
-    "3_2_2_mind": ["_mind_rows", "run_mind"],
-    "3_2_3_sasrec": ["_sequence_windows_from_sequences", "run_sasrec"],
-    "3_3_1_deepfm": ["_ranking_fields", "run_deepfm"],
-    "3_3_2_din": ["_run_sequence_ranker", "run_din"],
-    "3_3_3_dien": ["_run_sequence_ranker", "run_dien"],
-    "3_4_1_mmoe": ["_multitask_view", "_run_multitask", "run_mmoe"],
-    "3_4_2_ple": ["_multitask_view", "_run_multitask", "run_ple"],
-    "4_1_openonerec_practice": ["_semantic_catalog", "run_openonerec"],
-    "4_2_dlrm_hstu_practice": ["_sequence_windows_from_sequences", "run_hstu"],
+    "5_2_dssm": ["run_dssm"],
+    "5_3_mind": ["_mind_rows", "run_mind"],
+    "5_4_sasrec": ["_sequence_windows_from_sequences", "run_sasrec"],
+    "6_2_deepfm": ["_ranking_fields", "run_deepfm"],
+    "6_3_din": ["_run_sequence_ranker", "run_din"],
+    "6_4_dien": ["_run_sequence_ranker", "run_dien"],
+    "7_2_mmoe": ["_multitask_view", "_run_multitask", "run_mmoe"],
+    "7_3_ple": ["_multitask_view", "_run_multitask", "run_ple"],
+    "8_2_openonerec_practice": ["_semantic_catalog", "run_openonerec"],
+    "8_3_dlrm_hstu_practice": ["_sequence_windows_from_sequences", "run_hstu"],
 }
 
 TRAIN_IMPORTS = {
-    "3_2_1_dssm": "from torch_rechub.basic.features import SparseFeature\nfrom torch_rechub.models.matching import DSSM",
-    "3_2_2_mind": "from torch_rechub.basic.features import SequenceFeature, SparseFeature\nfrom torch_rechub.models.matching import MIND",
-    "3_2_3_sasrec": "from torch_rechub.basic.features import SequenceFeature\nfrom torch_rechub.models.matching import SASRec",
-    "3_3_1_deepfm": "from sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import log_loss\nfrom torch_rechub.basic.features import SparseFeature\nfrom torch_rechub.models.ranking import DeepFM",
-    "3_3_2_din": "from sklearn.metrics import log_loss\nfrom torch_rechub.basic.features import SequenceFeature, SparseFeature\nfrom torch_rechub.models.ranking import DIN",
-    "3_3_3_dien": "from sklearn.metrics import log_loss\nfrom torch_rechub.basic.features import SequenceFeature, SparseFeature\nfrom torch_rechub.models.ranking import DIEN",
-    "3_4_1_mmoe": "from sklearn.linear_model import LogisticRegression\nfrom torch_rechub.basic.features import DenseFeature\nfrom torch_rechub.models.multi_task import MMOE",
-    "3_4_2_ple": "from sklearn.linear_model import LogisticRegression\nfrom torch_rechub.basic.features import DenseFeature\nfrom torch_rechub.models.multi_task import PLE",
-    "4_1_openonerec_practice": "from .model import TinyListGenerator",
-    "4_2_dlrm_hstu_practice": "from torch_rechub.models.generative import HSTUModel",
+    "5_2_dssm": "from torch_rechub.basic.features import SparseFeature\nfrom torch_rechub.models.matching import DSSM",
+    "5_3_mind": "from torch_rechub.basic.features import SequenceFeature, SparseFeature\nfrom torch_rechub.models.matching import MIND",
+    "5_4_sasrec": "from torch_rechub.basic.features import SequenceFeature\nfrom torch_rechub.models.matching import SASRec",
+    "6_2_deepfm": "from sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import log_loss\nfrom torch_rechub.basic.features import SparseFeature\nfrom torch_rechub.models.ranking import DeepFM",
+    "6_3_din": "from sklearn.metrics import log_loss\nfrom torch_rechub.basic.features import SequenceFeature, SparseFeature\nfrom torch_rechub.models.ranking import DIN",
+    "6_4_dien": "from sklearn.metrics import log_loss\nfrom torch_rechub.basic.features import SequenceFeature, SparseFeature\nfrom torch_rechub.models.ranking import DIEN",
+    "7_2_mmoe": "from sklearn.linear_model import LogisticRegression\nfrom torch_rechub.basic.features import DenseFeature\nfrom torch_rechub.models.multi_task import MMOE",
+    "7_3_ple": "from sklearn.linear_model import LogisticRegression\nfrom torch_rechub.basic.features import DenseFeature\nfrom torch_rechub.models.multi_task import PLE",
+    "8_2_openonerec_practice": "from .model import TinyListGenerator",
+    "8_3_dlrm_hstu_practice": "from torch_rechub.models.generative import HSTUModel",
 }
 
 MODEL_GUIDES = {
-    "3_2_1_dssm": ["user tower 与 item tower 分别编码，才能离线预计算物品向量", "两个塔输出同维向量，余弦/内积越大表示偏好越强", "训练使用点击标签；线上召回用用户向量查询 ANN 索引"],
-    "3_2_2_mind": ["行为序列先经动态路由聚成多个兴趣向量", "每个兴趣向量独立召回，最后合并候选", "label-aware attention 只用于训练时选择与目标物品最相关的兴趣"],
-    "3_2_3_sasrec": ["因果 mask 保证位置 t 只能读取过去行为", "位置编码保存行为顺序，self-attention 选择相关历史", "最后位置的隐藏状态作为 next-item 召回用户向量"],
-    "3_3_1_deepfm": ["FM 分支显式计算一阶与二阶交叉", "DNN 分支学习更高阶非线性交互", "两条分支共享 embedding，避免同一特征学习两套不一致表示"],
-    "3_3_2_din": ["候选物品作为 query，对历史行为逐条计算相关性", "加权历史表示会随候选变化", "拼接用户、候选与兴趣表示后预测点击概率"],
-    "3_3_3_dien": ["GRU 从行为序列提取逐时刻兴趣状态", "辅助损失要求相邻兴趣能够区分真实下一行为和负样本", "AUGRU 用候选相关性控制兴趣状态更新"],
-    "3_4_1_mmoe": ["多个 expert 学习不同共享模式", "每个任务的 gate 生成独立专家权重", "任务 tower 只读取自己的混合结果并输出对应目标"],
-    "3_4_2_ple": ["共享 expert 与任务专属 expert 明确分开", "每层 gate 控制信息流向，减少不相关任务的负迁移", "多层渐进抽取后再进入各任务 tower"],
-    "4_1_openonerec_practice": ["item 先被编码为多级 Semantic ID", "生成器逐 token 输出推荐列表", "解码时必须用合法目录约束，避免生成不存在的物品"],
-    "4_2_dlrm_hstu_practice": ["item embedding 将高基数 ID 映射为稠密向量", "HSTU block 针对非平稳长行为流建模", "每个位置预测下一物品，最后位置用于在线推荐"],
+    "5_2_dssm": ["user tower 与 item tower 分别编码，才能离线预计算物品向量", "两个塔输出同维向量，余弦/内积越大表示偏好越强", "训练使用点击标签；线上召回用用户向量查询 ANN 索引"],
+    "5_3_mind": ["行为序列先经动态路由聚成多个兴趣向量", "每个兴趣向量独立召回，最后合并候选", "label-aware attention 只用于训练时选择与目标物品最相关的兴趣"],
+    "5_4_sasrec": ["因果 mask 保证位置 t 只能读取过去行为", "位置编码保存行为顺序，self-attention 选择相关历史", "最后位置的隐藏状态作为 next-item 召回用户向量"],
+    "6_2_deepfm": ["FM 分支显式计算一阶与二阶交叉", "DNN 分支学习更高阶非线性交互", "两条分支共享 embedding，避免同一特征学习两套不一致表示"],
+    "6_3_din": ["候选物品作为 query，对历史行为逐条计算相关性", "加权历史表示会随候选变化", "拼接用户、候选与兴趣表示后预测点击概率"],
+    "6_4_dien": ["GRU 从行为序列提取逐时刻兴趣状态", "辅助损失要求相邻兴趣能够区分真实下一行为和负样本", "AUGRU 用候选相关性控制兴趣状态更新"],
+    "7_2_mmoe": ["多个 expert 学习不同共享模式", "每个任务的 gate 生成独立专家权重", "任务 tower 只读取自己的混合结果并输出对应目标"],
+    "7_3_ple": ["共享 expert 与任务专属 expert 明确分开", "每层 gate 控制信息流向，减少不相关任务的负迁移", "多层渐进抽取后再进入各任务 tower"],
+    "8_2_openonerec_practice": ["item 先被编码为多级 Semantic ID", "生成器逐 token 输出推荐列表", "解码时必须用合法目录约束，避免生成不存在的物品"],
+    "8_3_dlrm_hstu_practice": ["item embedding 将高基数 ID 映射为稠密向量", "HSTU block 针对非平稳长行为流建模", "每个位置预测下一物品，最后位置用于在线推荐"],
 }
 
 CLASSIC_MODELS = {
-    "3_1_1_collaborative_filtering": '''import numpy as np
+    "4_2_collaborative_filtering": '''import numpy as np
 
 class ItemCF:
     """Item-based collaborative filtering using cosine similarity."""
@@ -91,7 +91,7 @@ class ItemCF:
         # 用户历史 × 物品相似度表，得到该用户对所有候选物品的分数。
         return np.asarray(interactions, dtype=np.float64) @ self.similarity
 ''',
-    "3_1_2_matrix_factorization": '''import torch
+    "4_3_matrix_factorization": '''import torch
 
 class BiasMF(torch.nn.Module):
     """Global mean + user/item bias + latent-vector inner product."""
@@ -109,7 +109,7 @@ class BiasMF(torch.nn.Module):
         interaction = (self.user_embedding(user_id) * self.item_embedding(item_id)).sum(-1)
         return self.global_mean + self.user_bias(user_id).squeeze(-1) + self.item_bias(item_id).squeeze(-1) + interaction
 ''',
-    "3_1_3_factorization_machine": '''import torch
+    "4_4_factorization_machine": '''import torch
 
 class FactorizationMachine(torch.nn.Module):
     """Linear term plus all second-order feature interactions in O(kd)."""
@@ -126,7 +126,7 @@ class FactorizationMachine(torch.nn.Module):
         pairwise = 0.5 * ((vectors.sum(1) ** 2 - (vectors ** 2).sum(1)).sum(1))
         return linear + pairwise
 ''',
-    "3_1_4_gbdt_lr": '''from sklearn.ensemble import GradientBoostingClassifier
+    "4_5_gbdt_lr": '''from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 
 def build_models(seed=2026):
@@ -134,7 +134,7 @@ def build_models(seed=2026):
     # GBDT 负责非线性分桶/组合；训练后应把叶节点编号 one-hot 化再输入 LR。
     return GradientBoostingClassifier(random_state=seed), LogisticRegression(max_iter=300)
 ''',
-    "3_1_5_word2vec": '''import torch
+    "4_6_word2vec": '''import torch
 
 class SkipGram(torch.nn.Module):
     """Skip-gram with negative sampling: a center item predicts its context items."""
@@ -182,7 +182,7 @@ MODEL_CLASS = {name}
 def model_class():
     return MODEL_CLASS
 '''
-    if slug == "4_1_openonerec_practice":
+    if slug == "8_2_openonerec_practice":
         return '''"""Small list generator used to explain OpenOneRec's list-level objective."""
 import torch
 
@@ -261,7 +261,7 @@ def train_and_evaluate(epochs: int = 4) -> dict:
     """Small default for learning/CI; increase epochs for the full experiment."""
     return {runner}(epochs=epochs)
 '''
-    if slug.startswith("3_1_"):
+    if slug.startswith("4_"):
         return '''"""Classic-model experiment entry on MovieLens."""
 from recsys_lab.experiments import run_classic
 
@@ -331,7 +331,7 @@ def test_training_pipeline_returns_observed_results():
     assert result.get("randomly_fabricated_rows", 0) == 0
 ''',
     }
-    if slug in {"4_1_openonerec_practice", "4_2_dlrm_hstu_practice"}:
+    if slug in {"8_2_openonerec_practice", "8_3_dlrm_hstu_practice"}:
         files["test_model.py"] = '''"""CUDA-first chapter test with an explicit CPU-only basic fallback."""
 import torch
 from train import train_and_evaluate

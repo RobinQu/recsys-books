@@ -26,14 +26,14 @@ def test_notebook_kind_schema_is_explicit_and_visible_in_catalogue():
     assert set(CHAPTER_CODE_NOTEBOOK_KINDS) == {"foundation", "algorithm", "summary"}
     assert set(NOTEBOOK_KIND_LABELS) == {"foundation", "algorithm", "summary", "curriculum"}
     assert [notebook["slug"] for notebook in NOTEBOOKS[:8]] == [
-        "3_0_math_foundations",
-        "3_0_1_data_ml_basics",
-        "3_0_2_linear_algebra",
-        "3_0_3_calculus",
-        "3_0_4_probability_statistics",
-        "3_0_5_information_theory",
-        "3_0_6_optimization",
-        "3_0_7_data_pipeline",
+        "3_1_math_foundations",
+        "3_2_data_ml_basics",
+        "3_3_linear_algebra",
+        "3_4_calculus",
+        "3_5_probability_statistics",
+        "3_6_information_theory",
+        "3_7_optimization",
+        "3_8_data_pipeline",
     ]
     assert [notebook["kind"] for notebook in NOTEBOOKS[:8]] == [
         "foundation", "curriculum", "curriculum", "curriculum",
@@ -75,7 +75,7 @@ def test_curriculum_page_uses_course_source_instead_of_chapter_code():
 
 
 def test_unknown_notebook_hash_checks_the_iframe_before_switching_tabs():
-    html = client.get("/notebooks/3_2_1_dssm").text
+    html = client.get("/notebooks/5_2_dssm").text
     function = html.split("function focusPreviewAnchor(anchor)", 1)[1].split(
         "function applyLocationHash()", 1
     )[0]
@@ -102,24 +102,24 @@ def test_home_contains_required_sections():
     for token in ["DSSM", "MIND", "DeepFM", "DIN", "DIEN", "MMoE", "PLE", "SASRec", "BERT4Rec", "OpenOneRec", "DLRM HSTU"]:
         assert token in html
     assert "<iframe" not in html
-    assert "/notebooks/3_1_0_classic_foundations" in html
-    assert "/notebooks/3_2_0_retrieval_foundations" in html
-    assert "/notebooks/3_3_0_ranking_foundations" in html
-    assert "/notebooks/3_4_0_multitask_foundations" in html
-    assert "/notebooks/3_2_3_sasrec" in html
-    assert "/notebooks/4_0_generative_foundations" in html
+    assert "/notebooks/4_1_classic_foundations" in html
+    assert "/notebooks/5_1_retrieval_foundations" in html
+    assert "/notebooks/6_1_ranking_foundations" in html
+    assert "/notebooks/7_1_multitask_foundations" in html
+    assert "/notebooks/5_4_sasrec" in html
+    assert "/notebooks/8_1_generative_foundations" in html
     assert "/chapters/" not in html
-    assert "/notebooks/3_1_1_collaborative_filtering" in html
-    assert "/notebooks/3_2_1_dssm" in html
-    assert "/notebooks/3_3_1_deepfm" in html
-    assert "/notebooks/3_4_1_mmoe" in html
+    assert "/notebooks/4_2_collaborative_filtering" in html
+    assert "/notebooks/5_2_dssm" in html
+    assert "/notebooks/6_2_deepfm" in html
+    assert "/notebooks/7_2_mmoe" in html
     assert "先把公式翻译成可以手算的直觉" in html
     assert 'class="sidebar-subnav"' in html
-    assert "/notebooks/4_1_openonerec_practice" in html
-    assert "/notebooks/4_2_dlrm_hstu_practice" in html
+    assert "/notebooks/8_2_openonerec_practice" in html
+    assert "/notebooks/8_3_dlrm_hstu_practice" in html
     assert "查看 33 个 Notebook" in html
-    assert "/notebooks/3_0_7_data_pipeline" in html
-    assert "/notebooks/3_0_1_data_ml_basics" in html
+    assert "/notebooks/3_8_data_pipeline" in html
+    assert "/notebooks/3_2_data_ml_basics" in html
     assert "Amazon Reviews 2023" in html and "KuaiRand" in html
     assert "开源数据集清单" in html
     assert 'href="/papers/deepfm"' in html
@@ -135,15 +135,15 @@ def test_full_and_smoke_dataset_protocols_are_explicit_in_catalogue_and_headers(
     from app import content
 
     affected = {
-        "3_2_1_dssm": ("full：Amazon Books 5-core 迁移", "smoke：Amazon 真实切片"),
-        "3_2_2_mind": ("full：Amazon Books 2014 10-core", "smoke：Amazon 真实切片"),
-        "3_2_3_sasrec": ("full：MovieLens-1M 论文协议", "smoke：Amazon 真实切片"),
-        "3_3_1_deepfm": ("full：Criteo", "smoke：KuaiRand-Pure is_click"),
-        "3_3_2_din": ("full：Amazon Electronics", "smoke：KuaiRand feed 序列"),
-        "3_3_3_dien": ("full：Amazon Electronics", "smoke：KuaiRand feed 序列"),
-        "3_4_1_mmoe": ("full：Census-Income", "smoke：KuaiRand 双目标"),
-        "3_4_2_ple": ("full：Census-Income", "smoke：KuaiRand 双目标"),
-        "4_2_dlrm_hstu_practice": ("full：Meta MovieLens-20M + Amazon Books", "smoke：KuaiRand feed 序列"),
+        "5_2_dssm": ("full：Amazon Books 5-core 迁移", "smoke：Amazon 真实切片"),
+        "5_3_mind": ("full：Amazon Books 2014 10-core", "smoke：Amazon 真实切片"),
+        "5_4_sasrec": ("full：MovieLens-1M 论文协议", "smoke：Amazon 真实切片"),
+        "6_2_deepfm": ("full：Criteo", "smoke：KuaiRand-Pure is_click"),
+        "6_3_din": ("full：Amazon Electronics", "smoke：KuaiRand feed 序列"),
+        "6_4_dien": ("full：Amazon Electronics", "smoke：KuaiRand feed 序列"),
+        "7_2_mmoe": ("full：Census-Income", "smoke：KuaiRand 双目标"),
+        "7_3_ple": ("full：Census-Income", "smoke：KuaiRand 双目标"),
+        "8_3_dlrm_hstu_practice": ("full：Meta MovieLens-20M + Amazon Books", "smoke：KuaiRand feed 序列"),
     }
     notebooks = {notebook["slug"]: notebook for notebook in content.NOTEBOOKS}
     for slug, phrases in affected.items():
@@ -165,16 +165,16 @@ def test_math_map_covers_all_models_with_valid_acyclic_curriculum_links():
     curriculum = {n["slug"] for n in NOTEBOOKS if n["kind"] == "curriculum"}
     algorithms = {n["slug"] for n in NOTEBOOKS if n["kind"] == "algorithm"}
     assert curriculum == {
-        "3_0_1_data_ml_basics", "3_0_2_linear_algebra", "3_0_3_calculus",
-        "3_0_4_probability_statistics", "3_0_5_information_theory", "3_0_6_optimization",
+        "3_2_data_ml_basics", "3_3_linear_algebra", "3_4_calculus",
+        "3_5_probability_statistics", "3_6_information_theory", "3_7_optimization",
     }
     expected_anchors = {
-        "3_0_1_data_ml_basics": {"observation-label", "implicit-feedback", "split-leakage"},
-        "3_0_2_linear_algebra": {"tensors-shapes", "elementwise-dot", "matmul-embedding", "low-rank-attention"},
-        "3_0_3_calculus": {"functions", "derivative-gradient", "chain-rule"},
-        "3_0_4_probability_statistics": {"random-variable", "conditional-chain", "expectation-variance", "likelihood-calibration"},
-        "3_0_5_information_theory": {"information-entropy", "cross-entropy-kl", "softmax-temperature", "sequence-nll-dpo"},
-        "3_0_6_optimization": {"sgd", "learning-rate", "regularization", "gradient-conflict"},
+        "3_2_data_ml_basics": {"observation-label", "implicit-feedback", "split-leakage"},
+        "3_3_linear_algebra": {"tensors-shapes", "elementwise-dot", "matmul-embedding", "low-rank-attention"},
+        "3_4_calculus": {"functions", "derivative-gradient", "chain-rule"},
+        "3_5_probability_statistics": {"random-variable", "conditional-chain", "expectation-variance", "likelihood-calibration"},
+        "3_6_information_theory": {"information-entropy", "cross-entropy-kl", "softmax-temperature", "sequence-nll-dpo"},
+        "3_7_optimization": {"sgd", "learning-rate", "regularization", "gradient-conflict"},
     }
     assert {
         slug: {item["anchor"] for item in MATH_PREREQUISITES if item["notebook"] == slug}
@@ -260,10 +260,10 @@ def test_page_context_exposes_default_and_six_focused_knowledge_graph_views():
 
 def test_legacy_chapter_routes_redirect_to_math_openings():
     expected = {
-        "foundations": "3_0_math_foundations", "classic": "3_1_0_classic_foundations",
-        "retrieval": "3_2_0_retrieval_foundations", "ranking": "3_3_0_ranking_foundations",
-        "multitask": "3_4_0_multitask_foundations", "transformer": "3_2_0_retrieval_foundations",
-        "generative": "4_0_generative_foundations",
+        "foundations": "3_1_math_foundations", "classic": "4_1_classic_foundations",
+        "retrieval": "5_1_retrieval_foundations", "ranking": "6_1_ranking_foundations",
+        "multitask": "7_1_multitask_foundations", "transformer": "5_1_retrieval_foundations",
+        "generative": "8_1_generative_foundations",
     }
     for chapter, opening in expected.items():
         response = client.get(f"/chapters/{chapter}", follow_redirects=False)
@@ -273,13 +273,13 @@ def test_legacy_chapter_routes_redirect_to_math_openings():
 
 def test_legacy_math_routes_redirect_to_published_3_0_curriculum():
     expected = {
-        "3_0_data_pipeline": "3_0_7_data_pipeline",
-        "a_4_1_data_ml_basics": "3_0_1_data_ml_basics",
-        "a_4_2_linear_algebra": "3_0_2_linear_algebra",
-        "a_4_3_calculus": "3_0_3_calculus",
-        "a_4_4_probability_statistics": "3_0_4_probability_statistics",
-        "a_4_5_optimization": "3_0_6_optimization",
-        "a_4_6_information_theory": "3_0_5_information_theory",
+        "3_0_data_pipeline": "3_8_data_pipeline",
+        "a_4_1_data_ml_basics": "3_2_data_ml_basics",
+        "a_4_2_linear_algebra": "3_3_linear_algebra",
+        "a_4_3_calculus": "3_4_calculus",
+        "a_4_4_probability_statistics": "3_5_probability_statistics",
+        "a_4_5_optimization": "3_7_optimization",
+        "a_4_6_information_theory": "3_6_information_theory",
     }
     for old, new in expected.items():
         detail = client.get(f"/notebooks/{old}", follow_redirects=False)
@@ -294,12 +294,12 @@ def test_legacy_math_routes_redirect_to_published_3_0_curriculum():
 
 
 def test_notebook_preview_uses_application_shell_and_raw_content_route():
-    slug = "3_1_1_collaborative_filtering"
+    slug = "4_2_collaborative_filtering"
     response = client.get(f"/notebooks/{slug}")
     assert response.status_code == 200
     html = response.text
     assert "RecSys Atlas" in html
-    assert "返回 3.1 导读与数学基础" not in html
+    assert "返回 4.1 导读与数学基础" not in html
     assert "notebook-breadcrumb" not in html
     for label in ["论文导读", "实验预览", "可交互执行", "代码实现", "独立 IDE"]:
         assert label in html
@@ -317,22 +317,22 @@ def test_notebook_preview_uses_application_shell_and_raw_content_route():
 
 def test_home_and_detail_share_the_same_global_navigation():
     home = client.get("/").text
-    detail = client.get("/notebooks/3_2_1_dssm").text
-    for token in ["搜索模型", "启动实验室 ↗", "召回 × 排序演进", "发展历程综述", "附录", "论文清单", "数据集清单", "Notebook 清单"]:
+    detail = client.get("/notebooks/5_2_dssm").text
+    for token in ["搜索模型", "启动实验室 ↗", "导读", "附录", "论文清单", "数据集清单", "Notebook 清单"]:
         assert token in home and token in detail
     assert "框架选型" not in home and "框架选型" not in detail
     assert home.count('<header class="topbar">') == detail.count('<header class="topbar">') == 1
     assert home.count('<aside class="sidebar"') == detail.count('<aside class="sidebar"') == 1
-    assert 'href="/notebooks/3_2_1_dssm" class="active" aria-current="page"' in detail
-    assert 'href="/notebooks/3_2_1_dssm" class="active" aria-current="page"' not in home
+    assert 'href="/notebooks/5_2_dssm" class="active" aria-current="page"' in detail
+    assert 'href="/notebooks/5_2_dssm" class="active" aria-current="page"' not in home
 
 
 def test_dssm_preview_contains_model_structure_and_formula_derivation():
-    shell = client.get("/notebooks/3_2_1_dssm").text
+    shell = client.get("/notebooks/5_2_dssm").text
     for mode in ["paper", "preview", "execute", "source"]:
         assert f'data-mode="{mode}"' in shell
     assert "run_dssm" in shell and "_real_amazon" in shell
-    content = client.get("/notebooks/3_2_1_dssm/content")
+    content = client.get("/notebooks/5_2_dssm/content")
     assert content.status_code == 200
     for token in ["Model Structure &amp; Formula Walkthrough", "结构：两条独立编码路径", "从相似度到训练目标", "temperature", "[B,N]"]:
         assert token in content.text
@@ -346,15 +346,15 @@ def test_detail_pages_render_modes_and_paper_guide_by_role():
 
     no_guide = {n["slug"] for n in NOTEBOOKS if not notebook_has_paper_guide(n["slug"])}
     assert no_guide == {
-        "3_0_math_foundations", "3_0_1_data_ml_basics", "3_0_2_linear_algebra",
-        "3_0_3_calculus", "3_0_4_probability_statistics", "3_0_5_information_theory",
-        "3_0_6_optimization", "3_0_7_data_pipeline",
-        "3_1_0_classic_foundations", "3_2_0_retrieval_foundations",
-        "3_3_0_ranking_foundations", "3_4_0_multitask_foundations",
-        "4_0_generative_foundations",
+        "3_1_math_foundations", "3_2_data_ml_basics", "3_3_linear_algebra",
+        "3_4_calculus", "3_5_probability_statistics", "3_6_information_theory",
+        "3_7_optimization", "3_8_data_pipeline",
+        "4_1_classic_foundations", "5_1_retrieval_foundations",
+        "6_1_ranking_foundations", "7_1_multitask_foundations",
+        "8_1_generative_foundations",
         # 总结章节在 notebook 内做跨论文比较，不再显示论文导读 tab
-        "3_1_summary", "3_2_summary", "3_3_summary", "3_4_summary",
-        "4_3_generative_summary",
+        "4_7_classic_summary", "5_5_retrieval_summary", "6_5_ranking_summary", "7_4_multitask_summary",
+        "8_4_generative_summary",
     }
     for notebook in NOTEBOOKS:
         slug = notebook["slug"]
@@ -386,16 +386,16 @@ def test_detail_pages_render_modes_and_paper_guide_by_role():
 
 def test_generative_interactive_mode_follows_cuda_capability(monkeypatch):
     monkeypatch.setenv("RECSYS_CUDA_AVAILABLE", "0")
-    html = client.get("/notebooks/4_1_openonerec_practice").text
+    html = client.get("/notebooks/8_2_openonerec_practice").text
     assert 'data-mode="execute" disabled aria-disabled="true"' in html
     assert "未检测到 CUDA" in html and "此实验需要 CUDA" in html
-    assert "/lab/tree/notebooks/4_1_openonerec_practice.ipynb" not in html
+    assert "/lab/tree/notebooks/8_2_openonerec_practice.ipynb" not in html
 
     monkeypatch.setenv("RECSYS_CUDA_AVAILABLE", "1")
-    html = client.get("/notebooks/4_1_openonerec_practice").text
+    html = client.get("/notebooks/8_2_openonerec_practice").text
     assert 'data-mode="execute" disabled' not in html
     assert "CUDA 已就绪" in html
-    assert "/lab/tree/notebooks/4_1_openonerec_practice.ipynb" in html
+    assert "/lab/tree/notebooks/8_2_openonerec_practice.ipynb" in html
 
 
 def test_cuda_compose_override_builds_cuda_image_and_exposes_gpu():
@@ -435,7 +435,7 @@ def test_embedded_paper_reader_is_viewer_only():
     assert "paper-embedded" in embedded and 'id="pdf-viewer"' in embedded
     for chrome in ['class="topbar"', 'class="sidebar"', 'class="paper-head"', 'class="active-citation"']:
         assert chrome not in embedded
-    shell = client.get("/notebooks/3_2_1_dssm").text
+    shell = client.get("/notebooks/5_2_dssm").text
     assert "evidence=fig1-dssm&embedded=1" in shell
 
 
@@ -452,27 +452,27 @@ def test_notebook_shell_unknown_slug_returns_404():
 
 def test_preview_iframe_retargets_internal_links_to_the_top_page():
     """Site-internal links inside the preview must not nest the app shell."""
-    shell = client.get("/notebooks/3_0_math_foundations").text
+    shell = client.get("/notebooks/3_1_math_foundations").text
     iframe = re.search(r'<iframe id="notebook-preview-frame"[^>]*>', shell).group(0)
     assert "allow-top-navigation-by-user-activation" in iframe
     assert "allow-popups" in iframe
 
-    content = client.get("/notebooks/3_0_math_foundations/content").text
+    content = client.get("/notebooks/3_1_math_foundations/content").text
     assert 'id="recsys-preview-link-targets"' in content
     assert "anchor.target = '_top'" in content
     assert "anchor.target = '_blank'" in content
-    # 3.0 overview really does link to the 3.0.1 curriculum page
-    assert '/notebooks/3_0_1_data_ml_basics#observation-label' in content
+    # 3.0 overview really does link to the 3.2 curriculum page
+    assert '/notebooks/3_2_data_ml_basics#observation-label' in content
 
 
 def test_embedded_notebook_page_hides_application_chrome():
-    embedded = client.get("/notebooks/3_0_1_data_ml_basics", params={"embedded": 1}).text
+    embedded = client.get("/notebooks/3_2_data_ml_basics", params={"embedded": 1}).text
     assert 'class="notebook-shell-page embedded"' in embedded
     # default tab degrades to the preview panel
     assert 'data-mode="preview"' in embedded
-    assert 'src="/notebooks/3_0_1_data_ml_basics/content"' in embedded
+    assert 'src="/notebooks/3_2_data_ml_basics/content"' in embedded
 
-    full = client.get("/notebooks/3_0_1_data_ml_basics").text
+    full = client.get("/notebooks/3_2_data_ml_basics").text
     assert 'class="notebook-shell-page"' in full
 
     # iframe self-detection safety net + embedded CSS rules
@@ -483,10 +483,10 @@ def test_embedded_notebook_page_hides_application_chrome():
 
 
 def test_source_is_a_detail_tab_instead_of_a_separate_page():
-    response = client.get("/source/3_2_1_dssm", follow_redirects=False)
+    response = client.get("/source/5_2_dssm", follow_redirects=False)
     assert response.status_code == 307
-    assert response.headers["location"] == "/notebooks/3_2_1_dssm#source"
-    html = client.get("/notebooks/3_2_1_dssm").text
+    assert response.headers["location"] == "/notebooks/5_2_dssm#source"
+    html = client.get("/notebooks/5_2_dssm").text
     for token in ["Notebook 公用代码", "本章节独立目录", "Torch-RecHub 框架源码", "model.py", "train.py", "inference.py", "test_model.py", "dssm.py", "match_trainer.py", "run_dssm", "在 IDE 中打开章节目录"]:
         assert token in html
     assert 'class="source-code"' in html and 'class="kn"' in html
@@ -495,12 +495,12 @@ def test_source_is_a_detail_tab_instead_of_a_separate_page():
 
 
 def test_ide_route_opens_the_chapter_directory():
-    response = client.get("/ide/3_2_1_dssm", follow_redirects=False)
+    response = client.get("/ide/5_2_dssm", follow_redirects=False)
     assert response.status_code == 303
-    assert response.headers["location"] == "http://localhost:8090/?folder=/home/coder/project/chapter_code/3_2_1_dssm&goto=/home/coder/project/chapter_code/3_2_1_dssm/train.py:1:1"
-    pipeline = client.get("/ide/3_0_7_data_pipeline", follow_redirects=False)
+    assert response.headers["location"] == "http://localhost:8090/?folder=/home/coder/project/chapter_code/5_2_dssm&goto=/home/coder/project/chapter_code/5_2_dssm/train.py:1:1"
+    pipeline = client.get("/ide/3_8_data_pipeline", follow_redirects=False)
     assert pipeline.status_code == 303
-    assert "chapter_code/3_0_7_data_pipeline" in pipeline.headers["location"]
+    assert "chapter_code/3_8_data_pipeline" in pipeline.headers["location"]
     legacy_pipeline = client.get("/ide/3_0_data_pipeline", follow_redirects=False)
     assert legacy_pipeline.headers["location"] == pipeline.headers["location"]
     assert client.get("/ide/not-a-notebook").status_code == 404
@@ -577,13 +577,13 @@ def test_widgets_code_wrapping_and_theme_support_are_packaged():
 
 def test_algorithm_implementations_are_chapter_local():
     local_expectations = {
-        "3_2_2_mind": "def _mind_rows",
-        "3_2_3_sasrec": "def _sequence_windows_from_sequences",
-        "3_3_1_deepfm": "def _ranking_fields",
-        "3_3_2_din": "def _run_sequence_ranker",
-        "3_4_1_mmoe": "def _run_multitask",
-        "4_1_openonerec_practice": "def _semantic_catalog",
-        "4_2_dlrm_hstu_practice": "def _sequence_windows_from_sequences",
+        "5_3_mind": "def _mind_rows",
+        "5_4_sasrec": "def _sequence_windows_from_sequences",
+        "6_2_deepfm": "def _ranking_fields",
+        "6_3_din": "def _run_sequence_ranker",
+        "7_2_mmoe": "def _run_multitask",
+        "8_2_openonerec_practice": "def _semantic_catalog",
+        "8_3_dlrm_hstu_practice": "def _sequence_windows_from_sequences",
     }
     for slug, token in local_expectations.items():
         source = (Path("chapter_code") / slug / "train.py").read_text(encoding="utf-8")
